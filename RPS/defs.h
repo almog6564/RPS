@@ -12,7 +12,9 @@ typedef enum _pieceType
 	SCISSORS,
 	BOMB,
 	JOKER,
-	FLAG
+	FLAG,
+
+	PIECE_COUNT
 
 } ePieceType;
 

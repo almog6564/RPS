@@ -1,6 +1,7 @@
 #include "board.h"
-#include "piece.h"
 #include <iostream>
+#include "cstdio"
+#include "cstdlib"
 
 using namespace std;
 

@@ -3,9 +3,7 @@
 #define _BOARD_
 
 #include "piece.h"
-#include "cstdio"
-#include "cstdlib"
-#include <iostream>
+
 
 using namespace std;
 
