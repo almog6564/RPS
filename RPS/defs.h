@@ -4,7 +4,7 @@
 
 typedef unsigned int UINT;
 
-typedef enum _pieceType
+typedef enum _ePieceType
 {
 	UNDEF,
 	ROCK,
@@ -18,7 +18,7 @@ typedef enum _pieceType
 
 } ePieceType;
 
-typedef enum _score
+typedef enum _eScore
 {
 	WIN,
 	LOSE,
@@ -26,7 +26,6 @@ typedef enum _score
 	ERROR
 
 } eScore;
-
 
 
 
