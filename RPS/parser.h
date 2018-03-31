@@ -43,12 +43,17 @@ public:
 class PlayerFileContext
 {
 public:
-	FileContext* pieces;
+	FileContext * pieces;
 	FileContext* moves;
 
 	PlayerFileContext(std::string pieceFileName, std::string movesFileName);
 
 	eFileStatus getNextPiece(ePieceType* type, UINT* x, UINT* y, ePieceType* jokerType);
+
+	eFileStatus getNextMove(UINT* fromX, UINT* fromY, UINT* toX, UINT* toY,
+							bool* isJoker, UINT* jokerX, UINT* jokerY,
+							ePieceType* newRep);
+
 };
 
 class FileParser
