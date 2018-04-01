@@ -52,19 +52,18 @@ eScore Board::movePieceAndMatch(UINT fromX, UINT fromY, UINT toX, UINT toY)
 	}
 
 	p1 = getPieceAt(fromX, fromY);
-
-	if (!p1)
+	if (!p1) //Piece was not found
 	{
 		printf("movePieceAndMatch: no piece at fromX <%d> fromY <%d>", fromX, fromY);
 		return ERROR;
 	}
 
 	p2 = getPieceAt(toX, toY);
-	if (!p2)
+	if (!p2) //Piece was not found
 	{
 		table[toY][toX] = p1;
 		table[fromY][fromX] = NULL;
-
+		return ERROR; //not an actual error
 	}
 	else //piece found at cell, MATCH!
 	{
@@ -89,10 +88,9 @@ eScore Board::movePieceAndMatch(UINT fromX, UINT fromY, UINT toX, UINT toY)
 		default: //ERROR
 			cout << "invalid match result" << endl;
 			return ERROR;
-
 		}
-
 	}
+	return score;
 }
 
 Board::~Board()

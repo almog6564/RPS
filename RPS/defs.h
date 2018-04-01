@@ -24,9 +24,17 @@ typedef enum _score
 	LOSE,
 	TIE,
 	ERROR
-
 } eScore;
 
+/*
+typedef struct _move
+{
+	UINT fromX;
+	UINT fromY;
+	UINT toX;
+	UINT toY;
+} sMove;
+*/
 
 
 
