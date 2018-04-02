@@ -53,16 +53,7 @@ int Board::positionPieace(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, U
 	{
 		table[toY][toX] = p;
 		if (!moved) //first positioning
-		{
-			//player->setPosition();
-			player->setTypeCount(type); //increase type count for positioning new piece
-			if (player->getTypeCount(type) > player->getTypeMax(type))
-			{
-				player->setHasLost();
-				player->setReason(BAD_POSITIONING_INPUT_FILE);
-				return -1;
-			}
-		}
+			return (player->updateTypeCount(type) == -1);
 		return 0; 
 	}
 	else //piece found at cell
@@ -81,8 +72,8 @@ int Board::positionPieace(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, U
 		{
 		case WIN:
 			removePiece(toX, toY);
-			//player->setPosition();
 			table[toY][toX] = p;
+			player->updateTypeCount(type);
 			break;
 
 		case LOSE:

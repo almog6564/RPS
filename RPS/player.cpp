@@ -76,3 +76,15 @@ void Player::setHasMoreMoves(bool val)
 	hasMoreMoves = val;
 }
 
+int Player::updateTypeCount(ePieceType type)
+{
+	pieceCounters[type]++;
+	if (pieceCounters[type] > getTypeMax(type))
+	{
+		hasLost = 1;
+		reason = BAD_POSITIONING_INPUT_FILE;
+		return -1;
+	}
+	return 0;
+}
+

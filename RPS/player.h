@@ -51,11 +51,6 @@ public:
 		return pieceCounters[type];
 	}
 
-	void setTypeCount(ePieceType type)
-	{
-		pieceCounters[type]++;
-	}
-
 	UINT getTypeMax(ePieceType type)
 	{
 		switch (type)
@@ -76,6 +71,9 @@ public:
 			return UNDEF;
 		}
 	}
+
+	int updateTypeCount(ePieceType type);
+
 
 
 };
