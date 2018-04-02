@@ -27,63 +27,25 @@ eScore Piece::match(Piece* p)
 	return s;
 }
 
-class Rock : Piece 
+bool Piece::isJoker()
 {
-	Rock(Player* owner) : Piece(ROCK, SCISSORS, owner) {};
-};
+	return false;
+}
 
-class Scissors : Piece
+Joker::Joker(ePieceType currentTypeArg, Player * owner): Piece(JOKER, UNDEF, owner)
 {
-	Scissors(Player* owner) : Piece(SCISSORS, PAPER, owner) {};
-};
+	currentType = currentTypeArg;	
+}
 
-class Paper : Piece
+int Joker::setCurrentType(ePieceType newType)
 {
-	Paper(Player* owner) : Piece(PAPER, ROCK, owner) {};
-};
-
-class Flag : Piece
-{
-	Flag(Player* owner) : Piece(ROCK, UNDEF, owner) {};
-};
-
-class Bomb : Piece
-{
-	Bomb(Player* owner) : Piece(ROCK, UNDEF, owner) {};
-};
-
-class Joker : Piece
-{
-	ePieceType currentType;
-
-public:
-	Joker(ePieceType currentTypeArg, Player* owner) : Piece(JOKER, UNDEF, owner)
+	if (newType == FLAG || newType == UNDEF || newType == JOKER)
 	{
-		currentType = currentTypeArg;
-	};
-
-	//override original function, so match function wouldn't have to know if its Joker
-	ePieceType getType()const
-	{
-		return currentType;
+		cout << "setCurrentType: invalid newType " << newType << endl;
+		return -1;
 	}
 
-	ePieceType getCurrentType()const
-	{
-		return currentType;
-	}
+	currentType = newType;
 
-	int setCurrentType(ePieceType newType)
-	{
-		if (newType == FLAG || newType == UNDEF || newType == JOKER)
-		{
-			cout << "setCurrentType: invalid newType " << newType << endl;
-			return -1;
-		}
-		
-		currentType = newType;
-
-		return 0;
-	}
-};
-
+	return 0;
+}

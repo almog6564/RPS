@@ -46,7 +46,7 @@ public:
 
 	void flagsCheck();
 
-	int getWinner();
+	int getWinner(eReason* reason);
 
 	~Game();
 
