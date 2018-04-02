@@ -104,6 +104,16 @@ int FileParser::initializeFiles()
 }
 
 
+PlayerFileContext* FileParser::getPlayerFileContext(int playerNumber)
+{
+	if (playerNumber == 0)
+		return p1;
+	if (playerNumber == 1)
+		return p2;
+
+	return NULL;
+}
+
 eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, ePieceType* jokerType)
 {
 	eFileStatus status = FILE_SUCCESS;

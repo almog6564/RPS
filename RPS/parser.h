@@ -67,6 +67,8 @@ public:
 		std::string p1MovesFileName, std::string p2MovesFilename);
 
 	int initializeFiles(void);
+
+	PlayerFileContext* getPlayerFileContext(int playerNumber);
 };
 
 #endif //_PARSER_
