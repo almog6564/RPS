@@ -17,7 +17,7 @@ int main()
 	Game* game = new Game(M, N, R, P, S, B, J, F,
 								R, P, S, B, J, F, p1p, p2p, p1m, p2m);
 	/* First positioning */
-	
+	game->positionAllPieces();
 
 	/* Check Flags counters*/
 	game->flagsCheck();
