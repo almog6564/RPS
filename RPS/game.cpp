@@ -5,7 +5,7 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	:M(M), N(N), R1(R1), P1(P1), S1(S1), B1(B1), J1(J1), F1(F1),
 				 R2(R2), P2(P2), S2(S2), B2(B2), J2(J2), F2(F2)
 {
-	board = new Board(M, N);
+	board = new Board(N, M);
 	player1 = new Player(R1, P1, S1, B1, J1, F1);
 	player2 = new Player(R2, P2, S2, B2, J2, F2);
 	turn = 0;
@@ -48,6 +48,17 @@ bool Game::endGame()
 		|| player2->getHasMoreMoves()))
 		return false;
 	return true;
+}
+
+void Game::positionAllPieces()
+{
+	/* Initialize temporary boolean array to check if theres pieces from the same player*/
+	bool** tmpBoard = new bool*[N];
+
+	for (int i = 0; i < N; i++)
+		tmpBoard[i] = new bool[M]();	//() initializes the elements to false
+
+	positionPieces(tmpBoard);
 }
 
 void Game::flagsCheck()
