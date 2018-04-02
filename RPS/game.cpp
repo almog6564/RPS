@@ -99,16 +99,6 @@ void Game::positionPlayerPieces(Player* p, bool** tmpBoard)
 			else
 			{
 				tmpBoard[y][x] = true;
-				piece = createNewPiece(p, type, jokerType);
-				if (!piece)
-				{
-					//this can happen only if charToPiece got invalid character
-					p->setHasLost();
-					p->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
-					break;
-				}
-
-				board->positionPiece(piece, x, y, 0);
 			}
 			break;
 		}

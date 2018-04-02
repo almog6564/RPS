@@ -175,6 +175,11 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 			*jokerType = charToPiece(typeTmp);
 			*x = xTmp;
 			*y = yTmp;
+
+			if(*jokerType == UNDEF)
+			{
+				status = FILE_BAD_FORMAT;
+			}
 			break;
 		}
 
@@ -197,6 +202,11 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 		*x = xTmp;
 		*y = yTmp;
 		*jokerType = UNDEF; //joker type undefined
+
+		if (*type == UNDEF || *type == JOKER)
+		{
+			status = FILE_BAD_FORMAT;
+		}
 		break;
 
 	} while (false);
@@ -312,6 +322,12 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 	} while (false);
 
 	return status;
+}
+
+void PlayerFileContext::setPieceFileToStart()
+{
+	pieces->file.clear();
+	pieces->file.seekg(0, ios::beg);
 }
 
 
