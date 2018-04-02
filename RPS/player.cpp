@@ -52,7 +52,7 @@ bool Player::isAlive()
 
 bool Player::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY)
 {
-	// if next move exists in file, update pointers and return true, else return false
+	
 	return true;
 }
 
@@ -87,5 +87,10 @@ int Player::updateTypeCount(ePieceType type)
 		return -1;
 	}
 	return 0;
+}
+
+PlayerFileContext * Player::getPlayerFileContext()
+{
+	return fileContext;
 }
 

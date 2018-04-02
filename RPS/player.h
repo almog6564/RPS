@@ -76,6 +76,8 @@ public:
 
 	int updateTypeCount(ePieceType type);
 
+	PlayerFileContext* getPlayerFileContext();
+
 
 
 };
