@@ -22,7 +22,8 @@ public:
 	Player(UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext);
 	void decCounter(ePieceType type);
 	bool isAlive();
-	bool getNextMove(UINT* fromX, UINT* fromY, UINT* toX, UINT* toY);
+	bool getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
+		UINT * jokerX, UINT * jokerY, ePieceType* newRep);
 	bool getNextPosition(ePieceType* type, UINT* toX, UINT* toY);
 	void updateScore();
 	bool getHasMoreMoves();

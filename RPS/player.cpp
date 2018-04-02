@@ -50,10 +50,23 @@ bool Player::isAlive()
 	return true;
 }
 
-bool Player::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY)
+bool Player::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
+						 UINT * jokerX, UINT * jokerY, ePieceType* newRep)
 {
-	
-	return true;
+	eFileStatus status = fileContext->getNextMove(fromX, fromY, toX, toY, isJoker, jokerX, jokerY, newRep);
+	if (status == FILE_SUCCESS)
+		return true;
+	if (status == FILE_EOF_REACHED)
+		return false;
+	if (status == FILE_BAD_FORMAT)
+	{
+		hasLost = 1;
+		reason = BAD_MOVES_INPUT_FILE;
+		return false;
+	}
+	if (status == FILE_ERROR)
+		return false;
+	return true; //should never get here
 }
 
 bool Player::getNextPosition(ePieceType* type, UINT * toX, UINT * toY)

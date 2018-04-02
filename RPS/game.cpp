@@ -14,20 +14,27 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 void Game::runMove()
 {
 	if (turn == 0) //player 1's turn
-		runSingleMove(player1, player2);
+		runSingleMove(player1);
 	else //player 2's turn
-		runSingleMove(player2, player1);
+		runSingleMove(player2);
 	turn += 1 % 2;
 }
 
-void Game::runSingleMove(Player* player, Player* against)
+void Game::runSingleMove(Player* player)
 {
 	UINT fromX, fromY, toX, toY;
+	bool isJoker;
+	UINT jokerX, jokerY;
+	ePieceType newRep;
 
 	if (player->getHasMoreMoves())
 	{
-		if (player->getNextMove(&fromX, &fromY, &toX, &toY))
+		if (player->getNextMove(&fromX, &fromY, &toX, &toY, &isJoker, &jokerX, &jokerY, &newRep))
+		{
 			board->movePiece(fromX, fromY, toX, toY);
+			if (isJoker)
+				board->changeJokerType(jokerX, jokerY, newRep);
+		}
 		else
 			player->setHasMoreMoves(false);
 	}
@@ -111,6 +118,22 @@ void Game::positionPlayerPieces(Player* p, PlayerFileContext* pfc, bool** tmpBoa
 			break;
 		}
 	}
+}
+
+void Game::positionPiece(int player)
+{
+	if (player == 0)
+		positionSinglePiece(player1);
+	else
+		positionSinglePiece(player2);
+}
+
+void Game::positionSinglePiece(Player* player)
+{
+	ePieceType type, jokerType;
+	UINT x, y;
+	player->getPlayerFileContext->getNextPiece(&type, &x, &y, &jokerType);
+		
 }
 
 void Game::flagsCheck()

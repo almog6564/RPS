@@ -26,8 +26,12 @@ class Game
 	FileParser* fileParser;
 	int turn; //0=player1, 1=player2
 	
-	void runSingleMove(Player* player, Player* against);
+	void runSingleMove(Player* player);
+
 	void checkPlayersFlags(Player* player);
+
+	void positionSinglePiece(Player* player);
+
 
 public:
 	Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
@@ -39,7 +43,8 @@ public:
 
 	bool positioningDone();
 
-	void positionSinglePiece();
+	void positionPiece(int player);
+
 
 	void flagsCheck();
 
@@ -47,7 +52,7 @@ public:
 
 	void positionAllPieces();
 private:
-	void positionPlayerPieces(Player* p, PlayerFileContext* pfc, bool** tmpBoard)
+	void positionPlayerPieces(Player* p, PlayerFileContext* pfc, bool** tmpBoard);
 };
 
 
