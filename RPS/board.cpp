@@ -104,6 +104,7 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 	return 0;
 }
 
+
 int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
 {
 	Piece* p1;
@@ -127,6 +128,33 @@ int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
 	{
 		return -1;
 	}
+	return 0;
+}
+
+int Board::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
+{
+	Piece* p1;
+
+	if (fromX >= cols || fromY >= rows)
+	{
+		cout << "changeJokerType: Illegal dimensions" << endl;
+		return ERROR;
+	}
+
+	p1 = getPieceAt(fromX, fromY);
+	if (!p1) //Piece was not found
+	{
+		printf("changeJokerType: no piece at fromX <%d> fromY <%d>", fromX, fromY);
+		return -1;
+	}
+
+	if (!p1->isJoker())
+	{
+		printf("changeJokerType: piece at fromX <%d> fromY <%d> is not a Joker", fromX, fromY);
+		return -1;
+	}
+
+	((Joker*)p1)->setCurrentType(newType);
 	return 0;
 }
 

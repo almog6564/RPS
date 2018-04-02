@@ -9,7 +9,7 @@ Player::Player(UINT R, UINT P, UINT S, UINT B, UINT J, UINT F) : R(R), P(P), S(S
 	movingPiecesCtr = R + P + S + B + J;
 	score = 0;
 	hasMoreMoves = true;
-	hasLost = 0;
+	hasLost = false;
 }
 
 void Player::decCounter(ePieceType type)
@@ -32,9 +32,21 @@ void Player::decCounter(ePieceType type)
 
 bool Player::isAlive()
 {
-	if (pieceCounters[FLAG] > 0 && movingPiecesCtr > 0 && !hasLost) 
-		return true;
-	return false;
+	if (pieceCounters[FLAG] == 0)
+	{
+		hasLost = 1;
+		reason = FLAGS_CAPTURED;
+		return false;
+	}
+	if (movingPiecesCtr == 0)
+	{
+		hasLost = 1;
+		reason = PIECES_EATEN;
+		return false;
+	}
+	if (hasLost)
+		return false;
+	return true;
 }
 
 bool Player::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY)

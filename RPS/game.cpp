@@ -107,4 +107,37 @@ void Game::flagsCheck()
 	checkPlayersFlags(player2);
 }
 
+int Game::getWinner(eReason* reason)
+{
+	if (player1->getHasLost() && !player2->getHasLost())
+	{
+		*reason = player1->getReason();
+		return 2; //player2 wins
+	}
+	if (!player1->getHasLost() && player2->getHasLost())
+	{
+		*reason = player2->getReason();
+		return 1; //player1 wins
+	}
+	//TIE scenarios:
+	if (!player1->getHasMoreMoves() && !player2->getHasMoreMoves())
+	{
+		*reason = MOVES_INPUT_FILES_DONE;
+		return 0;
+	}
+	if (player1->getReason() == BAD_POSITIONING_INPUT_FILE &&
+		player2->getReason() == BAD_POSITIONING_INPUT_FILE)
+	{
+		*reason = BAD_POSITIONING_INPUT_FILE;
+		return 0;
+	}
+	
+	if (player1->getTypeCount(FLAG) == 0 && player2->getTypeCount(FLAG) == 0)
+	{
+		*reason = BOTH_BAD_POSITIONING_INPUT_FILE;
+		return 0;
+	}
+	return 0;
+}
+
 

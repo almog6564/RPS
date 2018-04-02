@@ -10,7 +10,7 @@ class Player
 	UINT pieceCounters[PIECE_COUNT];
 	UINT movingPiecesCtr; 
 	UINT score;
-	UINT hasLost;
+	bool hasLost;
 	UINT R, P, S, B, J, F;
 	eReason reason;
 	bool hasMoreMoves;
@@ -26,14 +26,14 @@ public:
 	bool getHasMoreMoves();
 	void setHasMoreMoves(bool val);
 
-	UINT getHasLost()const
+	bool getHasLost()const
 	{
 		return hasLost;
 	}
 
 	void setHasLost()
 	{
-		hasLost = 1;
+		hasLost = true;
 	}
 
 	eReason getReason()const
@@ -73,7 +73,7 @@ public:
 		case JOKER:
 			return J;
 		default:
-			break;
+			return UNDEF;
 		}
 	}
 

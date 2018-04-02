@@ -12,6 +12,7 @@ int main()
 	string p1m = "player1.rps_moves";
 	string p2p = "player2.rps_board";
 	string p2m = "player2.rps_moves";
+	eReason* reason;
 
 	Game* game = new Game(M, N, R, P, S, B, J, F,
 								R, P, S, B, J, F, p1p, p2p, p1m, p2m);
@@ -24,6 +25,7 @@ int main()
 	/* Start Game */
 	while (!game->endGame())
 		game->runMove();
+	game->getWinner(reason);
 
 	return 0;
 }
