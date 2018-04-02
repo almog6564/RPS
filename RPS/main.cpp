@@ -14,8 +14,16 @@ int main()
 	string p2m = "player2.rps_moves";
 	eReason* reason;
 
+	FileParser* fileParser = new FileParser(p1p, p2p, p1m, p2m);
+	if (fileParser->initializeFiles()) //initialization failed
+	{
+		//print error
+		return -1;
+	}
+
+
 	Game* game = new Game(M, N, R, P, S, B, J, F,
-								R, P, S, B, J, F, p1p, p2p, p1m, p2m);
+								R, P, S, B, J, F, fileParser);
 	/* First positioning */
 	game->positionAllPieces();
 
