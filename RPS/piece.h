@@ -42,26 +42,31 @@ public:
 
 class Rock : public Piece
 {
+public:
 	Rock(Player* owner) : Piece(ROCK, SCISSORS, owner) {};
 };
 
 class Scissors : public Piece
 {
+public:
 	Scissors(Player* owner) : Piece(SCISSORS, PAPER, owner) {};
 };
 
 class Paper : public Piece
 {
+public:
 	Paper(Player* owner) : Piece(PAPER, ROCK, owner) {};
 };
 
 class Flag : public Piece
 {
+public:
 	Flag(Player* owner) : Piece(ROCK, UNDEF, owner) {};
 };
 
 class Bomb : public Piece
 {
+public:
 	Bomb(Player* owner) : Piece(ROCK, UNDEF, owner) {};
 };
 

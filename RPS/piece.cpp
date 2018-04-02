@@ -54,18 +54,34 @@ int Joker::setCurrentType(ePieceType newType)
 	}
 };
 
-void createNewPiece(Piece** pPiece, Player* owner, ePieceType type, ePieceType jokerType)
+Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType)
 {
-	/*
+	Piece* p = NULL;
+
 	switch (type)
 	{
 	case ROCK:
-		*pPiece = new Rock(owner);
+		p = new Rock(owner);
+		break;
+	case PAPER:
+		p = new Paper(owner);
+		break;
+	case SCISSORS:
+		p = new Scissors(owner);
+		break;
+	case BOMB:
+		p = new Bomb(owner);
+		break;
+	case FLAG:
+		p = new Flag(owner);
+		break;
+	case JOKER:
+		p = new Joker(jokerType,owner);
+		break;
 	default:
 		break;
 	}
 
 	return p;
-	*/
 }
 

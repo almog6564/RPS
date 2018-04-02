@@ -43,7 +43,7 @@ public:
 class PlayerFileContext
 {
 public:
-	FileContext * pieces;
+	FileContext* pieces;
 	FileContext* moves;
 
 	PlayerFileContext(std::string pieceFileName, std::string movesFileName);
@@ -60,7 +60,7 @@ class FileParser
 {
 
 public:
-	PlayerFileContext * p1;
+	PlayerFileContext* p1;
 	PlayerFileContext* p2;
 
 	FileParser(std::string p1PiecesFileName, std::string p2PiecesFilename,

@@ -63,6 +63,11 @@ void Game::positionAllPieces()
 		tmpBoard[i] = new bool[M]();	//() initializes the elements to false
 
 	positionPlayerPieces(player1, fileParser->p1, tmpBoard);
+	positionPlayerPieces(player2, fileParser->p2, tmpBoard);
+
+	if (player1->getHasLost())
+		player1->setReason(BAD_POSITIONING_INPUT_FILE);
+
 }
 
 void Game::positionPlayerPieces(Player* p, PlayerFileContext* pfc, bool** tmpBoard)
@@ -70,6 +75,7 @@ void Game::positionPlayerPieces(Player* p, PlayerFileContext* pfc, bool** tmpBoa
 	UINT x, y;
 	ePieceType type, jokerType;
 	eFileStatus status;
+	Piece* piece;
 
 	while (true)
 	{
@@ -83,18 +89,28 @@ void Game::positionPlayerPieces(Player* p, PlayerFileContext* pfc, bool** tmpBoa
 		case FILE_ERROR:
 		case FILE_BAD_FORMAT:
 			p->setHasLost();
+			p->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
 			break;
 
 		case FILE_SUCCESS:
 			if (tmpBoard[y, x])
 			{
 				p->setHasLost();
+				p->setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
 			}
 			else
 			{
 				tmpBoard[y][x] = true;
-				board->positionPiece(new Rock(type,)
+				piece = createNewPiece(p, type, jokerType);
+				if (!piece)
+				{
+					//this can happen only if charToPiece got invalid character
+					p->setHasLost();
+					p->setReason()
+					break;
+				}
 
+				board->positionPiece(piece, x, y, 0);
 			}
 			break;
 		}
