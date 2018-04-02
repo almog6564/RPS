@@ -28,6 +28,8 @@ public:
 	void updateScore();
 	bool getHasMoreMoves();
 	void setHasMoreMoves(bool val);
+	int updateTypeCount(ePieceType type);
+	PlayerFileContext* getPlayerFileContext();
 
 	bool getHasLost()const
 	{
@@ -75,9 +77,7 @@ public:
 		}
 	}
 
-	int updateTypeCount(ePieceType type);
 
-	PlayerFileContext* getPlayerFileContext();
 
 
 

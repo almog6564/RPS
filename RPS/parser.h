@@ -54,6 +54,8 @@ public:
 							bool* isJoker, UINT* jokerX, UINT* jokerY,
 							ePieceType* newRep);
 
+	void setPieceFileToStart();
+
 };
 
 class FileParser
