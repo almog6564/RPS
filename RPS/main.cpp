@@ -1,5 +1,7 @@
 #include "game.h"
 
+#include "parser.h"
+
 
 int main()
 {
