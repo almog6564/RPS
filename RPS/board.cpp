@@ -39,7 +39,7 @@ void Board::removePiece(UINT col, UINT row)
 	table[row][col] = NULL;
 }
 
-int Board::positionPieace(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY)
+int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY)
 {
 	Piece* p2;
 	eScore score;
@@ -122,7 +122,7 @@ int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
 		return -1;
 	}
 
-	ret = positionPieace(p1, toX, toY, 1, fromX, fromY);
+	ret = positionPiece(p1, toX, toY, 1, fromX, fromY);
 	if (!ret)
 	{
 		return -1;

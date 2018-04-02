@@ -57,6 +57,8 @@ public:
 
 
 	void positionAllPieces();
+private:
+	void positionPlayerPieces(Player* p, PlayerFileContext* pfc, bool** tmpBoard)
 };
 
 

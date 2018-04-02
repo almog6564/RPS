@@ -4,6 +4,7 @@
 
 using namespace std;
 
+
 Piece::Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* playerOwner) :
 	type(typeArg), winAgainst(winAgainstArg), owner(playerOwner) {};
 
@@ -11,6 +12,8 @@ Piece::~Piece()
 {
 	owner->decCounter(type);
 }
+
+
 
 eScore Piece::match(Piece* p)
 {
@@ -86,4 +89,19 @@ public:
 		return 0;
 	}
 };
+
+void createNewPiece(Piece** pPiece, Player* owner, ePieceType type, ePieceType jokerType)
+{
+	/*
+	switch (type)
+	{
+	case ROCK:
+		*pPiece = new Rock(owner);
+	default:
+		break;
+	}
+
+	return p;
+	*/
+}
 

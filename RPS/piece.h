@@ -39,7 +39,7 @@ public:
 };
 
 
-
+Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType = UNDEF);
 
 
 

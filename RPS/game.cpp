@@ -62,7 +62,43 @@ void Game::positionAllPieces()
 	for (int i = 0; i < N; i++)
 		tmpBoard[i] = new bool[M]();	//() initializes the elements to false
 
-	positionPieces(tmpBoard);
+	positionPlayerPieces(player1, fileParser->p1, tmpBoard);
+}
+
+void Game::positionPlayerPieces(Player* p, PlayerFileContext* pfc, bool** tmpBoard)
+{
+	UINT x, y;
+	ePieceType type, jokerType;
+	eFileStatus status;
+
+	while (true)
+	{
+		status = pfc->getNextPiece(&type, &x, &y, &jokerType);
+
+		switch (status)
+		{
+		case FILE_EOF_REACHED:
+			return;
+
+		case FILE_ERROR:
+		case FILE_BAD_FORMAT:
+			p->setHasLost();
+			break;
+
+		case FILE_SUCCESS:
+			if (tmpBoard[y, x])
+			{
+				p->setHasLost();
+			}
+			else
+			{
+				tmpBoard[y][x] = true;
+				board->positionPiece(new Rock(type,)
+
+			}
+			break;
+		}
+	}
 }
 
 void Game::flagsCheck()
