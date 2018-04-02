@@ -1,13 +1,17 @@
 #include "game.h"
 
 Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
-						   UINT R2, UINT P2, UINT S2, UINT B2, UINT J2, UINT F2)
+						   UINT R2, UINT P2, UINT S2, UINT B2, UINT J2, UINT F2,
+	string p1PiecesFileName, string p2PiecesFilename, string p1MovesFileName, string p2MovesFilename)
 	:M(M), N(N), R1(R1), P1(P1), S1(S1), B1(B1), J1(J1), F1(F1),
-				 R2(R2), P2(P2), S2(S2), B2(B2), J2(J2), F2(F2)
+				 R2(R2), P2(P2), S2(S2), B2(B2), J2(J2), F2(F2),
+	p1PiecesFileName(p1PiecesFileName), p2PiecesFilename(p2PiecesFilename), 
+	p1MovesFileName(p1MovesFileName), p2MovesFilename(p2MovesFilename)
 {
 	board = new Board(N, M);
 	player1 = new Player(R1, P1, S1, B1, J1, F1);
 	player2 = new Player(R2, P2, S2, B2, J2, F2);
+	fileParser = new FileParser(p1PiecesFileName, p2PiecesFilename, p1MovesFileName, p2MovesFilename);
 	turn = 0;
 }
 
