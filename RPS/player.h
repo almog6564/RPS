@@ -2,6 +2,7 @@
 #define _PLAYER_
 
 #include "defs.h"
+#include "parser.h"
 #include <iostream>
 
 
@@ -14,10 +15,11 @@ class Player
 	UINT R, P, S, B, J, F;
 	eReason reason;
 	bool hasMoreMoves;
+	PlayerFileContext* fileContext;
 	
 
 public:
-	Player(UINT R, UINT P, UINT S, UINT B, UINT J, UINT F);
+	Player(UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext);
 	void decCounter(ePieceType type);
 	bool isAlive();
 	bool getNextMove(UINT* fromX, UINT* fromY, UINT* toX, UINT* toY);

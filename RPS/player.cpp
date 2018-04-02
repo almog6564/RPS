@@ -2,7 +2,8 @@
 
 using namespace std;
 
-Player::Player(UINT R, UINT P, UINT S, UINT B, UINT J, UINT F) : R(R), P(P), S(S), B(B), J(J), F(F)
+Player::Player(UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext) 
+	: R(R), P(P), S(S), B(B), J(J), F(F), fileContext(fileContext)
 {
 	pieceCounters[ROCK] = 0; pieceCounters[SCISSORS] = 0; pieceCounters[PAPER] = 0;
 	pieceCounters[BOMB] = 0; pieceCounters[JOKER] = 0; pieceCounters[FLAG] = 0;
