@@ -8,39 +8,52 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	board = new Board(M, N);
 	player1 = new Player(R1, P1, S1, B1, J1, F1);
 	player2 = new Player(R2, P2, S2, B2, J2, F2);
+	turn = 0;
 }
 
 void Game::runMove()
 {
-	runSingleMove(player1, player2);
-	runSingleMove(player2, player1);
+	if (turn == 0) //player 1's turn
+		runSingleMove(player1, player2);
+	else //player 2's turn
+		runSingleMove(player2, player1);
+	turn += 1 % 2;
 }
 
 void Game::runSingleMove(Player* player, Player* against)
 {
-	int fromX, fromY, toX, toY;
+	UINT fromX, fromY, toX, toY;
 
 	if (player->getHasMoreMoves())
 	{
 		if (player->getNextMove(&fromX, &fromY, &toX, &toY))
-			board->movePieceAndMatch(fromX, fromY, toX, toY);
+			board->movePiece(fromX, fromY, toX, toY);
 		else
 			player->setHasMoreMoves(false);
 	}
 }
 
+void Game::checkPlayersFlags(Player * player)
+{
+	if (player->getTypeCount(FLAG) != player->getTypeMax(FLAG))
+	{
+		player->setHasLost();
+		player->setReason(BAD_POSITIONING_INPUT_FILE);
+	}
+}
+
 bool Game::endGame()
 {
-	if (player1->isAlive() && player2->isAlive() && (player1->getHasMoreMoves() || player2->getHasMoreMoves()))
+	if (player1->isAlive() && player2->isAlive() && (player1->getHasMoreMoves() 
+		|| player2->getHasMoreMoves()))
 		return false;
 	return true;
 }
 
-
-
-Game::~Game()
+void Game::flagsCheck()
 {
-	delete player1;
-	delete player2;
-	delete board;
+	checkPlayersFlags(player1);
+	checkPlayersFlags(player2);
 }
+
+

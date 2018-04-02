@@ -39,11 +39,75 @@ void Board::removePiece(UINT col, UINT row)
 	table[row][col] = NULL;
 }
 
-eScore Board::movePieceAndMatch(UINT fromX, UINT fromY, UINT toX, UINT toY)
+int Board::positionPieace(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY)
 {
-	Piece* p1;
 	Piece* p2;
 	eScore score;
+	Player*  player;
+	ePieceType type;
+
+	type = p->getType();
+	player = p->getOwner();
+	p2 = getPieceAt(toX, toY);
+	if (!p2) //Piece was not found
+	{
+		table[toY][toX] = p;
+		if (!moved) //first positioning
+		{
+			//player->setPosition();
+			player->setTypeCount(type); //increase type count for positioning new piece
+			if (player->getTypeCount(type) > player->getTypeMax(type))
+			{
+				player->setHasLost();
+				player->setReason(BAD_POSITIONING_INPUT_FILE);
+				return -1;
+			}
+		}
+		return 0; 
+	}
+	else //piece found at cell
+	{
+		if (player == p2->getOwner())
+		{
+			//both pieces belong to same player
+			player->setHasLost();
+			player->setReason(BAD_MOVES_INPUT_FILE);
+			return -1; 
+		}
+
+		//pieces belong to different players, MATCH!
+		score = p->match(p2);
+		switch (score)
+		{
+		case WIN:
+			removePiece(toX, toY);
+			//player->setPosition();
+			table[toY][toX] = p;
+			break;
+
+		case LOSE:
+			if (moved)
+				removePiece(fromX, fromY);
+			break;
+
+		case TIE:
+			if (moved)
+				removePiece(fromX, fromY);
+			removePiece(toX, toY);
+			break;
+
+		default: //ERROR
+			cout << "invalid match result" << endl;
+			return -1;
+		}
+	}
+	return 0;
+}
+
+int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
+{
+	Piece* p1;
+	int ret;
 
 	if (fromX >= cols || fromY >= rows || toX >= cols || toY >= rows)
 	{
@@ -55,42 +119,15 @@ eScore Board::movePieceAndMatch(UINT fromX, UINT fromY, UINT toX, UINT toY)
 	if (!p1) //Piece was not found
 	{
 		printf("movePieceAndMatch: no piece at fromX <%d> fromY <%d>", fromX, fromY);
-		return ERROR;
+		return -1;
 	}
 
-	p2 = getPieceAt(toX, toY);
-	if (!p2) //Piece was not found
+	ret = positionPieace(p1, toX, toY, 1, fromX, fromY);
+	if (!ret)
 	{
-		table[toY][toX] = p1;
-		table[fromY][fromX] = NULL;
-		return ERROR; //not an actual error
+		return -1;
 	}
-	else //piece found at cell, MATCH!
-	{
-		score = p1->match(p2);
-		switch (score)
-		{
-		case WIN:
-			removePiece(toX, toY);
-			table[toY][toX] = p1;
-			table[fromY][fromX] = NULL;
-			break;
-
-		case LOSE:
-			removePiece(fromX, fromY);
-			break;
-
-		case TIE:
-			removePiece(fromX, fromY);
-			removePiece(toX, toY);
-			break;
-
-		default: //ERROR
-			cout << "invalid match result" << endl;
-			return ERROR;
-		}
-	}
-	return score;
+	return 0;
 }
 
 Board::~Board()

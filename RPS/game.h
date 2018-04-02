@@ -20,8 +20,10 @@ class Game
 	UINT M, N;
 	UINT R1, P1, S1, B1, J1, F1;
 	UINT R2, P2, S2, B2, J2, F2;
+	int turn; //0=player1, 1=player2
 	
 	void runSingleMove(Player* player, Player* against);
+	void checkPlayersFlags(Player* player);
 
 public:
 	Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
@@ -30,6 +32,12 @@ public:
 	void runMove();
 
 	bool endGame();
+
+	bool positioningDone();
+
+	void positionSinglePiece();
+
+	void flagsCheck();
 
 	int getWinner();
 

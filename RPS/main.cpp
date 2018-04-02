@@ -10,8 +10,10 @@ int main()
 	Game* game = new Game(M, N, R, P, S, B, J, F,
 								R, P, S, B, J, F);
 	/* First positioning */
+	
 
-
+	/* Check Flags counters*/
+	game->flagsCheck();
 
 	/* Start Game */
 	while (!game->endGame())

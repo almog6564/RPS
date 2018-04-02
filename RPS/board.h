@@ -28,7 +28,9 @@ public:
 
 	void removePiece(UINT col, UINT row);
 
-	eScore movePieceAndMatch(UINT fromX, UINT fromY, UINT toX, UINT toY);
+	int positionPieace(Piece* p, UINT toX, UINT toY, int moved = 0, UINT fromX = 0, UINT fromY = 0);
+
+	int movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY);
 };
 
 
