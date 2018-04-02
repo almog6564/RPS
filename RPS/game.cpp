@@ -58,20 +58,22 @@ void Game::positionAllPieces()
 	for (int i = 0; i < N; i++)
 		tmpBoard[i] = new bool[M]();	//() initializes the elements to false
 
-	positionPlayerPieces(player1, fileParser->p1, tmpBoard);
-	positionPlayerPieces(player2, fileParser->p2, tmpBoard);
+	positionPlayerPieces(player1, tmpBoard);
 
-	if (player1->getHasLost())
-		player1->setReason(BAD_POSITIONING_INPUT_FILE);
+	for (int i = 0; i < N; i++)
+		for (int j = 0; j < M; j++)
+			tmpBoard[i][j] = false;
 
+	positionPlayerPieces(player2, tmpBoard);
 }
 
-void Game::positionPlayerPieces(Player* p, PlayerFileContext* pfc, bool** tmpBoard)
+void Game::positionPlayerPieces(Player* p, bool** tmpBoard)
 {
 	UINT x, y;
 	ePieceType type, jokerType;
 	eFileStatus status;
 	Piece* piece;
+	PlayerFileContext* pfc = p->getPlayerFileContext();
 
 	while (true)
 	{
@@ -102,7 +104,7 @@ void Game::positionPlayerPieces(Player* p, PlayerFileContext* pfc, bool** tmpBoa
 				{
 					//this can happen only if charToPiece got invalid character
 					p->setHasLost();
-					p->setReason()
+					p->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
 					break;
 				}
 
