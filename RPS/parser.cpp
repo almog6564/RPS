@@ -306,6 +306,7 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 
 
 /* Unit Test */
+/*
 int main()
 {
 	char* p1p = "player1.rps_board";
@@ -362,3 +363,4 @@ int main()
 
 	return 0;
 }
+*/

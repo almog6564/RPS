@@ -4,12 +4,12 @@
 
 using namespace std;
 
-Piece::Piece(ePieceType typeArg, ePieceType winAgainstArg, Player& playerOwner) :
+Piece::Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* playerOwner) :
 	type(typeArg), winAgainst(winAgainstArg), owner(playerOwner) {};
 
 Piece::~Piece()
 {
-	//owner.decCounter(type);
+	owner->decCounter(type);
 }
 
 eScore Piece::match(Piece* p)
@@ -29,27 +29,27 @@ eScore Piece::match(Piece* p)
 
 class Rock : Piece 
 {
-	Rock(Player& owner) : Piece(ROCK, SCISSORS, owner) {};
+	Rock(Player* owner) : Piece(ROCK, SCISSORS, owner) {};
 };
 
 class Scissors : Piece
 {
-	Scissors(Player& owner) : Piece(SCISSORS, PAPER, owner) {};
+	Scissors(Player* owner) : Piece(SCISSORS, PAPER, owner) {};
 };
 
 class Paper : Piece
 {
-	Paper(Player& owner) : Piece(PAPER, ROCK, owner) {};
+	Paper(Player* owner) : Piece(PAPER, ROCK, owner) {};
 };
 
 class Flag : Piece
 {
-	Flag(Player& owner) : Piece(ROCK, UNDEF, owner) {};
+	Flag(Player* owner) : Piece(ROCK, UNDEF, owner) {};
 };
 
 class Bomb : Piece
 {
-	Bomb(Player& owner) : Piece(ROCK, UNDEF, owner) {};
+	Bomb(Player* owner) : Piece(ROCK, UNDEF, owner) {};
 };
 
 class Joker : Piece
@@ -57,7 +57,7 @@ class Joker : Piece
 	ePieceType currentType;
 
 public:
-	Joker(ePieceType currentTypeArg, Player& owner) : Piece(JOKER, UNDEF, owner)
+	Joker(ePieceType currentTypeArg, Player* owner) : Piece(JOKER, UNDEF, owner)
 	{
 		currentType = currentTypeArg;
 	};
