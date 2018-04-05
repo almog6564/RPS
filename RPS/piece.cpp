@@ -22,9 +22,9 @@ eScore Piece::match(Piece* p)
 
 	if (type == p2type)
 		s = TIE;
-	else if (type == BOMB || p2type == winAgainst || p2type == FLAG)
+	else if (p2type == winAgainst || p2type == FLAG)
 		s = WIN;
-	else if (p2type == BOMB || type == p->getWinAgainst() || type == FLAG)
+	else if (type == p->getWinAgainst() || type == FLAG)
 		s = LOSE;
 
 	return s;
@@ -49,9 +49,7 @@ int Joker::setCurrentType(ePieceType newType)
 	}
 
 	currentType = newType;
-
-		return 0;
-	}
+	return 0;
 };
 
 Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType)

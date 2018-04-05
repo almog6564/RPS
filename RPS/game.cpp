@@ -45,7 +45,7 @@ void Game::checkPlayersFlags(Player * player)
 	if (player->getTypeCount(FLAG) != player->getTypeMax(FLAG))
 	{
 		player->setHasLost();
-		player->setReason(BAD_POSITIONING_INPUT_FILE);
+		player->setReason(BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER);
 	}
 }
 
@@ -57,75 +57,62 @@ bool Game::endGame()
 	return true;
 }
 
-void Game::positionAllPieces()
+int Game::validatePositionFiles()
 {
 	/* Initialize temporary boolean array to check if theres pieces from the same player*/
 	bool** tmpBoard = new bool*[N];
 
-	for (int i = 0; i < N; i++)
+	for (UINT i = 0; i < N; i++)
 		tmpBoard[i] = new bool[M]();	//() initializes the elements to false
 
-	positionPlayerPieces(player1, tmpBoard);
+	player1->validatePlayerPositions(tmpBoard);
 
-	for (int i = 0; i < N; i++)
-		for (int j = 0; j < M; j++)
+	for (UINT i = 0; i < N; i++)
+		for (UINT j = 0; j < M; j++)
 			tmpBoard[i][j] = false;
 
-	positionPlayerPieces(player2, tmpBoard);
+	player2->validatePlayerPositions(tmpBoard);
+
+	for (UINT i = 0; i < N; i++)
+		delete [] tmpBoard[i];
+
+	delete [] tmpBoard;
+
+	if (player1->getHasLost() || player2->getHasLost())
+		return -1;
+	return 0;
+
+
 }
 
-void Game::positionPlayerPieces(Player* p, bool** tmpBoard)
+void Game::resetPieceFiles()
 {
-	UINT x, y;
-	ePieceType type, jokerType;
-	eFileStatus status;
-	Piece* piece;
-	PlayerFileContext* pfc = p->getPlayerFileContext();
-
-	while (true)
-	{
-		status = pfc->getNextPiece(&type, &x, &y, &jokerType);
-
-		switch (status)
-		{
-		case FILE_EOF_REACHED:
-			return;
-
-		case FILE_ERROR:
-		case FILE_BAD_FORMAT:
-			p->setHasLost();
-			p->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
-			break;
-
-		case FILE_SUCCESS:
-			if (tmpBoard[y, x])
-			{
-				p->setHasLost();
-				p->setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
-			}
-			else
-			{
-				tmpBoard[y][x] = true;
-			}
-			break;
-		}
-	}
+	player1->getPlayerFileContext()->setPieceFileToStart();
+	player2->getPlayerFileContext()->setPieceFileToStart();
 }
 
-void Game::positionPiece(int player)
+
+int Game::positionPiece(int player)
 {
 	if (player == 0)
-		positionSinglePiece(player1);
+		return positionSinglePiece(player1);
 	else
-		positionSinglePiece(player2);
+		return positionSinglePiece(player2);
 }
 
-void Game::positionSinglePiece(Player* player)
+int Game::positionSinglePiece(Player* player)
 {
 	ePieceType type, jokerType;
 	UINT x, y;
-	player->getPlayerFileContext->getNextPiece(&type, &x, &y, &jokerType);
-		
+	if (!player->getNextPiece(&type, &x, &y, &jokerType))
+	{
+		Piece* p = createNewPiece(player, type, jokerType);
+		board->positionPiece(p, x, y);
+		return 0;
+	}
+	else
+		return -1;
+	
 }
 
 void Game::flagsCheck()
@@ -152,16 +139,18 @@ int Game::getWinner(eReason* reason)
 		*reason = MOVES_INPUT_FILES_DONE;
 		return 0;
 	}
+	//TODO getWinner both positioning scenario
+	/* 
 	if (player1->getReason() == BAD_POSITIONING_INPUT_FILE &&
 		player2->getReason() == BAD_POSITIONING_INPUT_FILE)
 	{
 		*reason = BOTH_BAD_POSITIONING_INPUT_FILE;
 		return 0;
 	}
-	
+	*/
 	if (player1->getTypeCount(FLAG) == 0 && player2->getTypeCount(FLAG) == 0)
 	{
-		*reason = BOTH_BAD_POSITIONING_INPUT_FILE;
+		*reason = BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER;
 		return 0;
 	}
 	return 0;

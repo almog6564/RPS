@@ -30,7 +30,7 @@ class Game
 
 	void checkPlayersFlags(Player* player);
 
-	void positionSinglePiece(Player* player);
+	int positionSinglePiece(Player* player);
 
 
 public:
@@ -43,16 +43,16 @@ public:
 
 	bool positioningDone();
 
-	void positionPiece(int player);
-
+	int positionPiece(int player);
 
 	void flagsCheck();
 
 	int getWinner(eReason* reason);
 
-	void positionAllPieces();
-private:
-	void positionPlayerPieces(Player* p, bool** tmpBoard)
+	int validatePositionFiles();
+
+	void resetPieceFiles();
+
 };
 
 

@@ -66,6 +66,14 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 			return -1; 
 		}
 
+		if (type == BOMB || p2->getType() == BOMB)
+		{
+			removePiece(toX, toY);
+			if (moved)
+				removePiece(fromX, fromY);
+			return 0;
+		}
+
 		//pieces belong to different players, MATCH!
 		score = p->match(p2);
 		switch (score)
@@ -91,6 +99,7 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 			cout << "invalid match result" << endl;
 			return -1;
 		}
+
 	}
 	return 0;
 }

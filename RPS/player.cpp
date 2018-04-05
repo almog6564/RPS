@@ -54,25 +54,27 @@ bool Player::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, boo
 						 UINT * jokerX, UINT * jokerY, ePieceType* newRep)
 {
 	eFileStatus status = fileContext->getNextMove(fromX, fromY, toX, toY, isJoker, jokerX, jokerY, newRep);
-	if (status == FILE_SUCCESS)
-		return true;
-	if (status == FILE_EOF_REACHED)
-		return false;
-	if (status == FILE_BAD_FORMAT)
+	switch (status)
 	{
+	case FILE_SUCCESS:
+		return true;
+	case FILE_EOF_REACHED:
+	case FILE_ERROR:
+		return false;
+	case FILE_BAD_FORMAT:
 		hasLost = 1;
 		reason = BAD_MOVES_INPUT_FILE;
 		return false;
-	}
-	if (status == FILE_ERROR)
+	default:
 		return false;
-	return true; //should never get here
+	}
 }
 
-bool Player::getNextPosition(ePieceType* type, UINT * toX, UINT * toY)
+int Player::getNextPiece(ePieceType* type, UINT * toX, UINT * toY, ePieceType* jokerType)
 {
-	//update pointers
-	return true;
+	if (fileContext->getNextPiece(type, toX, toY, jokerType) != FILE_SUCCESS)
+		return -1;
+	return 0;
 }
 
 void Player::updateScore()
@@ -96,7 +98,7 @@ int Player::updateTypeCount(ePieceType type)
 	if (pieceCounters[type] > getTypeMax(type))
 	{
 		hasLost = 1;
-		reason = BAD_POSITIONING_INPUT_FILE;
+		reason = BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER;
 		return -1;
 	}
 	return 0;
@@ -106,4 +108,41 @@ PlayerFileContext * Player::getPlayerFileContext()
 {
 	return fileContext;
 }
+
+void Player::validatePlayerPositions(bool** tmpBoard)
+{
+	UINT x, y;
+	ePieceType type, jokerType;
+	eFileStatus status;
+
+	while (true)
+	{
+		status = fileContext->getNextPiece(&type, &x, &y, &jokerType);
+
+		switch (status)
+		{
+		case FILE_EOF_REACHED:
+			return;
+
+		case FILE_ERROR:
+		case FILE_BAD_FORMAT:
+			setHasLost();
+			setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
+			break;
+
+		case FILE_SUCCESS:
+			if (tmpBoard[y][x])
+			{
+				setHasLost();
+				setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
+			}
+			else
+			{
+				tmpBoard[y][x] = true;
+			}
+			break;
+		}
+	}
+}
+
 
