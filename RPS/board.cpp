@@ -84,13 +84,22 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 			return -1; 
 		}
 
+		dprint("MATCH: Player#%d [%c already at (%d,%d)] VS Player #%d [%c from (%d,%d)] ... ",
+			p2->getOwner()->getPlayerId(), pieceToChar(p2->getType()), toX, toY, p->getOwner()->getPlayerId(), pieceToChar(type), fromX, fromY);
+
 		if (type == BOMB || p2->getType() == BOMB)
 		{
+			if(type != p2->getType())
+				dprint("Player #%d WINS!\n", type == BOMB ? player->getPlayerId() : p2->getOwner()->getPlayerId());
+			else
+				dprint("It's a TIE!\n");
+
 			removePiece(toX, toY);
 			if (moved)
 				removePiece(fromX, fromY);
 			return 0;
 		}
+
 
 		//pieces belong to different players, MATCH!
 		score = p->match(p2);
@@ -100,14 +109,17 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 			removePiece(toX, toY);
 			setPieceAt(p, toX, toY);
 			player->updateTypeCount(type);
+			dprint("Player #%d WINS!\n", p->getOwner()->getPlayerId());
 			break;
 
 		case LOSE:
+			dprint("Player #%d LOSES!\n", p->getOwner()->getPlayerId());
 			if (moved)
 				removePiece(fromX, fromY);
 			break;
 
 		case TIE:
+			dprint("It's a TIE!\n");
 			if (moved)
 				removePiece(fromX, fromY);
 			removePiece(toX, toY);

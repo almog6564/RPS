@@ -88,11 +88,6 @@ public:
 		return currentType;
 	}
 
-	ePieceType getCurrentType()const
-	{
-		return currentType;
-	}
-
 	int setCurrentType(ePieceType newType);
 
 	bool isJoker()

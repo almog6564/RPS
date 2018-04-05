@@ -240,10 +240,10 @@ void Game::writeOutputFile()
 	board->getBoardDimensions(&cols, &rows);
 	fileParser->output->file.seekp(ios::beg);
 
-	fileParser->output->file << "Winner: " << winner << '\n';
-	fileParser->output->file << "Reason: " << GetReasonString(reason) << "\n\n";
+	fileParser->output->file << "Winner: " << winner << '\n';	//1st line: winner
+	fileParser->output->file << "Reason: " << GetReasonString(reason) << "\n\n"; //2nd line: reason, 3rd line: empty
 
-	dprint("writeOutputFile: got reason string, reason = %d\n",reason);
+	dprint("writeOutputFile: got reason string, reason = [%s]\n", GetReasonString(reason).c_str());
 
 	for (i = 1; i <= rows; i++)
 	{
@@ -258,7 +258,7 @@ void Game::writeOutputFile()
 			else
 			{
 				isPlayer1 = (piece->getOwner() == player1);
-				c = pieceToChar(piece->getOriginalType(), isPlayer1);
+				c = pieceToChar(piece->getOriginalType(), isPlayer1);	//need to get original type to print joker as joker
 				if (c < 0)
 				{
 					cout << "Bad piece returned from function" << endl;
@@ -270,6 +270,6 @@ void Game::writeOutputFile()
 		}
 		fileParser->output->file << '\n';
 	}
-	fileParser->output->file.flush();
+	fileParser->output->file.flush();	//actual write to the file
 
 }

@@ -100,6 +100,6 @@ public:
 };
 
 ePieceType charToPiece(char c);
-char pieceToChar(ePieceType p, bool isUpperCase);
+char pieceToChar(ePieceType p, bool isUpperCase = true);
 
 #endif //_PARSER_
