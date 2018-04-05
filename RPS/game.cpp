@@ -157,3 +157,45 @@ int Game::getWinner(eReason* reason)
 }
 
 
+
+void Game::writeOutputFile(Board* board, Player* p1, Player* p2,
+	int winner, eReason reason)
+{
+	UINT rows, cols, i, j;
+	Piece* piece;
+	bool isPlayer1 = false;
+	char c;
+
+	board->getBoardDimensions(&cols, &rows);
+	fileParser->output->file.seekp(ios::beg);
+
+	fileParser->output->file << "Winner: " << winner << '\n';
+	fileParser->output->file << "Reason: " << GetReasonString(reason) << '\n';
+
+
+	for (i = 0; i < rows; i++)
+	{
+		for (j = 0; j < cols; j++)
+		{
+			piece = board->getPieceAt(j, i);
+			isPlayer1 = (piece->getOwner() == p1);
+
+			if (!piece)
+			{
+				c = ' ';
+			}
+			else
+			{
+				c = pieceToChar(piece->getOriginalType(), isPlayer1);
+				if (c < 0)
+				{
+					cout << "Bad piece returned from function" << endl;
+					return;
+				}
+			}
+
+			fileParser->output->file << c;
+		}
+		fileParser->output->file << '\n';
+	}
+}

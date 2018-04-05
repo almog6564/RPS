@@ -1,6 +1,5 @@
 
 #include "parser.h"
-#include <string>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -9,14 +8,14 @@
 
 using namespace std;
 
-PlayerFileContext::PlayerFileContext(string pieceFileName, string movesFileName)
+PlayerFileContext::PlayerFileContext(string& pieceFileName, string& movesFileName)
 {
 	pieces = new FileContext(pieceFileName, true);
 	moves = new FileContext(movesFileName, true);
 }
 
-FileParser::FileParser(string p1PiecesFileName, string p2PiecesFilename,
-	string p1MovesFileName, string p2MovesFilename, string outputFilename)
+FileParser::FileParser(string& p1PiecesFileName, string& p2PiecesFilename,
+	string& p1MovesFileName, string& p2MovesFilename, string& outputFilename)
 {
 	p1 = new PlayerFileContext(p1PiecesFileName,p1MovesFileName);
 	p2 = new PlayerFileContext(p2PiecesFilename, p2MovesFilename);
@@ -299,7 +298,7 @@ void PlayerFileContext::setPieceFileToStart()
 	pieces->file.seekg(0, ios::beg);
 }
 
-string GetReasonString(eReason reason, int arg0 = -1, int arg1 = -1)
+string GetReasonString(eReason reason, int arg0, int arg1)
 {
 	char temp[100];
 
@@ -336,47 +335,84 @@ string GetReasonString(eReason reason, int arg0 = -1, int arg1 = -1)
 	}
 }
 
-void FileParser::writeOutputFile(Board* board, Player* p1, Player* p2, 
-	int winner, eReason reason)
+
+ePieceType charToPiece(char c)
 {
-	UINT rows, cols, i, j;
-	Piece* piece;
-	bool isPlayer1 = false;
+	ePieceType p;
+
+	switch (c)
+	{
+	case 'R':
+		p = ROCK;
+		break;
+
+	case 'P':
+		p = PAPER;
+		break;
+
+	case 'S':
+		p = SCISSORS;
+		break;
+
+	case 'B':
+		p = BOMB;
+		break;
+
+	case 'J':
+		p = JOKER;
+		break;
+
+	case 'F':
+		p = FLAG;
+		break;
+
+	default:
+		p = UNDEF;
+		break;
+	}
+
+	return p;
+}
+
+char pieceToChar(ePieceType p, bool isUpperCase)
+{
 	char c;
 
-	board->getBoardDimensions(&cols, &rows);
-	output->file.seekp(ios::beg);
-
-	output->file << "Winner: " << winner << '\n';
-	output->file << "Reason: " << GetReasonString(reason) << '\n';
-
-
-	for (i = 0; i < rows; i++)
+	switch (p)
 	{
-		for (j = 0; j < cols; j++)
-		{
-			piece = board->getPieceAt(j, i);
-			isPlayer1 = (piece->getOwner() == p1);
+	case ROCK:
+		c = isUpperCase ? 'R' : 'r';
+		break;
 
-			if (!piece)
-			{
-				c = ' ';
-			}
-			else
-			{
-				c = pieceToChar(piece->getOriginalType(), isPlayer1);
-				if (c < 0)
-				{
-					cout << "Bad piece returned from function" << endl;
-					return;
-				}
-			}
+	case PAPER:
+		c = isUpperCase ? 'P' : 'p';
+		break;
 
-			output->file << c;
-		}
-		output->file << '\n';
+	case SCISSORS:
+		c = isUpperCase ? 'S' : 's';
+		break;
+
+	case BOMB:
+		c = isUpperCase ? 'B' : 'b';
+		break;
+
+	case JOKER:
+		c = isUpperCase ? 'J' : 'j';
+		break;
+
+	case FLAG:
+		c = isUpperCase ? 'F' : 'f';
+		break;
+
+	default:
+		c = -1;
+		break;
 	}
+
+	return c;
 }
+
+
 /* Unit Test */
 /*
 int main()

@@ -12,9 +12,11 @@ int main()
 	string p1m = "player1.rps_moves";
 	string p2p = "player2.rps_board";
 	string p2m = "player2.rps_moves";
-	eReason* reason;
+	string output = "rps.output";
 
-	FileParser* fileParser = new FileParser(p1p, p2p, p1m, p2m);
+	eReason reason;
+
+	FileParser* fileParser = new FileParser(p1p, p2p, p1m, p2m, output);
 	if (fileParser->initializeFiles()) //initialization failed
 	{
 		//print error
@@ -41,7 +43,7 @@ int main()
 	/* Start Game */
 	while (!game->endGame())
 		game->runMove();
-	game->getWinner(reason);
+	game->getWinner(&reason);
 
 	return 0;
 }

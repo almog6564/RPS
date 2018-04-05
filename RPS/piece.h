@@ -41,7 +41,7 @@ public:
 
 	bool isJoker();
 
-	~Piece();
+	virtual ~Piece();
 
 };
 
@@ -104,8 +104,5 @@ public:
 
 Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType = UNDEF);
 
-ePieceType charToPiece(char c);
-
-char pieceToChar(ePieceType p, bool isUpperCase);
 #endif //_PIECE_
 

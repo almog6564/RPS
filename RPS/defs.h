@@ -2,8 +2,6 @@
 #ifndef _DEFS_
 #define _DEFS_
 
-#include <string>
-
 typedef unsigned int UINT;
 
 typedef enum _ePieceType

@@ -6,7 +6,6 @@
 #include <fstream>
 #include <iostream>
 #include "defs.h"
-#include "board.h"
 
 typedef enum _eFileStatus
 {
@@ -28,8 +27,8 @@ private:
 	std::string* currentLine = nullptr;
 
 public:
-	FileContext(std::string fname, bool isInputFile) :
-		fileName(fname), currentLine(NULL), isInputFile(isInputFile) {};
+	FileContext(std::string& fname, bool isInputFile) :
+		fileName(fname), isInputFile(isInputFile), currentLine(NULL) {};
 
 	~FileContext();
 
@@ -52,7 +51,7 @@ public:
 	FileContext* pieces;
 	FileContext* moves;
 
-	PlayerFileContext(std::string pieceFileName, std::string movesFileName);
+	PlayerFileContext(std::string& pieceFileName, std::string& movesFileName);
 
 	eFileStatus getNextPiece(ePieceType* type, UINT* x, UINT* y, ePieceType* jokerType);
 
@@ -66,18 +65,22 @@ public:
 
 class FileParser
 {
-	FileContext* output;
 public:
 	PlayerFileContext* p1;
 	PlayerFileContext* p2;
+	FileContext* output;
 
-	FileParser(std::string p1PiecesFileName, std::string p2PiecesFilename,
-		std::string p1MovesFileName, std::string p2MovesFilename, 
-		std::string outputFilename);
+	FileParser(std::string& p1PiecesFileName, std::string& p2PiecesFilename,
+		std::string& p1MovesFileName, std::string& p2MovesFilename, 
+		std::string& outputFilename);
 
 	int initializeFiles(void);
-	void writeOutputFile(Board* board, Player* p1, Player* p2, int winner, eReason reason);
+
 	PlayerFileContext* getPlayerFileContext(int playerNumber);
 };
+
+std::string GetReasonString(eReason reason, int arg0 = -1, int arg1 = -1);
+ePieceType charToPiece(char c);
+char pieceToChar(ePieceType p, bool isUpperCase);
 
 #endif //_PARSER_
