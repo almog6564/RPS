@@ -19,16 +19,17 @@ typedef enum _eFileStatus
 class FileContext
 {
 public:
-	std::string fileName;
 	std::fstream file;
-	bool isInputFile;
 
 private:
+	std::string fileName;
 	std::string* currentLine = nullptr;
+	bool isInputFile;
+	int currentLineNumber = -1;	//number of last line that was read
 
 public:
 	FileContext(std::string& fname, bool isInputFile) :
-		fileName(fname), isInputFile(isInputFile), currentLine(NULL) {};
+		fileName(fname), isInputFile(isInputFile) {};
 
 	~FileContext();
 
@@ -42,6 +43,21 @@ public:
 	void setCurrentLine(std::string* line)
 	{
 		currentLine = line;
+	}
+
+	int getCurrentLineNum()
+	{
+		return currentLineNumber;
+	}
+
+	void incCurrentLineNum()
+	{
+		currentLineNumber++;
+	}
+
+	void zeroCurrentLineNum()
+	{
+		currentLineNumber = 0;
 	}
 };
 
@@ -79,7 +95,6 @@ public:
 	PlayerFileContext* getPlayerFileContext(int playerNumber);
 };
 
-std::string GetReasonString(eReason reason, int arg0 = -1, int arg1 = -1);
 ePieceType charToPiece(char c);
 char pieceToChar(ePieceType p, bool isUpperCase);
 

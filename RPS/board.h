@@ -25,7 +25,7 @@ public:
 	~Board();
 
 	Piece* getPieceAt(UINT col, UINT row);
-
+	void setPieceAt(Piece* p, UINT col, UINT row);
 	void removePiece(UINT col, UINT row);
 
 	int positionPiece(Piece* p, UINT toX, UINT toY, int moved = 0, UINT fromX = 0, UINT fromY = 0);

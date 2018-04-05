@@ -2,8 +2,8 @@
 
 using namespace std;
 
-Player::Player(UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext) 
-	: R(R), P(P), S(S), B(B), J(J), F(F), fileContext(fileContext)
+Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext) 
+	: ID(ID), R(R), P(P), S(S), B(B), J(J), F(F), fileContext(fileContext)
 {
 	pieceCounters[ROCK] = 0; pieceCounters[SCISSORS] = 0; pieceCounters[PAPER] = 0;
 	pieceCounters[BOMB] = 0; pieceCounters[JOKER] = 0; pieceCounters[FLAG] = 0;
@@ -109,7 +109,7 @@ PlayerFileContext * Player::getPlayerFileContext()
 	return fileContext;
 }
 
-void Player::validatePlayerPositions(bool** tmpBoard)
+void Player::validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols)
 {
 	UINT x, y;
 	ePieceType type, jokerType;
@@ -118,6 +118,16 @@ void Player::validatePlayerPositions(bool** tmpBoard)
 	while (true)
 	{
 		status = fileContext->getNextPiece(&type, &x, &y, &jokerType);
+
+		if (x > cols || y > rows)
+		{
+			printf("[Player::validatePlayerPositions] player #%d dimensions check failed: "
+				"x=%d, y=%d WHILE: cols=%d and rows=%d\n",
+				ID, x, y, cols, rows);
+
+			status = FILE_BAD_FORMAT;
+		}
+
 
 		switch (status)
 		{
@@ -128,17 +138,18 @@ void Player::validatePlayerPositions(bool** tmpBoard)
 		case FILE_BAD_FORMAT:
 			setHasLost();
 			setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
-			break;
+			return;
 
 		case FILE_SUCCESS:
-			if (tmpBoard[y][x])
+			dprint("got piece: %c %d %d joker: %c\n", pieceToChar(type, true), x, y, pieceToChar(jokerType, true));
+			if (tmpBoard[y-1][x-1])
 			{
 				setHasLost();
 				setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
 			}
 			else
 			{
-				tmpBoard[y][x] = true;
+				tmpBoard[y-1][x-1] = true;
 			}
 			break;
 		}

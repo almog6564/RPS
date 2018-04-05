@@ -49,7 +49,8 @@ public:
 
 	int getWinner(eReason* reason);
 
-	void writeOutputFile(Board* board, Player* p1, Player* p2, int winner, eReason reason);
+	string GetReasonString(eReason reason);
+	void writeOutputFile();
 	int validatePositionFiles();
 
 	void resetPieceFiles();

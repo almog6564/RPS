@@ -25,6 +25,9 @@ int main()
 
 	Game* game = new Game(M, N, R, P, S, B, J, F,
 								R, P, S, B, J, F, fileParser);
+
+	dprint("created new game\n");
+
 	/* First positioning */
 	if (game->validatePositionFiles())
 	{
@@ -32,6 +35,8 @@ int main()
 		return -1;
 	}
 		
+	dprint("validated position files\n");
+
 	game->resetPieceFiles();
 
 	while (!game->positionPiece(0));

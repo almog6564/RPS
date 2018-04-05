@@ -106,6 +106,7 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 			getline(pieces->file, line);
 			length = (UINT)line.length();
 			pieces->setCurrentLine(&line); //save the current line to print if there was error
+			pieces->incCurrentLineNum();
 
 			if (length > 0)
 			{
@@ -209,8 +210,8 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 		while (true)
 		{
 			getline(moves->file, line);
-
 			moves->setCurrentLine(&line); //save the current line to print if there was error
+			moves->incCurrentLineNum();
 
 			if (line.length() > 0)
 			{
@@ -296,45 +297,8 @@ void PlayerFileContext::setPieceFileToStart()
 {
 	pieces->file.clear();
 	pieces->file.seekg(0, ios::beg);
+	pieces->zeroCurrentLineNum();
 }
-
-string GetReasonString(eReason reason, int arg0, int arg1)
-{
-	char temp[100];
-
-	switch (reason)
-	{
-	case FLAGS_CAPTURED:
-		return "All flags of the opponent are captured";
-		
-	case PIECES_EATEN:
-		return "All moving PIECEs of the opponent are eaten";
-
-	case MOVES_INPUT_FILES_DONE:
-		return "A tie - both Moves input files done without a winner";
-
-	case ALL_FLAGS_EATEN_DURING_POSITIONING:
-		return "A tie - all flags are eaten by both players in the position files";
-
-	case BAD_POSITIONING_INPUT_FILE_FORMAT:
-	case BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
-	case BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
-	case BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
-		sprintf(temp, "Bad Positioning input file for player %d - line %d", arg0, arg1);
-		return (string)temp;
-
-	case BOTH_BAD_POSITIONING_INPUT_FILE_FORMAT:
-	case BOTH_BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
-	case BOTH_BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
-	case BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
-		sprintf(temp, "Bad Positioning input file for both players - player 1: line %d, player 2: line %d", arg0, arg1);
-		return (string)temp;
-
-	default: 
-		return "Invalid eReason code";
-	}
-}
-
 
 ePieceType charToPiece(char c)
 {
@@ -405,7 +369,7 @@ char pieceToChar(ePieceType p, bool isUpperCase)
 		break;
 
 	default:
-		c = -1;
+		c = 'U';
 		break;
 	}
 

@@ -6,7 +6,7 @@ using namespace std;
 
 
 Piece::Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* playerOwner) :
-	type(typeArg), winAgainst(winAgainstArg), owner(playerOwner) {};
+	type(typeArg), winAgainst(winAgainstArg), owner(playerOwner) {}
 
 Piece::~Piece()
 {
@@ -50,7 +50,7 @@ int Joker::setCurrentType(ePieceType newType)
 
 	currentType = newType;
 	return 0;
-};
+}
 
 Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType)
 {

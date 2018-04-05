@@ -8,6 +8,7 @@
 
 class Player
 {
+	const UINT ID;
 	UINT pieceCounters[PIECE_COUNT];
 	UINT movingPiecesCtr; 
 	UINT score;
@@ -19,7 +20,7 @@ class Player
 	
 
 public:
-	Player(UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext);
+	Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext);
 	void decCounter(ePieceType type);
 	bool isAlive();
 	bool getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
@@ -30,8 +31,12 @@ public:
 	void setHasMoreMoves(bool val);
 	int updateTypeCount(ePieceType type);
 	PlayerFileContext* getPlayerFileContext();
-	void validatePlayerPositions(bool** tmpBoard);
+	void validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols);
 
+	UINT getPlayerId()const
+	{
+		return ID;
+	}
 
 	bool getHasLost()const
 	{

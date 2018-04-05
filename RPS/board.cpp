@@ -27,18 +27,29 @@ Board::Board(UINT N, UINT M) : rows(N), cols(M)
 
 Piece* Board::getPieceAt(UINT col, UINT row)
 {
-	if (col >= cols || row >= rows)
+	if (col > cols || row > rows)
 		return NULL;
 
-	return table[row][col];
+	return table[row-1][col-1];
+}
+
+void Board::setPieceAt(Piece* p, UINT col, UINT row)
+{
+	if (col > cols || row > rows)
+		return;
+
+	table[row-1][col-1] = p;
 }
 
 void Board::removePiece(UINT col, UINT row)
 {
-	delete table[row][col];
-	table[row][col] = NULL;
+	delete table[row-1][col-1];
+	table[row-1][col-1] = NULL;
 }
 
+/**
+ * This function assumes legal dimensions.
+ */
 int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY)
 {
 	Piece* p2;
@@ -48,10 +59,11 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 
 	type = p->getType();
 	player = p->getOwner();
+
 	p2 = getPieceAt(toX, toY);
 	if (!p2) //Piece was not found
 	{
-		table[toY][toX] = p;
+		setPieceAt(p, toX, toY);
 		if (!moved) //first positioning
 			return (player->updateTypeCount(type) == -1);
 		return 0; 
@@ -110,16 +122,28 @@ int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
 	Piece* p1;
 	int ret;
 
-	if (fromX >= cols || fromY >= rows || toX >= cols || toY >= rows)
+	if (toX > cols || toY > rows)
 	{
-		cout << "movePieceAndMatch: Illegal dimensions" << endl;
+		printf("[Board::movePiece] TO-dimensions check failed:\n"
+			"\t toX=%d, toY=%d WHILE: cols=%d and rows=%d\n",
+			toX, toY, cols, rows);
+
+		return ERROR;
+	}
+
+	if (fromX > cols || fromY > rows)
+	{
+		printf("[Board::movePiece] FROM-dimensions check failed.\n"
+			"\t fromX=%d, fromY=%d WHILE: cols=%d and rows=%d\n",
+			fromX, fromY, cols, rows);
+
 		return ERROR;
 	}
 
 	p1 = getPieceAt(fromX, fromY);
 	if (!p1) //Piece was not found
 	{
-		printf("movePieceAndMatch: no piece at fromX <%d> fromY <%d>", fromX, fromY);
+		printf("[Board::movePiece] no piece at fromX <%d> fromY <%d>", fromX, fromY);
 		return -1;
 	}
 
