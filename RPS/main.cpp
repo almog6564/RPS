@@ -21,11 +21,19 @@ int main()
 		return -1;
 	}
 
-
 	Game* game = new Game(M, N, R, P, S, B, J, F,
 								R, P, S, B, J, F, fileParser);
 	/* First positioning */
-	game->positionAllPieces();
+	if (game->validatePositionFiles())
+	{
+		//end game
+		return -1;
+	}
+		
+	game->resetPieceFiles();
+
+	while (!game->positionPiece(0));
+	while (!game->positionPiece(1));
 
 	/* Check Flags counters*/
 	game->flagsCheck();

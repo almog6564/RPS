@@ -17,7 +17,7 @@ public:
 
 	Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* owner);
 
-	ePieceType getType()const 
+	virtual ePieceType getType()const 
 	{ 
 		return type; 
 	}
@@ -61,13 +61,13 @@ public:
 class Flag : public Piece
 {
 public:
-	Flag(Player* owner) : Piece(ROCK, UNDEF, owner) {};
+	Flag(Player* owner) : Piece(FLAG, UNDEF, owner) {};
 };
 
 class Bomb : public Piece
 {
 public:
-	Bomb(Player* owner) : Piece(ROCK, UNDEF, owner) {};
+	Bomb(Player* owner) : Piece(BOMB, UNDEF, owner) {};
 };
 
 class Joker : public Piece
@@ -78,7 +78,7 @@ public:
 	Joker(ePieceType currentTypeArg, Player* owner);
 
 	//override original function, so match function wouldn't have to know if its Joker
-	ePieceType getType()const
+	ePieceType getType()const override
 	{
 		return currentType;
 	}

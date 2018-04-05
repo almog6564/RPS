@@ -24,12 +24,14 @@ public:
 	bool isAlive();
 	bool getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
 		UINT * jokerX, UINT * jokerY, ePieceType* newRep);
-	bool getNextPosition(ePieceType* type, UINT* toX, UINT* toY);
+	int getNextPiece(ePieceType* type, UINT * toX, UINT * toY, ePieceType* jokerType);
 	void updateScore();
 	bool getHasMoreMoves();
 	void setHasMoreMoves(bool val);
 	int updateTypeCount(ePieceType type);
 	PlayerFileContext* getPlayerFileContext();
+	void validatePlayerPositions(bool** tmpBoard);
+
 
 	bool getHasLost()const
 	{
@@ -76,6 +78,8 @@ public:
 			return UNDEF;
 		}
 	}
+
+
 
 
 
