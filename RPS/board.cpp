@@ -149,6 +149,15 @@ int Board::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
 	return 0;
 }
 
+void Board::getBoardDimensions(UINT* pCols, UINT* pRows)
+{
+	if (pCols)
+		*pCols = cols;
+
+	if (pRows)
+		*pRows = rows;
+}
+
 Board::~Board()
 {
 	for (UINT i = 0; i < rows; i++)

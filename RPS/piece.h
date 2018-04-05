@@ -17,6 +17,11 @@ public:
 
 	Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* owner);
 
+	ePieceType getOriginalType()const
+	{
+		return type;
+	}
+
 	ePieceType getType()const 
 	{ 
 		return type; 
@@ -99,8 +104,8 @@ public:
 
 Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType = UNDEF);
 
+ePieceType charToPiece(char c);
 
-
-
+char pieceToChar(ePieceType p, bool isUpperCase);
 #endif //_PIECE_
 

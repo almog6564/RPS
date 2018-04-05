@@ -11,73 +11,39 @@ using namespace std;
 
 PlayerFileContext::PlayerFileContext(string pieceFileName, string movesFileName)
 {
-	pieces = new FileContext(pieceFileName);
-	moves = new FileContext(movesFileName);
-}
-
-ePieceType charToPiece(char c)
-{
-	ePieceType p;
-
-	switch (c)
-	{
-	case 'R':
-		p = ROCK;
-		break;
-
-	case 'P':
-		p = PAPER;
-		break;
-
-	case 'S':
-		p = SCISSORS;
-		break;
-
-	case 'B':
-		p = BOMB;
-		break;
-
-	case 'J':
-		p = JOKER;
-		break;
-
-	case 'F':
-		p = FLAG;
-		break;
-
-	default:
-		p = UNDEF;
-		break;
-	}
-
-	return p;
+	pieces = new FileContext(pieceFileName, true);
+	moves = new FileContext(movesFileName, true);
 }
 
 FileParser::FileParser(string p1PiecesFileName, string p2PiecesFilename,
-	string p1MovesFileName, string p2MovesFilename)
+	string p1MovesFileName, string p2MovesFilename, string outputFilename)
 {
 	p1 = new PlayerFileContext(p1PiecesFileName,p1MovesFileName);
 	p2 = new PlayerFileContext(p2PiecesFilename, p2MovesFilename);
+	output = new FileContext(outputFilename, false);
 }
 
-static bool openFile(FileContext* fc)
+FileContext::~FileContext()
+{
+	if (file.is_open())
+		file.close();
+}
+
+bool FileContext::openFile()
 {
 	bool ret = false;
 
-	do 
+	do
 	{
-		if (!fc)
-			break;
+		file.open(fileName, isInputFile ? (ios::in) : (ios::out | ios::trunc));
 
-		fc->file.open(fc->fileName);
-
-		if (fc->file.is_open())
+		if (file.is_open())
 		{
 			ret = true;
 			break;
 		}
 
-		printf("Error while opening file: %s, %s\n", fc->fileName.c_str(), strerror(errno));
+		printf("Error while opening file: %s, %s\n", fileName.c_str(), strerror(errno));
 
 	} while (false);
 
@@ -88,16 +54,19 @@ int FileParser::initializeFiles()
 {
 	//open files and check if file was opened successfully
 	
-	if (!openFile(p1->pieces))
+	if (!p1->pieces->openFile())
 		return -1;
 
-	if (!openFile(p1->moves))
+	if (!p1->moves->openFile())
 		return -1;
 
-	if (!openFile(p2->pieces))
+	if (!p2->pieces->openFile())
 		return -1;
 
-	if (!openFile(p2->moves))
+	if (!p2->moves->openFile())
+		return -1;
+
+	if (!output->openFile())
 		return -1;
 	
 	return 0;
@@ -330,7 +299,84 @@ void PlayerFileContext::setPieceFileToStart()
 	pieces->file.seekg(0, ios::beg);
 }
 
+string GetReasonString(eReason reason, int arg0 = -1, int arg1 = -1)
+{
+	char temp[100];
 
+	switch (reason)
+	{
+	case FLAGS_CAPTURED:
+		return "All flags of the opponent are captured";
+		
+	case PIECES_EATEN:
+		return "All moving PIECEs of the opponent are eaten";
+
+	case MOVES_INPUT_FILES_DONE:
+		return "A tie - both Moves input files done without a winner";
+
+	case ALL_FLAGS_EATEN_DURING_POSITIONING:
+		return "A tie - all flags are eaten by both players in the position files";
+
+	case BAD_POSITIONING_INPUT_FILE_FORMAT:
+	case BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
+	case BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
+	case BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
+		sprintf(temp, "Bad Positioning input file for player %d - line %d", arg0, arg1);
+		return (string)temp;
+
+	case BOTH_BAD_POSITIONING_INPUT_FILE_FORMAT:
+	case BOTH_BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
+	case BOTH_BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
+	case BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
+		sprintf(temp, "Bad Positioning input file for both players - player 1: line %d, player 2: line %d", arg0, arg1);
+		return (string)temp;
+
+	default: 
+		return "Invalid eReason code";
+	}
+}
+
+void FileParser::writeOutputFile(Board* board, Player* p1, Player* p2, 
+	int winner, eReason reason)
+{
+	UINT rows, cols, i, j;
+	Piece* piece;
+	bool isPlayer1 = false;
+	char c;
+
+	board->getBoardDimensions(&cols, &rows);
+	output->file.seekp(ios::beg);
+
+	output->file << "Winner: " << winner << '\n';
+	output->file << "Reason: " << GetReasonString(reason) << '\n';
+
+
+	for (i = 0; i < rows; i++)
+	{
+		for (j = 0; j < cols; j++)
+		{
+			piece = board->getPieceAt(j, i);
+			isPlayer1 = (piece->getOwner() == p1);
+
+			if (!piece)
+			{
+				c = ' ';
+			}
+			else
+			{
+				c = pieceToChar(piece->getOriginalType(), isPlayer1);
+				if (c < 0)
+				{
+					cout << "Bad piece returned from function" << endl;
+					return;
+				}
+			}
+
+			output->file << c;
+		}
+		output->file << '\n';
+	}
+}
 /* Unit Test */
 /*
 int main()
@@ -364,7 +410,7 @@ int main()
 		}
 		else
 		{
-			printf("Bad line : %s\n", f->p1->pieces->getLastReadLine().c_str());
+			printf("Bad line : %s\n", f->p1->pieces->getLastReadLine()->c_str());
 		}
 	}
 	printf("\n\n");
@@ -381,7 +427,7 @@ int main()
 		}
 		else
 		{
-			printf("Bad line : %s\n", f->p1->moves->getLastReadLine().c_str());
+			printf("Bad line : %s\n", f->p1->moves->getLastReadLine()->c_str());
 		}
 	}
 

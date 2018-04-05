@@ -33,6 +33,8 @@ public:
 	int movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY);
 
 	int changeJokerType(UINT fromX, UINT fromY, ePieceType newType);
+
+	void getBoardDimensions(UINT* pCols, UINT* pRows);
 };
 
 

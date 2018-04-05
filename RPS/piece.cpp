@@ -85,3 +85,79 @@ Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType)
 	return p;
 }
 
+ePieceType charToPiece(char c)
+{
+	ePieceType p;
+
+	switch (c)
+	{
+	case 'R':
+		p = ROCK;
+		break;
+
+	case 'P':
+		p = PAPER;
+		break;
+
+	case 'S':
+		p = SCISSORS;
+		break;
+
+	case 'B':
+		p = BOMB;
+		break;
+
+	case 'J':
+		p = JOKER;
+		break;
+
+	case 'F':
+		p = FLAG;
+		break;
+
+	default:
+		p = UNDEF;
+		break;
+	}
+
+	return p;
+}
+
+char pieceToChar(ePieceType p, bool isUpperCase)
+{
+	char c;
+
+	switch (p)
+	{
+	case ROCK:
+		c = isUpperCase ? 'R' : 'r';
+		break;
+
+	case PAPER:
+		c = isUpperCase ? 'P' : 'p';
+		break;
+
+	case SCISSORS:
+		c = isUpperCase ? 'S' : 's';
+		break;
+
+	case BOMB:
+		c = isUpperCase ? 'B' : 'b';
+		break;
+
+	case JOKER:
+		c = isUpperCase ? 'J' : 'j';
+		break;
+
+	case 'F':
+		c = isUpperCase ? 'F' : 'f';
+		break;
+
+	default:
+		c = -1;
+		break;
+	}
+
+	return c;
+}
+

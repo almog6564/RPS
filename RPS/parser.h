@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include "defs.h"
-
+#include "board.h"
 
 typedef enum _eFileStatus
 {
@@ -21,17 +21,23 @@ class FileContext
 {
 public:
 	std::string fileName;
-	std::ifstream file;
+	std::fstream file;
+	bool isInputFile;
 
 private:
-	std::string* currentLine;
+	std::string* currentLine = nullptr;
 
 public:
-	FileContext(std::string fname) : fileName(fname), currentLine(NULL) {};
+	FileContext(std::string fname, bool isInputFile) :
+		fileName(fname), currentLine(NULL), isInputFile(isInputFile) {};
 
-	std::string& getLastReadLine()
+	~FileContext();
+
+	bool openFile();
+
+	std::string* getLastReadLine()
 	{
-		return *currentLine;
+		return currentLine;
 	}
 
 	void setCurrentLine(std::string* line)
@@ -60,16 +66,17 @@ public:
 
 class FileParser
 {
-
+	FileContext* output;
 public:
 	PlayerFileContext* p1;
 	PlayerFileContext* p2;
 
 	FileParser(std::string p1PiecesFileName, std::string p2PiecesFilename,
-		std::string p1MovesFileName, std::string p2MovesFilename);
+		std::string p1MovesFileName, std::string p2MovesFilename, 
+		std::string outputFilename);
 
 	int initializeFiles(void);
-
+	void writeOutputFile(Board* board, Player* p1, Player* p2, int winner, eReason reason);
 	PlayerFileContext* getPlayerFileContext(int playerNumber);
 };
 
