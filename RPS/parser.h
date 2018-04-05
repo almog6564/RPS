@@ -77,6 +77,8 @@ public:
 
 	void setPieceFileToStart();
 
+	~PlayerFileContext();
+
 };
 
 class FileParser
@@ -93,6 +95,8 @@ public:
 	int initializeFiles(void);
 
 	PlayerFileContext* getPlayerFileContext(int playerNumber);
+
+	~FileParser();
 };
 
 ePieceType charToPiece(char c);

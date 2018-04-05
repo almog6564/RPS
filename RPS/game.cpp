@@ -243,13 +243,13 @@ void Game::writeOutputFile()
 	fileParser->output->file << "Winner: " << winner << '\n';
 	fileParser->output->file << "Reason: " << GetReasonString(reason) << "\n\n";
 
+	dprint("writeOutputFile: got reason string, reason = %d\n",reason);
 
-	for (i = 0; i < rows; i++)
+	for (i = 1; i <= rows; i++)
 	{
-		for (j = 0; j < cols; j++)
+		for (j = 1; j <= cols; j++)
 		{
 			piece = board->getPieceAt(j, i);
-			isPlayer1 = (piece->getOwner() == player1);
 
 			if (!piece)
 			{
@@ -257,6 +257,7 @@ void Game::writeOutputFile()
 			}
 			else
 			{
+				isPlayer1 = (piece->getOwner() == player1);
 				c = pieceToChar(piece->getOriginalType(), isPlayer1);
 				if (c < 0)
 				{
@@ -269,4 +270,6 @@ void Game::writeOutputFile()
 		}
 		fileParser->output->file << '\n';
 	}
+	fileParser->output->file.flush();
+
 }

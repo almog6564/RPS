@@ -7,7 +7,7 @@ Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFi
 {
 	pieceCounters[ROCK] = 0; pieceCounters[SCISSORS] = 0; pieceCounters[PAPER] = 0;
 	pieceCounters[BOMB] = 0; pieceCounters[JOKER] = 0; pieceCounters[FLAG] = 0;
-	movingPiecesCtr = R + P + S + B + J;
+	movingPiecesCtr = 0;
 	score = 0;
 	hasMoreMoves = true;
 	hasLost = false;
@@ -95,6 +95,10 @@ void Player::setHasMoreMoves(bool val)
 int Player::updateTypeCount(ePieceType type)
 {
 	pieceCounters[type]++;
+
+	if(type != FLAG && type != UNDEF)
+		movingPiecesCtr++;
+
 	if (pieceCounters[type] > getTypeMax(type))
 	{
 		hasLost = 1;

@@ -26,6 +26,9 @@ FileContext::~FileContext()
 {
 	if (file.is_open())
 		file.close();
+
+	if(currentLine != nullptr)
+		delete currentLine;
 }
 
 bool FileContext::openFile()
@@ -80,6 +83,13 @@ PlayerFileContext* FileParser::getPlayerFileContext(int playerNumber)
 		return p2;
 
 	return NULL;
+}
+
+FileParser::~FileParser()
+{
+	delete p1;
+	delete p2;
+	delete output;
 }
 
 eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, ePieceType* jokerType)
@@ -298,6 +308,12 @@ void PlayerFileContext::setPieceFileToStart()
 	pieces->file.clear();
 	pieces->file.seekg(0, ios::beg);
 	pieces->zeroCurrentLineNum();
+}
+
+PlayerFileContext::~PlayerFileContext()
+{
+	delete pieces;
+	delete moves;
 }
 
 ePieceType charToPiece(char c)

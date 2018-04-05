@@ -1,13 +1,12 @@
 #include "board.h"
 #include <iostream>
 #include "cstdio"
-#include "cstdlib"
 
 using namespace std;
 
 Board::Board(UINT N, UINT M) : rows(N), cols(M)
 {
-	table = (Piece***)malloc(N * sizeof(Piece**));
+	table = new Piece**[N];
 
 	if (!table)
 	{
@@ -16,7 +15,7 @@ Board::Board(UINT N, UINT M) : rows(N), cols(M)
 
 	for (UINT i = 0; i < N; i++)
 	{
-		table[i] = (Piece**)calloc(M, sizeof(Piece*));
+		table[i] = new Piece*[M]();
 
 		if (!table[i])
 		{
@@ -27,7 +26,7 @@ Board::Board(UINT N, UINT M) : rows(N), cols(M)
 
 Piece* Board::getPieceAt(UINT col, UINT row)
 {
-	if (col > cols || row > rows)
+	if (col > cols || row > rows || row < 1 || col < 1)
 		return NULL;
 
 	return table[row-1][col-1];
@@ -35,7 +34,7 @@ Piece* Board::getPieceAt(UINT col, UINT row)
 
 void Board::setPieceAt(Piece* p, UINT col, UINT row)
 {
-	if (col > cols || row > rows)
+	if (col > cols || row > rows || row < 1 || col < 1)
 		return;
 
 	table[row-1][col-1] = p;
@@ -43,6 +42,9 @@ void Board::setPieceAt(Piece* p, UINT col, UINT row)
 
 void Board::removePiece(UINT col, UINT row)
 {
+	if (col > cols || row > rows || row < 1 || col < 1)
+		return;
+
 	delete table[row-1][col-1];
 	table[row-1][col-1] = NULL;
 }
@@ -74,7 +76,11 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 		{
 			//both pieces belong to same player
 			player->setHasLost();
-			player->setReason(BAD_MOVES_INPUT_FILE);
+			if (moved)
+				player->setReason(BAD_MOVES_INPUT_FILE);
+			else
+				player->setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
+
 			return -1; 
 		}
 
@@ -92,7 +98,7 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 		{
 		case WIN:
 			removePiece(toX, toY);
-			table[toY][toX] = p;
+			setPieceAt(p, toX, toY);
 			player->updateTypeCount(type);
 			break;
 
@@ -120,7 +126,6 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
 {
 	Piece* p1;
-	int ret;
 
 	if (toX > cols || toY > rows)
 	{
@@ -147,12 +152,7 @@ int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
 		return -1;
 	}
 
-	ret = positionPiece(p1, toX, toY, 1, fromX, fromY);
-	if (!ret)
-	{
-		return -1;
-	}
-	return 0;
+	return positionPiece(p1, toX, toY, 1, fromX, fromY);
 }
 
 int Board::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
@@ -195,9 +195,9 @@ Board::~Board()
 {
 	for (UINT i = 0; i < rows; i++)
 	{
-		free(table[i]);
+		delete[] table[i];
 	}
-	free(table);
+	delete[] table;
 }
 
 

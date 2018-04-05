@@ -13,7 +13,7 @@ int main()
 	string p2p = "player2.rps_board";
 	string p2m = "player2.rps_moves";
 	string output = "rps.output";
-
+	int	winner;
 	eReason reason;
 
 	FileParser* fileParser = new FileParser(p1p, p2p, p1m, p2m, output);
@@ -42,13 +42,24 @@ int main()
 	while (!game->positionPiece(0));
 	while (!game->positionPiece(1));
 
+	dprint("positioned files on screen\n");
+
 	/* Check Flags counters*/
 	game->flagsCheck();
+
+	dprint("checked flags\n");
 
 	/* Start Game */
 	while (!game->endGame())
 		game->runMove();
-	game->getWinner(&reason);
+
+	winner = game->getWinner(&reason);
+
+	dprint("winner is %d\n",winner);
+
+	game->writeOutputFile();
+
+	dprint("wrote output file\n");
 
 	return 0;
 }
