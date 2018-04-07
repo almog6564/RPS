@@ -107,7 +107,12 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 			removePiece(toX, toY);
 			setPieceAt(p, toX, toY);
 			setPieceAt(NULL, fromX, fromY);
-			player->incTypeCount(type, originalType);
+			if (!moved)
+			{
+				if (player->incTypeCount(type, originalType))
+					return -1;
+			}
+
 			dprint("Player #%d WINS!\n", p->getOwner()->getPlayerId());
 			break;
 
@@ -137,6 +142,7 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
 {
 	Piece* p1;
+	ePieceType type;
 
 	if (toX > cols || toY > rows)
 	{
@@ -160,6 +166,13 @@ int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
 	if (!p1) //Piece was not found
 	{
 		printf("[Board::movePiece] no piece at fromX <%d> fromY <%d>\n", fromX, fromY);
+		return ERROR;
+	}
+
+	type = p1->getType();
+	if (type == BOMB || type == FLAG || type == UNDEF || type == JOKER)
+	{
+		printf("[Board::movePiece] illegal piece type <%c> for move at fromX <%d> fromY <%d> toX <%d> toY <%d> \n", pieceToChar(type), fromX, fromY, toX, toY);
 		return ERROR;
 	}
 

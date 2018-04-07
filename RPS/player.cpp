@@ -120,6 +120,8 @@ int Player::incTypeCount(ePieceType type, ePieceType originalType, bool updateOn
 	{
 		hasLost = 1;
 		reason = BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER;
+		dprint("\n** ERROR: Player #%d piece %c count is <%d> bigger than MAX <%d>\n",
+			ID, pieceToChar(originalType), pieceCounters[originalType], getTypeMax(type));
 		return -1;
 	}
 	return 0;
