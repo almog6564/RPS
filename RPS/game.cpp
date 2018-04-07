@@ -17,7 +17,8 @@ void Game::runMove()
 		runSingleMove(player1);
 	else //player 2's turn
 		runSingleMove(player2);
-	turn += 1 % 2;
+	turn += 1;
+	turn %= 2;
 }
 
 void Game::runSingleMove(Player* player)
@@ -26,6 +27,8 @@ void Game::runSingleMove(Player* player)
 	bool isJoker;
 	UINT jokerX, jokerY;
 	ePieceType newRep;
+
+	dprint("\n\n ************ Starting MOVE: Player #%d ************ \n\n", player->getPlayerId());
 
 	if (player->getHasMoreMoves())
 	{
@@ -41,7 +44,15 @@ void Game::runSingleMove(Player* player)
 			}
 
 			if (isJoker)
-				board->changeJokerType(jokerX, jokerY, newRep);
+			{
+				if (board->changeJokerType(jokerX, jokerY, newRep))
+				{
+					player->setHasLost();
+					player->setReason(BAD_MOVES_INPUT_FILE);
+					return;
+				}
+			}
+				
 		}
 		else
 		{
@@ -155,7 +166,9 @@ int Game::getWinner(eReason* pReason)
 
 	/*********** Tie Scenarios ***********/
 
-	else if (!player1->getHasMoreMoves() && !player2->getHasMoreMoves())
+	//if no moves left but both players still alive
+	else if (!player1->getHasMoreMoves() && !player2->getHasMoreMoves() &&
+		!player1->getHasLost() && !player2->getHasLost())
 	{
 		reason = MOVES_INPUT_FILES_DONE;
 	}
@@ -165,9 +178,10 @@ int Game::getWinner(eReason* pReason)
 		reason = (eReason) MAKE_REASON_DOUBLE(player1->getReason());
 	}
 	
-	else if (player1->getTypeCount(FLAG) == 0 && player2->getTypeCount(FLAG) == 0)
+	else if (player1->getReason() != player2->getReason())
 	{
-		reason = BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER;
+		printf("BOTH player Got TIE scenario with two d");
+		reason = BOTH_LOST_DIFFERENT_REASONS;
 	}
 
 	*pReason = reason;
@@ -193,6 +207,20 @@ string Game::GetReasonString(eReason reason)
 
 	case ALL_FLAGS_EATEN_DURING_POSITIONING:
 		return "A tie - all flags are eaten by both players in the position files";
+
+	case BAD_MOVES_INPUT_FILE:
+		if (player1->getHasLost())
+		{
+			playerNumber = 0;
+			line = player1->getPlayerFileContext()->moves->getCurrentLineNum();
+		}
+		else
+		{
+			playerNumber = 1;
+			line = player2->getPlayerFileContext()->moves->getCurrentLineNum();
+		}
+		sprintf(temp, "Bad Moves input file for player %d - line %d", playerNumber, line);
+		return (string)temp;
 
 	case BAD_POSITIONING_INPUT_FILE_FORMAT:
 	case BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
@@ -231,7 +259,7 @@ void Game::writeOutputFile()
 	UINT rows, cols, i, j;
 	Piece* piece;
 	bool isPlayer1 = false;
-	char c;
+	char c, debug_c;
 	int winner;
 	eReason reason;
 
@@ -243,8 +271,8 @@ void Game::writeOutputFile()
 	fileParser->output->file << "Winner: " << winner << '\n';	//1st line: winner
 	fileParser->output->file << "Reason: " << GetReasonString(reason) << "\n\n"; //2nd line: reason, 3rd line: empty
 
-	dprint("writeOutputFile: got reason string, reason = [%s]\n", GetReasonString(reason).c_str());
-
+	dprint("writeOutputFile: got reason string, reason = (%d) [%s]\n", reason, GetReasonString(reason).c_str());
+	dprint("\n\n ##### BOARD #####\n\n");
 	for (i = 1; i <= rows; i++)
 	{
 		for (j = 1; j <= cols; j++)
@@ -254,11 +282,13 @@ void Game::writeOutputFile()
 			if (!piece)
 			{
 				c = ' ';
+				debug_c = '-';
 			}
 			else
 			{
 				isPlayer1 = (piece->getOwner() == player1);
 				c = pieceToChar(piece->getOriginalType(), isPlayer1);	//need to get original type to print joker as joker
+				debug_c = c;
 				if (c < 0)
 				{
 					cout << "Bad piece returned from function" << endl;
@@ -267,9 +297,12 @@ void Game::writeOutputFile()
 			}
 
 			fileParser->output->file << c;
+			dprint("%c", debug_c);
 		}
 		fileParser->output->file << '\n';
+		dprint("\n");
 	}
 	fileParser->output->file.flush();	//actual write to the file
+	dprint("\n");
 
 }

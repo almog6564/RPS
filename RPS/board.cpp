@@ -8,19 +8,9 @@ Board::Board(UINT N, UINT M) : rows(N), cols(M)
 {
 	table = new Piece**[N];
 
-	if (!table)
-	{
-		throw "Board constructor: memory error 1";
-	}
-
 	for (UINT i = 0; i < N; i++)
 	{
 		table[i] = new Piece*[M]();
-
-		if (!table[i])
-		{
-			throw "Board constructor: memory error 1";
-		}
 	}
 }
 
@@ -57,9 +47,10 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 	Piece* p2;
 	eScore score;
 	Player*  player;
-	ePieceType type;
+	ePieceType type, originalType;
 
 	type = p->getType();
+	originalType = p->getOriginalType();
 	player = p->getOwner();
 
 	p2 = getPieceAt(toX, toY);
@@ -67,7 +58,14 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 	{
 		setPieceAt(p, toX, toY);
 		if (!moved) //first positioning
-			return (player->updateTypeCount(type) == -1);
+			return (player->incTypeCount(type, originalType) == -1);
+		else
+		{
+			dprint("Player #%d moved its %c [if J: %c] from (%d,%d) to (%d,%d)\n",
+				player->getPlayerId(), pieceToChar(originalType), pieceToChar(type),
+				fromX, fromY, toX, toY);
+			setPieceAt(NULL, fromX, fromY);
+		}
 		return 0; 
 	}
 	else //piece found at cell
@@ -108,7 +106,8 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 		case WIN:
 			removePiece(toX, toY);
 			setPieceAt(p, toX, toY);
-			player->updateTypeCount(type);
+			setPieceAt(NULL, fromX, fromY);
+			player->incTypeCount(type, originalType);
 			dprint("Player #%d WINS!\n", p->getOwner()->getPlayerId());
 			break;
 
@@ -160,11 +159,36 @@ int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
 	p1 = getPieceAt(fromX, fromY);
 	if (!p1) //Piece was not found
 	{
-		printf("[Board::movePiece] no piece at fromX <%d> fromY <%d>", fromX, fromY);
-		return -1;
+		printf("[Board::movePiece] no piece at fromX <%d> fromY <%d>\n", fromX, fromY);
+		return ERROR;
 	}
 
-	return positionPiece(p1, toX, toY, 1, fromX, fromY);
+	if (fromX == toX && fromY == toY)
+	{
+		printf("[Board::movePiece] piece %c of player #%d at <%d> fromY <%d> same position: toX <%d> toY <%d>\n",
+			pieceToChar(p1->getOriginalType()), p1->getOwner()->getPlayerId(), fromX, fromY, toX, toY);
+
+		return ERROR;
+	}
+	//can move only one cell at a time
+	if (fromX >= (toX - 1) && fromX <= (toX + 1) && fromY >= (toY - 1) && fromY <= (toY + 1))
+	{
+		if (fromX != toX && fromY != toY)	//diagonal
+		{
+			printf("[Board::movePiece] piece %c of player #%d at <%d> fromY <%d> cannot move diagonally to toX <%d> toY <%d>\n",
+				pieceToChar(p1->getOriginalType()), p1->getOwner()->getPlayerId(), fromX, fromY, toX, toY);
+
+			return ERROR;
+		}
+		return positionPiece(p1, toX, toY, 1, fromX, fromY);
+
+	}
+
+	printf("[Board::movePiece] piece %c of player #%d at <%d> fromY <%d> tried to move more than one cell to: toX <%d> toY <%d>\n",
+		pieceToChar(p1->getOriginalType()), p1->getOwner()->getPlayerId(), fromX, fromY, toX, toY);
+
+	return ERROR;
+
 }
 
 int Board::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
@@ -174,21 +198,25 @@ int Board::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
 	if (fromX >= cols || fromY >= rows)
 	{
 		cout << "changeJokerType: Illegal dimensions" << endl;
-		return ERROR;
+		return -1;
 	}
 
 	p1 = getPieceAt(fromX, fromY);
 	if (!p1) //Piece was not found
 	{
-		printf("changeJokerType: no piece at fromX <%d> fromY <%d>", fromX, fromY);
+		printf("changeJokerType: no piece at fromX <%d> fromY <%d>\n", fromX, fromY);
 		return -1;
 	}
 
 	if (!p1->isJoker())
 	{
-		printf("changeJokerType: piece at fromX <%d> fromY <%d> is not a Joker", fromX, fromY);
+		printf("changeJokerType: player #%d piece <%c> at fromX <%d> fromY <%d> is not a Joker\n", 
+			p1->getOwner()->getPlayerId(), charToPiece(p1->getType()), fromX, fromY);
 		return -1;
 	}
+
+	dprint("CHANGED JOKER at (%d,%d) from %c to %c\n", 
+		fromX, fromY, pieceToChar(p1->getType()), pieceToChar(newType));
 
 	((Joker*)p1)->setCurrentType(newType);
 	return 0;

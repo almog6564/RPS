@@ -21,7 +21,6 @@ class Player
 
 public:
 	Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext);
-	void decCounter(ePieceType type);
 	bool isAlive();
 	bool getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
 		UINT * jokerX, UINT * jokerY, ePieceType* newRep);
@@ -29,7 +28,10 @@ public:
 	void updateScore();
 	bool getHasMoreMoves();
 	void setHasMoreMoves(bool val);
-	int updateTypeCount(ePieceType type);
+
+	void decTypeCounter(ePieceType type, ePieceType originalType = UNDEF, bool updateOnlyMovingCounter = false);
+	int incTypeCount(ePieceType type, ePieceType originalType, bool updateOnlyMovingCounter  = false );
+
 	PlayerFileContext* getPlayerFileContext();
 	void validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols);
 

@@ -55,7 +55,9 @@ int main()
 
 	winner = game->getWinner(&reason);
 
-	dprint("winner is %d\n",winner);
+	dprint("\n\n ########## FINISHED GAME - RESULTS ##########\n\n");
+
+	dprint("WINNER is: %d\n",winner);
 
 	game->writeOutputFile();
 

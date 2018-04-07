@@ -10,10 +10,11 @@ class Piece
 {
 	const ePieceType type;
 	ePieceType winAgainst;
-	Player* owner;
 
 	
 public:
+
+	Player * owner;
 
 	Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* owner);
 
@@ -27,7 +28,7 @@ public:
 		return type; 
 	}
 
-	ePieceType getWinAgainst()const
+	virtual ePieceType getWinAgainst()const
 	{
 		return winAgainst;
 	}
@@ -39,7 +40,7 @@ public:
 
 	eScore match(Piece* p);
 
-	bool isJoker();
+	virtual bool isJoker();
 
 	virtual ~Piece();
 
@@ -82,6 +83,8 @@ class Joker : public Piece
 public:
 	Joker(ePieceType currentTypeArg, Player* owner);
 
+	~Joker() override;
+
 	//override original function, so match function wouldn't have to know if its Joker
 	ePieceType getType()const override
 	{
@@ -90,7 +93,9 @@ public:
 
 	int setCurrentType(ePieceType newType);
 
-	bool isJoker()
+	ePieceType getWinAgainst()const override;
+
+	bool isJoker() override
 	{
 		return true;
 	}

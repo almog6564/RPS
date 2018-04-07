@@ -10,7 +10,7 @@ Piece::Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* playerOwner) 
 
 Piece::~Piece()
 {
-	owner->decCounter(type);
+	owner->decTypeCounter(type, type);
 }
 
 
@@ -18,19 +18,22 @@ Piece::~Piece()
 eScore Piece::match(Piece* p)
 {
 	eScore s = ERROR;
+	ePieceType p1type = this->getType();
+	ePieceType p1WinAgainst = this->getWinAgainst();
+
 	ePieceType p2type = p->getType();
 
-	if (type == p2type)
+	if (p1type == p2type)
 		s = TIE;
-	else if (p2type == winAgainst || p2type == FLAG)
+	else if (p2type == p1WinAgainst || p2type == FLAG)
 		s = WIN;
-	else if (type == p->getWinAgainst() || type == FLAG)
+	else if (p1type == p->getWinAgainst() || p1type == FLAG)
 		s = LOSE;
 
 	return s;
 }
 
-bool Piece::isJoker()
+ bool Piece::isJoker()
 {
 	return false;
 }
@@ -38,6 +41,11 @@ bool Piece::isJoker()
 Joker::Joker(ePieceType currentTypeArg, Player * owner): Piece(JOKER, UNDEF, owner)
 {
 	currentType = currentTypeArg;	
+}
+
+Joker::~Joker()
+{
+	owner->decTypeCounter(currentType, JOKER);
 }
 
 int Joker::setCurrentType(ePieceType newType)
@@ -48,8 +56,43 @@ int Joker::setCurrentType(ePieceType newType)
 		return -1;
 	}
 
+	/* We are now changing type from moving piece to non-moving piece.
+	this is to prevent race condition on which joker type changes after a player "loses",
+	but the joker changes type to moving type and saves the player from dying */
+	if (currentType != BOMB && newType == BOMB)
+	{
+		owner->decTypeCounter(currentType, JOKER, true);
+	} 
+	else if (currentType == BOMB && newType != BOMB)
+	{
+		owner->incTypeCount(newType, JOKER, true);
+	}
+
 	currentType = newType;
+
+
 	return 0;
+}
+
+ePieceType Joker::getWinAgainst() const
+{
+	ePieceType ret = UNDEF;
+	switch (currentType)
+	{
+	case ROCK:
+		ret = SCISSORS;
+		break;
+	case SCISSORS:
+		ret = PAPER;
+		break;
+	case PAPER:
+		ret = ROCK;
+		break;
+	//BOMB case is being checked by calling function
+	default:
+		break;
+	}
+	return ret;
 }
 
 Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType)

@@ -13,40 +13,11 @@ Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFi
 	hasLost = false;
 }
 
-void Player::decCounter(ePieceType type)
-{
-	pieceCounters[type]--;
-	switch (type)
-	{
-	case ROCK:
-	case SCISSORS:
-	case PAPER:
-	case BOMB:
-	case JOKER:
-		movingPiecesCtr--;
-	case FLAG:
-		break;
-	default:
-		cout << "setCurrentType: invalid newType " << type << endl;
-	}
-}
-
 bool Player::isAlive()
 {
-	if (pieceCounters[FLAG] == 0)
-	{
-		hasLost = 1;
-		reason = FLAGS_CAPTURED;
+	if (hasLost || pieceCounters[FLAG] == 0 || movingPiecesCtr == 0)
 		return false;
-	}
-	if (movingPiecesCtr == 0)
-	{
-		hasLost = 1;
-		reason = PIECES_EATEN;
-		return false;
-	}
-	if (hasLost)
-		return false;
+
 	return true;
 }
 
@@ -92,14 +63,60 @@ void Player::setHasMoreMoves(bool val)
 	hasMoreMoves = val;
 }
 
-int Player::updateTypeCount(ePieceType type)
+void Player::decTypeCounter(ePieceType type, ePieceType originalType /* = UNDEF */, bool updateOnlyMovingCounter /* = false */)
 {
-	pieceCounters[type]++;
+	if (!updateOnlyMovingCounter)
+	{
+		if (originalType == JOKER) 
+		{
+			pieceCounters[originalType]--;
+		}
+		else
+		{
+			//this check is so the Piece interface wouldn't "know" there's "original" and
+			// "not original" types, only type
+			pieceCounters[type]--;
+		}
+	}
 
-	if(type != FLAG && type != UNDEF)
+	switch (type)
+	{
+	case ROCK:
+	case SCISSORS:
+	case PAPER:
+		movingPiecesCtr--;
+
+	case JOKER:
+	case BOMB:
+	case FLAG:
+		break;
+
+	default:
+		cout << "decCounter: invalid type " << type << endl;
+	}
+
+	if (pieceCounters[FLAG] == 0)
+	{
+		hasLost = 1;
+		reason = FLAGS_CAPTURED;
+	}
+	else if (movingPiecesCtr == 0)
+	{
+		hasLost = 1;
+		reason = PIECES_EATEN;
+	}
+}
+
+
+int Player::incTypeCount(ePieceType type, ePieceType originalType, bool updateOnlyMovingCounter /* = false */)
+{
+	if(!updateOnlyMovingCounter)
+		pieceCounters[originalType]++;
+
+	if(type != BOMB && type != FLAG && type != UNDEF)
 		movingPiecesCtr++;
 
-	if (pieceCounters[type] > getTypeMax(type))
+	if (pieceCounters[originalType] > getTypeMax(type))
 	{
 		hasLost = 1;
 		reason = BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER;
