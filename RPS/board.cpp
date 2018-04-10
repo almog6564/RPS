@@ -17,7 +17,7 @@ Board::Board(UINT N, UINT M) : rows(N), cols(M)
 Piece* Board::getPieceAt(UINT col, UINT row)
 {
 	if (col > cols || row > rows || row < 1 || col < 1)
-		return NULL;
+		return nullptr;
 
 	return table[row-1][col-1];
 }
@@ -36,7 +36,7 @@ void Board::removePiece(UINT col, UINT row)
 		return;
 
 	delete table[row-1][col-1];
-	table[row-1][col-1] = NULL;
+	table[row-1][col-1] = nullptr;
 }
 
 /**
@@ -46,49 +46,52 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 {
 	Piece* p2;
 	eScore score;
-	Player*  player;
-	ePieceType type, originalType;
+	Player *p1owner, *p2owner;
+	ePieceType type, originalType, p2type;
 
 	type = p->getType();
 	originalType = p->getOriginalType();
-	player = p->getOwner();
+	p1owner = p->getOwner();
 
 	p2 = getPieceAt(toX, toY);
 	if (!p2) //Piece was not found
 	{
 		setPieceAt(p, toX, toY);
 		if (!moved) //first positioning
-			return (player->incTypeCount(type, originalType) == -1);
+			return (p1owner->incTypeCount(type, originalType) == -1);
 		else
 		{
 			dprint("Player #%d moved its %c [if J: %c] from (%d,%d) to (%d,%d)\n",
-				player->getPlayerId(), pieceToChar(originalType), pieceToChar(type),
+				p1owner->getPlayerId(), pieceToChar(originalType), pieceToChar(type),
 				fromX, fromY, toX, toY);
-			setPieceAt(NULL, fromX, fromY);
+			setPieceAt(nullptr, fromX, fromY);
 		}
 		return 0; 
 	}
 	else //piece found at cell
 	{
-		if (player == p2->getOwner())
+		p2type = p2->getType();
+		p2owner = p2->getOwner();
+
+		if (p1owner == p2owner)
 		{
 			//both pieces belong to same player
-			player->setHasLost();
+			p1owner->setHasLost();
 			if (moved)
-				player->setReason(BAD_MOVES_INPUT_FILE);
+				p1owner->setReason(BAD_MOVES_INPUT_FILE);
 			else
-				player->setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
+				p1owner->setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
 
 			return -1; 
 		}
 
 		dprint("MATCH: Player#%d [%c already at (%d,%d)] VS Player #%d [%c from (%d,%d)] ... ",
-			p2->getOwner()->getPlayerId(), pieceToChar(p2->getType()), toX, toY, p->getOwner()->getPlayerId(), pieceToChar(type), fromX, fromY);
+			p2owner->getPlayerId(), pieceToChar(p2->getType()), toX, toY, p1owner->getPlayerId(), pieceToChar(type), fromX, fromY);
 
-		if (type == BOMB || p2->getType() == BOMB)
+		if (type == BOMB || p2type == BOMB)
 		{
-			if(type != p2->getType())
-				dprint("Player #%d WINS!\n", type == BOMB ? player->getPlayerId() : p2->getOwner()->getPlayerId());
+			if(type != p2type)
+				dprint("Player #%d WINS!\n", type == BOMB ? p1owner->getPlayerId() : p2owner->getPlayerId());
 			else
 				dprint("It's a TIE!\n");
 
@@ -106,18 +109,18 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 		case WIN:
 			removePiece(toX, toY);
 			setPieceAt(p, toX, toY);
-			setPieceAt(NULL, fromX, fromY);
+			setPieceAt(nullptr, fromX, fromY);
 			if (!moved)
 			{
-				if (player->incTypeCount(type, originalType))
+				if (p1owner->incTypeCount(type, originalType))
 					return -1;
 			}
 
-			dprint("Player #%d WINS!\n", p->getOwner()->getPlayerId());
+			dprint("Player #%d WINS!\n", p1owner->getPlayerId());
 			break;
 
 		case LOSE:
-			dprint("Player #%d LOSES!\n", p->getOwner()->getPlayerId());
+			dprint("Player #%d LOSES!\n", p1owner->getPlayerId());
 			if (moved)
 				removePiece(fromX, fromY);
 			break;
@@ -127,6 +130,18 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 			if (moved)
 				removePiece(fromX, fromY);
 			removePiece(toX, toY);
+
+			/* Treat the case on which all the flags were eaten during positioning 
+				by a tie of two flags, otherwise afterwards it looks like there
+				were no flags positioned */
+			if (!moved && type == FLAG && p2type == FLAG &&
+				p1owner->getTypeCount(FLAG) == 0 && p2owner->getTypeCount(FLAG) == 0)
+			{
+				p1owner->setHasLost();
+				p1owner->setReason(ALL_FLAGS_EATEN_DURING_POSITIONING);
+				p2owner->setHasLost();
+				p2owner->setReason(ALL_FLAGS_EATEN_DURING_POSITIONING);
+			}
 			break;
 
 		default: //ERROR
@@ -139,9 +154,10 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 }
 
 
-int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
+int Board::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY)
 {
 	Piece* p1;
+	UINT p1PlayerId;
 	ePieceType type;
 
 	if (toX > cols || toY > rows)
@@ -170,6 +186,15 @@ int Board::movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY)
 	}
 
 	type = p1->getType();
+	p1PlayerId = p1->getOwner()->getPlayerId();
+	if (p1PlayerId != playerID)
+	{
+		printf("[Board::movePiece] player #%d tried to move piece %c at fromX <%d> fromY <%d> which belongs to player #%d \n", 
+			playerID, pieceToChar(type), fromX, fromY, p1PlayerId);
+
+		return ERROR;
+	}
+
 	if (type == BOMB || type == FLAG || type == UNDEF || type == JOKER)
 	{
 		printf("[Board::movePiece] illegal piece type <%c> for move at fromX <%d> fromY <%d> toX <%d> toY <%d> \n", pieceToChar(type), fromX, fromY, toX, toY);
@@ -208,7 +233,7 @@ int Board::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
 {
 	Piece* p1;
 
-	if (fromX >= cols || fromY >= rows)
+	if (fromX > cols || fromY > rows || fromX < 1 || fromY < 1)
 	{
 		cout << "changeJokerType: Illegal dimensions" << endl;
 		return -1;

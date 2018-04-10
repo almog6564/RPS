@@ -5,6 +5,7 @@
 
 int main()
 {
+	Game* game = nullptr;
 	int M, N, R, P, S, B, J, F;
 	M = N = 10;
 	R = 2; P = 5; S = 1; B = 2; J = 2; F = 1;
@@ -19,49 +20,48 @@ int main()
 	FileParser* fileParser = new FileParser(p1p, p2p, p1m, p2m, output);
 	if (fileParser->initializeFiles()) //initialization failed
 	{
-		//print error
+		cout << "Initialization of game failed because of file error" << endl;
 		return -1;
 	}
 
-	Game* game = new Game(M, N, R, P, S, B, J, F,
-								R, P, S, B, J, F, fileParser);
-
-	dprint("created new game\n");
-
-	/* First positioning */
-	if (game->validatePositionFiles())
+	do 
 	{
-		//end game
-		return -1;
-	}
+		 game = new Game(M, N, R, P, S, B, J, F,
+			R, P, S, B, J, F, fileParser);
+
+		/* First positioning */
+		if (game->validatePositionFiles())
+		{
+			//end game
+			dprint("Validation of piece files FAILED\n");
+			break;
+		}
+
+		dprint("Validated of position files SUCCESS\n");
+
+		game->resetPieceFiles();
+
+		while (!game->positionPiece(0));
+		dprint("Positioning of pieces 0 on board SUCCEEDED!\n");
+
+		while (!game->positionPiece(1));
+
+		dprint("Positioning of pieces on board ENDED!\n");
+
+		/* Check Flags counters*/
+		game->flagsCheck();
 		
-	dprint("validated position files\n");
+		/* Start Game */
+		while (!game->endGame())
+			game->runMove();
 
-	game->resetPieceFiles();
-
-	while (!game->positionPiece(0));
-	while (!game->positionPiece(1));
-
-	dprint("positioned files on screen\n");
-
-	/* Check Flags counters*/
-	game->flagsCheck();
-
-	dprint("checked flags\n");
-
-	/* Start Game */
-	while (!game->endGame())
-		game->runMove();
-
+	} while (false);
+	
 	winner = game->getWinner(&reason);
 
-	dprint("\n\n ########## FINISHED GAME - RESULTS ##########\n\n");
-
-	dprint("WINNER is: %d\n",winner);
+	dprint("\n\n ########## FINISHED GAME - RESULTS ##########\n\nWINNER is : %d\n", winner);
 
 	game->writeOutputFile();
-
-	dprint("wrote output file\n");
 
 	return 0;
 }

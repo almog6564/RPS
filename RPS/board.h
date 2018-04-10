@@ -30,7 +30,7 @@ public:
 
 	int positionPiece(Piece* p, UINT toX, UINT toY, int moved = 0, UINT fromX = 0, UINT fromY = 0);
 
-	int movePiece(UINT fromX, UINT fromY, UINT toX, UINT toY);
+	int movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY);
 
 	int changeJokerType(UINT fromX, UINT fromY, ePieceType newType);
 

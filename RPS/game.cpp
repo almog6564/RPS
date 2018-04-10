@@ -35,7 +35,7 @@ void Game::runSingleMove(Player* player)
 		if (player->getNextMove(&fromX, &fromY, &toX, &toY, &isJoker, &jokerX, &jokerY, &newRep))
 		{
 			//true means getNextMove succeeded
-			if (board->movePiece(fromX, fromY, toX, toY))
+			if (board->movePiece(player->getPlayerId(), fromX, fromY, toX, toY))
 			{
 				//non zero value means some kind of error in move file
 				player->setHasLost();
@@ -63,7 +63,8 @@ void Game::runSingleMove(Player* player)
 
 void Game::checkPlayersFlags(Player * player)
 {
-	if (player->getTypeCount(FLAG) != player->getTypeMax(FLAG))
+	//unless the player has already "lost" by tie of flags during positioning
+	if (!player->getHasLost() && (player->getTypeCount(FLAG) != player->getTypeMax(FLAG)))
 	{
 		player->setHasLost();
 		player->setReason(BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER);
@@ -88,7 +89,7 @@ int Game::validatePositionFiles()
 
 	player1->validatePlayerPositions(tmpBoard, N, M);
 
-	dprint("validatePlayerPositions #1 success\n");
+	dprint("validatePlayerPositions #1 %s\n",player1->getHasLost() ? "FAILED" : "SUCCESS");
 
 	for (UINT i = 0; i < N; i++)
 		for (UINT j = 0; j < M; j++)
@@ -96,7 +97,7 @@ int Game::validatePositionFiles()
 
 	player2->validatePlayerPositions(tmpBoard, N, M);
 
-	dprint("validatePlayerPositions #2 success\n");
+	dprint("validatePlayerPositions #2 %s\n", player2->getHasLost() ? "FAILED" : "SUCCESS");
 
 
 	for (UINT i = 0; i < N; i++)
@@ -175,12 +176,15 @@ int Game::getWinner(eReason* pReason)
 
 	else if (player1->getReason() == player2->getReason())
 	{
-		reason = (eReason) MAKE_REASON_DOUBLE(player1->getReason());
+		if (player1->getReason() == ALL_FLAGS_EATEN_DURING_POSITIONING)		//identified after match
+			reason = ALL_FLAGS_EATEN_DURING_POSITIONING;
+		else
+			reason = (eReason)MAKE_REASON_DOUBLE(player1->getReason());
 	}
 	
-	else if (player1->getReason() != player2->getReason())
+	else if (player1->getReason() != player2->getReason())						//TODO
 	{
-		printf("BOTH player Got TIE scenario with two d");
+		printf("BOTH player Got TIE scenario with two different reasons");
 		reason = BOTH_LOST_DIFFERENT_REASONS;
 	}
 
@@ -211,12 +215,12 @@ string Game::GetReasonString(eReason reason)
 	case BAD_MOVES_INPUT_FILE:
 		if (player1->getHasLost())
 		{
-			playerNumber = 0;
+			playerNumber = 1;
 			line = player1->getPlayerFileContext()->moves->getCurrentLineNum();
 		}
 		else
 		{
-			playerNumber = 1;
+			playerNumber = 2;
 			line = player2->getPlayerFileContext()->moves->getCurrentLineNum();
 		}
 		sprintf(temp, "Bad Moves input file for player %d - line %d", playerNumber, line);
@@ -228,12 +232,12 @@ string Game::GetReasonString(eReason reason)
 	case BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
 		if (player1->getHasLost())
 		{
-			playerNumber = 0;
+			playerNumber = 1;
 			line = player1->getPlayerFileContext()->pieces->getCurrentLineNum();
 		}
 		else
 		{
-			playerNumber = 1;
+			playerNumber = 2;
 			line = player2->getPlayerFileContext()->pieces->getCurrentLineNum();
 		}
 		sprintf(temp, "Bad Positioning input file for player %d - line %d", playerNumber, line);

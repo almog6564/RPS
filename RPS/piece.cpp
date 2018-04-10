@@ -97,7 +97,7 @@ ePieceType Joker::getWinAgainst() const
 
 Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType)
 {
-	Piece* p = NULL;
+	Piece* p = nullptr;
 
 	switch (type)
 	{

@@ -28,6 +28,7 @@ bool Player::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, boo
 	switch (status)
 	{
 	case FILE_SUCCESS:
+		hasMoreMoves = true;
 		return true;
 	case FILE_EOF_REACHED:
 	case FILE_ERROR:
@@ -97,8 +98,13 @@ void Player::decTypeCounter(ePieceType type, ePieceType originalType /* = UNDEF 
 
 	if (pieceCounters[FLAG] == 0)
 	{
-		hasLost = 1;
-		reason = FLAGS_CAPTURED;
+		//could be hasLost already because flags were captured during positioning
+		if (!hasLost)
+		{
+			hasLost = 1;
+			reason = FLAGS_CAPTURED;
+		}
+
 	}
 	else if (movingPiecesCtr == 0)
 	{
@@ -164,14 +170,16 @@ void Player::validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols)
 			return;
 
 		case FILE_SUCCESS:
-			dprint("got piece: %c %d %d joker: %c\n", pieceToChar(type, true), x, y, pieceToChar(jokerType, true));
 			if (tmpBoard[y-1][x-1])
 			{
+				printf("ERROR while checking position for piece %c (%d,%d), position is already occupied\n",
+					pieceToChar(type), x, y);
 				setHasLost();
 				setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
 			}
 			else
 			{
+				dprint("got piece: %c %d %d joker: %c\n", pieceToChar(type), x, y, pieceToChar(jokerType));
 				tmpBoard[y-1][x-1] = true;
 			}
 			break;

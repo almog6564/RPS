@@ -23,7 +23,7 @@ public:
 
 private:
 	std::string fileName;
-	std::string* currentLine = nullptr;
+	std::string currentLine;
 	bool isInputFile;
 	int currentLineNumber = -1;	//number of last line that was read
 
@@ -33,21 +33,26 @@ public:
 
 	~FileContext();
 
-	bool openFile();
+	int openFile();
 
-	std::string* getLastReadLine()
+	std::string& getFileName()
+	{
+		return fileName;
+	}
+
+	std::string& getLastReadLine()
 	{
 		return currentLine;
 	}
 
-	void setCurrentLine(std::string* line)
+	void setCurrentLine(std::string& line)
 	{
 		currentLine = line;
 	}
 
 	int getCurrentLineNum()
 	{
-		return currentLineNumber;
+		return currentLineNumber + 1;	//so it won't start from 0
 	}
 
 	void incCurrentLineNum()

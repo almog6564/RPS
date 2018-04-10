@@ -26,14 +26,11 @@ FileContext::~FileContext()
 {
 	if (file.is_open())
 		file.close();
-
-	if(currentLine != nullptr)
-		delete currentLine;
 }
 
-bool FileContext::openFile()
+int FileContext::openFile()
 {
-	bool ret = false;
+	int ret = -1;
 
 	do
 	{
@@ -41,7 +38,7 @@ bool FileContext::openFile()
 
 		if (file.is_open())
 		{
-			ret = true;
+			ret = 0;
 			break;
 		}
 
@@ -55,22 +52,32 @@ bool FileContext::openFile()
 int FileParser::initializeFiles()
 {
 	//open files and check if file was opened successfully
-	
-	if (!p1->pieces->openFile())
-		return -1;
 
-	if (!p1->moves->openFile())
-		return -1;
+	do 
+	{
+		if (p1->pieces->openFile())
+			break;
 
-	if (!p2->pieces->openFile())
-		return -1;
+		if (p1->moves->openFile())
+			break;
 
-	if (!p2->moves->openFile())
-		return -1;
+		if (p2->pieces->openFile())
+			break;
 
-	if (!output->openFile())
-		return -1;
-	
+		if (p2->moves->openFile())
+			break;
+
+		if (output->openFile())
+			break;
+
+	} while (false);
+
+	if (errno == ENOENT)	//one of files not found, print usage
+	{
+		cout << "To start the game, please make sure all input files are present in the working directory:\n"
+			<< "\t* player1.rps_board \t* player2.rps_board \t* player1.rps_moves \t* player2.rps_moves\n" << endl;
+	}
+
 	return 0;
 }
 
@@ -82,7 +89,7 @@ PlayerFileContext* FileParser::getPlayerFileContext(int playerNumber)
 	if (playerNumber == 1)
 		return p2;
 
-	return NULL;
+	return nullptr;
 }
 
 FileParser::~FileParser()
@@ -96,7 +103,7 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 {
 	eFileStatus status = FILE_SUCCESS;
 	UINT length, xTmp, yTmp;
-	string line;
+	string temp, line;
 	stringstream ss;
 	char typeTmp;
 
@@ -113,16 +120,21 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 
 		while (true)
 		{
-			getline(pieces->file, line);
-			length = (UINT)line.length();
-			pieces->setCurrentLine(&line); //save the current line to print if there was error
+			getline(pieces->file, temp);
+			length = (UINT)temp.length();
 			pieces->incCurrentLineNum();
 
 			if (length > 0)
 			{
-				break;
+				if (temp[0] == '\n' || temp[0] == '\r') // '\n' not supposed to happen
+					continue;
+				else
+				{
+					line = (temp[length - 1] == '\r') ? temp.substr(0, length - 1) : temp;
+					break;		//regular line
+				}
 			}
-			else if (pieces->file.eof())
+			else if (pieces->file.eof() || pieces->file.fail())
 			{
 				status = FILE_EOF_REACHED;
 				break;
@@ -132,11 +144,15 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 		if (status)
 			break;
 
-
-		if (line[0] == 'J')
+		/* put the relevant substring into a stream and ignore whitespace at beginning of line */
+		ss << (line[length-1] == '\r' ? line.substr(0, length-1) : line);
+		ss >> ws;
+		
+		/* if the first character is J, its a joker line */
+		if (ss.peek() == 'J')
 		{
-			/* put the relevant substring, without the J into a stream*/
-			ss << line.substr(1, length - 1);
+			/* move past the J */
+			ss.ignore(1);
 
 			/* parse the line, while "ws" ignores whitespace */
 			ss >> ws >> xTmp >> ws >> yTmp >> ws >> typeTmp >> ws;
@@ -145,6 +161,8 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 			or if there are anymore characters in the line after then its bad format */
 			if (ss.fail() || ss.rdbuf()->in_avail() > 0)
 			{
+				printf("File \"%s\" has illegal format on joker line %d [%s]\n",
+					pieces->getFileName().c_str(), pieces->getCurrentLineNum(), line.c_str());
 				status = FILE_BAD_FORMAT;
 				break;
 			}
@@ -157,21 +175,22 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 
 			if(*jokerType == UNDEF)
 			{
+				printf("File \"%s\" has illegal format on line %d [%s] - illegal joker type '%c'\n",
+					pieces->getFileName().c_str(), pieces->getCurrentLineNum(), line.c_str(), typeTmp);
 				status = FILE_BAD_FORMAT;
 			}
 			break;
 		}
 
-		/* regular line, no joker*/
-		ss << line;
-
-		/* parse line */
-		ss >> ws >> typeTmp >> ws >> xTmp >> ws >> yTmp >> ws;
+		/* parse line without joker */
+		ss >> typeTmp >> ws >> xTmp >> ws >> yTmp >> ws;
 
 		/* if there was fail during one or other conversions
 		or if there are anymore characters in the line after then it's bad format */
 		if (ss.fail() || ss.rdbuf()->in_avail() > 0)
 		{
+			printf("File \"%s\" has illegal format on line %d [%d]\n",
+				pieces->getFileName().c_str(), pieces->getCurrentLineNum(), line[0]);
 			status = FILE_BAD_FORMAT;
 			break;
 		}
@@ -184,6 +203,8 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 
 		if (*type == UNDEF || *type == JOKER)
 		{
+			printf("File \"%s\" has illegal format on line %d [%s] - illegal type\n",
+				pieces->getFileName().c_str(), pieces->getCurrentLineNum(), line.c_str());
 			status = FILE_BAD_FORMAT;
 		}
 		break;
@@ -199,8 +220,8 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 											ePieceType* newRep)
 {
 	eFileStatus status = FILE_SUCCESS;
-	UINT fX, fY, tX, tY, jX, jY;
-	string line;
+	UINT fX, fY, tX, tY, jX, jY, length;
+	string temp, line;
 	stringstream ss;
 	char typeTmp;
 	char chk[3];
@@ -219,13 +240,19 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 
 		while (true)
 		{
-			getline(moves->file, line);
-			moves->setCurrentLine(&line); //save the current line to print if there was error
+			getline(moves->file, temp);
+			length = (UINT)temp.length();
 			moves->incCurrentLineNum();
 
-			if (line.length() > 0)
+			if (length > 0)
 			{
-				break;
+				if (temp[0] == '\n' || temp[0] == '\r') // '\n' not supposed to happen
+					continue;
+				else
+				{
+					line = (temp[length - 1] == '\r') ? temp.substr(0, length - 1) : temp;
+					break;		//regular line
+				}
 			}
 			else if (moves->file.eof())
 			{
@@ -247,6 +274,8 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 		/* if there was fail during one or other conversions then its bad format */
 		if (ss.fail())
 		{
+			printf("File \"%s\" has illegal format on line %d [%s]\n",
+				moves->getFileName().c_str(), moves->getCurrentLineNum(), line.c_str());
 			status = FILE_BAD_FORMAT;
 			break;
 		}
@@ -267,6 +296,8 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 
 		if (ss.rdbuf()->in_avail() < chkSize) 
 		{
+			printf("File \"%s\" has illegal characters on line %d [%s]\n",
+				moves->getFileName().c_str(), moves->getCurrentLineNum(), line.c_str());
 			status = FILE_BAD_FORMAT;
 			break;
 		}
@@ -279,6 +310,8 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 			chk[1] != ':' || !isspace(chk[2]))
 		{
 			/* if its not "J: " then bad format */
+			printf("File \"%s\" has illegal format on joker line %d [%s]\n",
+				moves->getFileName().c_str(), moves->getCurrentLineNum(), line.c_str());
 			status = FILE_BAD_FORMAT;
 			break;
 		}
@@ -290,6 +323,8 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 		or if there are anymore characters in the line after then it's bad format */
 		if (ss.fail() || ss.rdbuf()->in_avail() > 0)
 		{
+			printf("File \"%s\" has illegal format on joker line %d [%s]\n",
+				moves->getFileName().c_str(), moves->getCurrentLineNum(), line.c_str());
 			status = FILE_BAD_FORMAT;
 			break;
 		}
@@ -297,7 +332,16 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 		*jokerX = jX;
 		*jokerY = jY;
 		*newRep = charToPiece(typeTmp);
+
+		if (*newRep == UNDEF)
+		{
+			printf("File \"%s\" has illegal format on line %d [%s] - illegal joker type '%c'\n",
+				moves->getFileName().c_str(), moves->getCurrentLineNum(), line.c_str(), typeTmp);
+			status = FILE_BAD_FORMAT;
+		}
+
 		*isJoker = true;
+		
 	} while (false);
 
 	return status;
