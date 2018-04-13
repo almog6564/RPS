@@ -6,6 +6,8 @@
 
 typedef unsigned int UINT;
 
+
+/***** For debug printing ******/
 #define DEBUG 1
 
 #if DEBUG == 1
@@ -13,6 +15,9 @@ typedef unsigned int UINT;
 #else
 #define dprint(...)
 #endif
+/***** For debug printing ******/
+
+
 typedef enum _ePieceType
 {
 	UNDEF,
@@ -23,7 +28,7 @@ typedef enum _ePieceType
 	JOKER,
 	FLAG,
 
-	PIECE_COUNT
+	PIECE_COUNT	//to declare array the size of enum 
 
 } ePieceType;
 
@@ -35,7 +40,7 @@ typedef enum _eScore
 	ERROR
 } eScore;
 
-
+/* Those macros are to make easily a "double" reason to indicate the same loss reason for both players */
 #define DOUBLE_REASON_MASK 0x80
 #define MAKE_REASON_DOUBLE(r) (r | DOUBLE_REASON_MASK)
 
@@ -63,6 +68,16 @@ typedef enum  _reason
 	BOTH_LOST_DIFFERENT_REASONS
 
 } eReason;
+
+
+typedef enum _eFileStatus
+{
+	FILE_SUCCESS,
+	FILE_ERROR,
+	FILE_EOF_REACHED,
+	FILE_BAD_FORMAT
+
+} eFileStatus;
 
 
 #endif //_DEFS_

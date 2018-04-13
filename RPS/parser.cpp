@@ -1,27 +1,30 @@
 
 #include "parser.h"
-#include <fstream>
-#include <iostream>
 #include <sstream>
 #include <cerrno>
 #include <cstring>
+#include <iostream>
 
 using namespace std;
 
+
 PlayerFileContext::PlayerFileContext(string& pieceFileName, string& movesFileName)
 {
-	pieces = new FileContext(pieceFileName, true);
-	moves = new FileContext(movesFileName, true);
+	pieces = new FileContext(pieceFileName, true);	//input file
+	moves = new FileContext(movesFileName, true);	//input file
 }
 
 FileParser::FileParser(string& p1PiecesFileName, string& p2PiecesFilename,
 	string& p1MovesFileName, string& p2MovesFilename, string& outputFilename)
 {
-	p1 = new PlayerFileContext(p1PiecesFileName,p1MovesFileName);
+	p1 = new PlayerFileContext(p1PiecesFileName, p1MovesFileName);
 	p2 = new PlayerFileContext(p2PiecesFilename, p2MovesFilename);
-	output = new FileContext(outputFilename, false);
+	output = new FileContext(outputFilename, false);	//output file
 }
 
+/*
+	Close file to free resources of file stream only if file was opened.
+*/
 FileContext::~FileContext()
 {
 	if (file.is_open())
@@ -34,6 +37,7 @@ int FileContext::openFile()
 
 	do
 	{
+		//if output file also truncate file
 		file.open(fileName, isInputFile ? (ios::in) : (ios::out | ios::trunc));
 
 		if (file.is_open())
@@ -354,12 +358,6 @@ void PlayerFileContext::setPieceFileToStart()
 	pieces->zeroCurrentLineNum();
 }
 
-PlayerFileContext::~PlayerFileContext()
-{
-	delete pieces;
-	delete moves;
-}
-
 ePieceType charToPiece(char c)
 {
 	ePieceType p;
@@ -390,7 +388,7 @@ ePieceType charToPiece(char c)
 		p = FLAG;
 		break;
 
-	default:
+	default:	//indicates invalid character
 		p = UNDEF;
 		break;
 	}
@@ -428,71 +426,10 @@ char pieceToChar(ePieceType p, bool isUpperCase)
 		c = isUpperCase ? 'F' : 'f';
 		break;
 
-	default:
+	default:	//indicates invalid enum
 		c = 'U';
 		break;
 	}
 
 	return c;
 }
-
-
-/* Unit Test */
-/*
-int main()
-{
-	char* p1p = "player1.rps_board";
-	char* p1m = "player1.rps_moves";
-	char* p2p = "player2.rps_board";
-	char* p2m = "player2.rps_moves";
-	ePieceType type, jokerType;
-	UINT x, y, fromx, fromy, tox, toy, jokerx, jokery;
-	bool isJoker;
-	FileParser* f = new FileParser(p1p, p2p, p1m, p2m);
-	eFileStatus status;
-
-	char* names[] = { "UNDEF", "ROCK", "PAPER", "SCISSORS", "BOMB", "JOKER", "FLAG" };
-
-	if (f->initializeFiles() < 0)
-	{
-		printf("Error file open\n");
-		return -1;
-	}
-
-	while ((status = f->p1->getNextPiece(&type, &x, &y, &jokerType)) != FILE_EOF_REACHED)
-	{
-		if (status == FILE_SUCCESS)
-		{
-			if (type != JOKER)
-				printf("Got piece: %s (%d,%d)\n", names[type], x, y);
-			else
-				printf("Got JOKER: %s (%d,%d)\n", names[jokerType], x, y);
-		}
-		else
-		{
-			printf("Bad line : %s\n", f->p1->pieces->getLastReadLine()->c_str());
-		}
-	}
-	printf("\n\n");
-	while ((status = f->p1->getNextMove(&fromx, &fromy, &tox, &toy, &isJoker,
-		&jokerx, &jokery, &type)) != FILE_EOF_REACHED)
-	{
-		if (status == FILE_SUCCESS)
-		{
-			if (isJoker)
-				printf("Got Joker: (%d,%d)->(%d,%d) [J: %d %d (%s)]\n", fromx, fromy, tox, toy,
-					jokerx, jokery, names[type]);
-			else
-				printf("Got Move : (%d,%d)->(%d,%d)\n", fromx, fromy, tox, toy);
-		}
-		else
-		{
-			printf("Bad line : %s\n", f->p1->moves->getLastReadLine()->c_str());
-		}
-	}
-
-	delete f;
-
-	return 0;
-}
-*/
