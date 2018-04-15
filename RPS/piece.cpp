@@ -10,7 +10,7 @@ Piece::Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* playerOwner) 
 
 Piece::~Piece()
 {
-	owner->decTypeCounter(type, type);
+	//owner->decTypeCounter(type, type);
 }
 
 
@@ -45,7 +45,7 @@ Joker::Joker(ePieceType currentTypeArg, Player * owner): Piece(JOKER, UNDEF, own
 
 Joker::~Joker()
 {
-	owner->decTypeCounter(currentType, JOKER);
+	//owner->decTypeCounter(currentType, JOKER);
 }
 
 int Joker::setCurrentType(ePieceType newType)

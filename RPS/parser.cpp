@@ -14,6 +14,12 @@ PlayerFileContext::PlayerFileContext(string& pieceFileName, string& movesFileNam
 	moves = new FileContext(movesFileName, true);	//input file
 }
 
+PlayerFileContext::~PlayerFileContext()
+{
+	delete pieces;
+	delete moves;
+}
+
 FileParser::FileParser(string& p1PiecesFileName, string& p2PiecesFilename,
 	string& p1MovesFileName, string& p2MovesFilename, string& outputFilename)
 {
@@ -22,13 +28,23 @@ FileParser::FileParser(string& p1PiecesFileName, string& p2PiecesFilename,
 	output = new FileContext(outputFilename, false);	//output file
 }
 
+FileParser::~FileParser()
+{
+	delete p1;
+	delete p2;
+	delete output;
+}
+
 /*
 	Close file to free resources of file stream only if file was opened.
 */
 FileContext::~FileContext()
 {
-	if (file.is_open())
-		file.close();
+	if (file->is_open())
+		file->close();
+
+	delete file;
+	delete fileName;
 }
 
 int FileContext::openFile()
@@ -37,16 +53,18 @@ int FileContext::openFile()
 
 	do
 	{
-		//if output file also truncate file
-		file.open(fileName, isInputFile ? (ios::in) : (ios::out | ios::trunc));
+		file = new std::fstream();
 
-		if (file.is_open())
+		//if output file also truncate file
+		file->open(*fileName, isInputFile ? (ios::in) : (ios::out | ios::trunc));
+
+		if (file->is_open())
 		{
 			ret = 0;
 			break;
 		}
 
-		printf("Error while opening file: %s, %s\n", fileName.c_str(), strerror(errno));
+		printf("Error while opening file: %s, %s\n", fileName->c_str(), strerror(errno));
 
 	} while (false);
 
@@ -96,12 +114,7 @@ PlayerFileContext* FileParser::getPlayerFileContext(int playerNumber)
 	return nullptr;
 }
 
-FileParser::~FileParser()
-{
-	delete p1;
-	delete p2;
-	delete output;
-}
+
 
 eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, ePieceType* jokerType)
 {
@@ -124,7 +137,7 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 
 		while (true)
 		{
-			getline(pieces->file, temp);
+			getline(*(pieces->file), temp);
 			length = (UINT)temp.length();
 			pieces->incCurrentLineNum();
 
@@ -138,7 +151,7 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 					break;		//regular line
 				}
 			}
-			else if (pieces->file.eof() || pieces->file.fail())
+			else if (pieces->file->eof() || pieces->file->fail())
 			{
 				pieces->decCurrentLineNum();	//this line was incremented incorrectly
 				status = FILE_EOF_REACHED;
@@ -245,7 +258,7 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 
 		while (true)
 		{
-			getline(moves->file, temp);
+			getline(*(moves->file), temp);
 			length = (UINT)temp.length();
 			moves->incCurrentLineNum();
 
@@ -259,7 +272,7 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 					break;		//regular line
 				}
 			}
-			else if (moves->file.eof())
+			else if (moves->file->eof())
 			{
 				status = FILE_EOF_REACHED;
 				break;
@@ -354,8 +367,8 @@ eFileStatus PlayerFileContext::getNextMove(UINT* fromX, UINT* fromY, UINT* toX, 
 
 void PlayerFileContext::setPieceFileToStart()
 {
-	pieces->file.clear();
-	pieces->file.seekg(0, ios::beg);
+	pieces->file->clear();
+	pieces->file->seekg(0, ios::beg);
 	pieces->zeroCurrentLineNum();
 }
 

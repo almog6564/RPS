@@ -11,6 +11,13 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	turn = 0;
 }
 
+Game::~Game()
+{
+	delete board;
+	delete player1;
+	delete player2;
+}
+
 void Game::runMove()
 {
 	if (turn == 0) //player 1's turn
@@ -322,10 +329,10 @@ void Game::writeOutputFile()
 	winner = getWinner(&reason);
 
 	board->getBoardDimensions(&cols, &rows);
-	fileParser->output->file.seekp(ios::beg);
+	fileParser->output->file->seekp(ios::beg);
 
-	fileParser->output->file << "Winner: " << winner << '\n';	//1st line: winner
-	fileParser->output->file << "Reason: " << GetReasonString(reason) << "\n\n"; //2nd line: reason, 3rd line: empty
+	*(fileParser->output->file) << "Winner: " << winner << '\n';	//1st line: winner
+	*(fileParser->output->file) << "Reason: " << GetReasonString(reason) << "\n\n"; //2nd line: reason, 3rd line: empty
 
 	dprint("writeOutputFile: got reason string, reason = (%d) [%s]\n", reason, GetReasonString(reason).c_str());
 	dprint("\n\n ##### BOARD #####\n\n");
@@ -356,13 +363,13 @@ void Game::writeOutputFile()
 				}
 			}
 
-			fileParser->output->file << c;
+			*(fileParser->output->file) << c;
 			dprint("%c", debug_c);
 		}
-		fileParser->output->file << '\n';
+		*(fileParser->output->file) << '\n';
 		dprint("\n");
 	}
-	fileParser->output->file.flush();	//actual write to the file
+	fileParser->output->file->flush();	//actual write to the file
 	dprint("\n");
 
 }

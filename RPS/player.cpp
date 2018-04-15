@@ -71,13 +71,15 @@ void Player::decTypeCounter(ePieceType type, ePieceType originalType /* = UNDEF 
 	{
 		if (originalType == JOKER) 
 		{
-			pieceCounters[originalType]--;
+			if(pieceCounters[originalType] > 0)
+				pieceCounters[originalType]--;
 		}
 		else
 		{
 			//this check is so the Piece interface wouldn't "know" there's "original" and
 			// "not original" types, only type
-			pieceCounters[type]--;
+			if(pieceCounters[type] > 0)
+				pieceCounters[type]--;
 		}
 	}
 

@@ -38,6 +38,7 @@ public:
 						 UINT R2, UINT P2, UINT S2, UINT B2, UINT J2, UINT F2, FileParser* fileParser);
 
 
+	~Game();
 	/*
 	Before starting the actual game (i.e. positioning, matching and moving pieces), this function checks
 	wheather the board files are valid (i.e. correct formats and no two pieces at the same location by the 

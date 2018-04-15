@@ -15,10 +15,10 @@ class FileContext
 {
 public:
 	/* File itself (either input or output) */
-	std::fstream file;
+	std::fstream* file;
 
 private:
-	std::string fileName;
+	std::string* fileName;
 
 	/* boolean holding is input file */
 	bool isInputFile;
@@ -32,7 +32,7 @@ public:
 	After initialization the function @openFile must be run in order to use the file.
 	*/
 	FileContext(std::string& fname, bool isInputFile) :
-		fileName(fname), isInputFile(isInputFile) {};
+		fileName(new std::string(fname)), isInputFile(isInputFile) {};
 
 	~FileContext();
 
@@ -46,7 +46,7 @@ public:
 
 	std::string& getFileName()
 	{
-		return fileName;
+		return *fileName;
 	}
 
 	int getCurrentLineNum()
@@ -88,6 +88,7 @@ public:
 	*/
 	PlayerFileContext(std::string& pieceFileName, std::string& movesFileName);
 
+	~PlayerFileContext();
 	/*
 		This function gets the next piece available in the player positioning file.
 		It also checks for all the possible #format violations only. This includes piece char

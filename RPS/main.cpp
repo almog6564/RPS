@@ -67,5 +67,8 @@ int main()
 
 	game->writeOutputFile();
 
+	delete game;
+	delete fileParser;
+
 	return 0;
 }

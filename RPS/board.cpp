@@ -35,8 +35,14 @@ void Board::removePiece(UINT col, UINT row)
 	if (col > cols || row > rows || row < 1 || col < 1)
 		return;
 
-	delete table[row-1][col-1];
-	table[row-1][col-1] = nullptr;
+	Piece* p = table[row - 1][col - 1];
+
+	if (p)
+	{
+		p->owner->decTypeCounter(p->getType(), p->getOriginalType());
+		delete table[row - 1][col - 1];
+		table[row - 1][col - 1] = nullptr;
+	}
 }
 
 /**
@@ -103,6 +109,8 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 			removePiece(toX, toY);
 			if (moved)
 				removePiece(fromX, fromY);
+			else
+				delete p;
 
 			if (!moved && type == FLAG)
 			{
@@ -135,17 +143,23 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 			dprint("Player #%d LOSES!\n", p1owner->getPlayerId()+1);
 			if (moved)
 				removePiece(fromX, fromY);
+			else
+				delete p;
 			break;
 
 		case TIE:
 			dprint("It's a TIE!\n");
 			if (moved)
 				removePiece(fromX, fromY);
+			else
+				delete p;
+
 			removePiece(toX, toY);
 
 			break;
 
 		default: //ERROR
+			delete p;
 			cout << "invalid match result" << endl;
 			return -1;
 		}
@@ -281,6 +295,12 @@ Board::~Board()
 {
 	for (UINT i = 0; i < rows; i++)
 	{
+		for (UINT j = 0; j < cols; j++)
+		{
+			if(table[i][j])
+				delete table[i][j];
+		}
+
 		delete[] table[i];
 	}
 	delete[] table;
