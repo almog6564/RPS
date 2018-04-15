@@ -18,6 +18,17 @@ public:
 
 	Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* owner);
 
+	/*
+	This function does a match between the piece and a given second piece accordint to the rules of Rock, Paper, Scissors.
+		@returns -
+			WIN - the Piece won p.
+			LOSE - the piece lost to p.
+			TIE - a tie result.
+			ERROR - some invalid values.
+	*/
+	eScore match(Piece* p);
+
+
 	ePieceType getOriginalType()const
 	{
 		return type;
@@ -38,7 +49,6 @@ public:
 		return owner;
 	}
 
-	eScore match(Piece* p);
 
 	virtual bool isJoker();
 
