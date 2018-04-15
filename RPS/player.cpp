@@ -8,6 +8,7 @@ Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFi
 	pieceCounters[ROCK] = 0; pieceCounters[SCISSORS] = 0; pieceCounters[PAPER] = 0;
 	pieceCounters[BOMB] = 0; pieceCounters[JOKER] = 0; pieceCounters[FLAG] = 0;
 	movingPiecesCtr = 0;
+	originalFlagsCnt = 0;
 	score = 0;
 	hasMoreMoves = true;
 	hasLost = false;
@@ -49,7 +50,7 @@ int Player::getNextPiece(ePieceType* type, UINT * toX, UINT * toY, ePieceType* j
 	return 0;
 }
 
-void Player::updateScore()
+void Player::updateScore()	//for future use
 {
 	score++;
 }
@@ -96,17 +97,7 @@ void Player::decTypeCounter(ePieceType type, ePieceType originalType /* = UNDEF 
 		cout << "decCounter: invalid type " << type << endl;
 	}
 
-	if (pieceCounters[FLAG] == 0)
-	{
-		//could be hasLost already because flags were captured during positioning
-		if (!hasLost)
-		{
-			hasLost = 1;
-			reason = FLAGS_CAPTURED;
-		}
-
-	}
-	else if (movingPiecesCtr == 0)
+	if (movingPiecesCtr == 0)
 	{
 		hasLost = 1;
 		reason = PIECES_EATEN;
@@ -119,15 +110,31 @@ int Player::incTypeCount(ePieceType type, ePieceType originalType, bool updateOn
 	if(!updateOnlyMovingCounter)
 		pieceCounters[originalType]++;
 
-	if(type != BOMB && type != FLAG && type != UNDEF)
+	if (type != BOMB && type != FLAG && type != UNDEF)
+	{
 		movingPiecesCtr++;
+		
+		if (originalType == JOKER && (type == ROCK || type == SCISSORS || type == PAPER)
+			&& hasLost && reason == PIECES_EATEN)
+		{
+			/* We are now changing type from moving piece to non-moving piece.
+			this is to prevent race condition on which joker type changes after a player "loses",
+			but the joker changes type to moving type and saves the player from dying */
+
+			hasLost = 0;	//we need to revert the loss
+			reason = INVALID_REASON;
+		}
+	}
+
+	if (type == FLAG)
+		incOriginalFlagCount();
 
 	if (pieceCounters[originalType] > getTypeMax(type))
 	{
 		hasLost = 1;
 		reason = BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER;
-		dprint("\n** ERROR: Player #%d piece %c count is <%d> bigger than MAX <%d>\n",
-			ID, pieceToChar(originalType), pieceCounters[originalType], getTypeMax(type));
+		printf("\n** ERROR: Player #%d piece %c count is <%d> bigger than MAX <%d>\n",
+			ID+1, pieceToChar(originalType), pieceCounters[originalType], getTypeMax(type));
 		return -1;
 	}
 	return 0;
@@ -148,11 +155,11 @@ void Player::validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols)
 	{
 		status = fileContext->getNextPiece(&type, &x, &y, &jokerType);
 
-		if (x > cols || y > rows)
+		if (x > cols || y > rows || x < 1 || y < 1)
 		{
 			printf("[Player::validatePlayerPositions] player #%d dimensions check failed: "
 				"x=%d, y=%d WHILE: cols=%d and rows=%d\n",
-				ID, x, y, cols, rows);
+				ID+1, x, y, cols, rows);
 
 			status = FILE_BAD_FORMAT;
 		}
@@ -172,8 +179,8 @@ void Player::validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols)
 		case FILE_SUCCESS:
 			if (tmpBoard[y-1][x-1])
 			{
-				printf("ERROR while checking position for piece %c (%d,%d), position is already occupied\n",
-					pieceToChar(type), x, y);
+				printf("ERROR [player #%d] - while checking position for piece %c at (%d,%d), position is already occupied\n",
+					ID+1, pieceToChar(type), x, y);
 				setHasLost();
 				setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
 			}

@@ -11,6 +11,7 @@ class Player
 	const UINT ID;
 	UINT pieceCounters[PIECE_COUNT];
 	UINT movingPiecesCtr; 
+	UINT originalFlagsCnt;
 	UINT score;
 	bool hasLost;
 	UINT R, P, S, B, J, F;
@@ -46,7 +47,7 @@ public:
 	int getNextPiece(ePieceType* type, UINT * toX, UINT * toY, ePieceType* jokerType);
 
 	/*
-	This function decreases the conunter of a specific Piece type. 
+	This function decreases the counter of a specific Piece type. 
 	If the type of the Piece is Joker, than originalType will be set to Joker, and the correct type counter will be
 	decreased (e.g. to avoid that the ROCK counter will be decreased if a Joker that is currently a ROCK was removed.
 	In any case, the movingPieces global counter will be updated according to the type or current type if it's a Joker
@@ -119,8 +120,16 @@ public:
 		}
 	}
 
+	/* This is to know whether there were flags before but they were eaten*/
+	UINT getOriginalFlagCount(void)
+	{
+		return originalFlagsCnt;
+	}
 
-
+	void incOriginalFlagCount(void)
+	{
+		originalFlagsCnt++;
+	}
 
 
 

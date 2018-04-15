@@ -140,6 +140,7 @@ eFileStatus PlayerFileContext::getNextPiece(ePieceType* type, UINT* x, UINT* y, 
 			}
 			else if (pieces->file.eof() || pieces->file.fail())
 			{
+				pieces->decCurrentLineNum();	//this line was incremented incorrectly
 				status = FILE_EOF_REACHED;
 				break;
 			}

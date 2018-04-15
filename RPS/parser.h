@@ -59,6 +59,11 @@ public:
 		currentLineNumber++;
 	}
 
+	void decCurrentLineNum()
+	{
+		currentLineNumber--;
+	}
+
 	void zeroCurrentLineNum()
 	{
 		currentLineNumber = -1;

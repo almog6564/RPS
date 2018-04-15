@@ -28,7 +28,7 @@ void Game::runSingleMove(Player* player)
 	UINT jokerX, jokerY;
 	ePieceType newRep;
 
-	dprint("\n\n ************ Starting MOVE: Player #%d ************ \n\n", player->getPlayerId());
+	dprint("\n\n ************ Starting MOVE: Player #%d ************ \n\n", player->getPlayerId()+1);
 
 	if (player->getHasMoreMoves())
 	{
@@ -52,6 +52,8 @@ void Game::runSingleMove(Player* player)
 					return;
 				}
 			}
+
+			checkWhetherFlagsWereCaptured();
 				
 		}
 		else
@@ -61,13 +63,18 @@ void Game::runSingleMove(Player* player)
 	}
 }
 
-void Game::checkPlayersFlags(Player * player)
+void Game::checkPlayersFlagCountLessThanMax(Player * player)
 {
-	//unless the player has already "lost" by tie of flags during positioning
-	if (!player->getHasLost() && (player->getTypeCount(FLAG) != player->getTypeMax(FLAG)))
+	if (player->getHasLost())
+		return;
+
+	if (player->getTypeCount(FLAG) != player->getTypeMax(FLAG) &&		//less flags that were supposed to be
+		player->getTypeCount(FLAG) == player->getOriginalFlagCount())	//no flags were eaten
 	{
 		player->setHasLost();
 		player->setReason(BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER);
+		printf("ERROR [player %d] - %d flags were supposed to be positioned on screen but only %d were in fact positioned\n", 
+			player->getPlayerId()+1, player->getTypeMax(FLAG), player->getTypeCount(FLAG));
 	}
 }
 
@@ -119,6 +126,28 @@ void Game::resetPieceFiles()
 }
 
 
+void Game::checkWhetherFlagsWereCaptured(void)
+{
+	if (player1->getTypeCount(FLAG) == 0 && player1->getOriginalFlagCount() > 0 &&
+		player2->getTypeCount(FLAG) > 0)
+	{
+		if (player1->getHasLost() == false)
+		{
+			player1->setHasLost();
+			player1->setReason(FLAGS_CAPTURED);
+		}
+	}
+	else if (player2->getTypeCount(FLAG) == 0 && player2->getOriginalFlagCount() > 0 &&
+		player1->getTypeCount(FLAG) > 0)
+	{
+		if (player2->getHasLost() == false)
+		{
+			player2->setHasLost();
+			player2->setReason(FLAGS_CAPTURED);
+		}
+	}
+}
+
 int Game::positionPiece(int player)
 {
 	if (player == 0)
@@ -144,8 +173,24 @@ int Game::positionSinglePiece(Player* player)
 
 void Game::flagsCheck()
 {
-	checkPlayersFlags(player1);
-	checkPlayersFlags(player2);
+	checkPlayersFlagCountLessThanMax(player1);
+	checkPlayersFlagCountLessThanMax(player2);
+
+	checkWhetherFlagsWereCaptured();
+	
+	if (player1->getTypeCount(FLAG) == 0 && player1->getOriginalFlagCount() > 0 &&
+		player2->getTypeCount(FLAG) == 0 && player2->getOriginalFlagCount() > 0)
+	{
+		if (player1->getHasLost() == false &&
+			player2->getHasLost() == false)
+		{
+			player1->setHasLost();
+			player1->setReason(ALL_FLAGS_EATEN_DURING_POSITIONING);
+			player2->setHasLost();
+			player2->setReason(ALL_FLAGS_EATEN_DURING_POSITIONING);
+		}
+	}
+
 }
 
 int Game::getWinner(eReason* pReason)
@@ -176,7 +221,7 @@ int Game::getWinner(eReason* pReason)
 
 	else if (player1->getReason() == player2->getReason())
 	{
-		if (player1->getReason() == ALL_FLAGS_EATEN_DURING_POSITIONING)		//identified after match
+		if (player1->getReason() == ALL_FLAGS_EATEN_DURING_POSITIONING)		//identified in checkPlayersFlags
 			reason = ALL_FLAGS_EATEN_DURING_POSITIONING;
 		else
 			reason = (eReason)MAKE_REASON_DOUBLE(player1->getReason());
@@ -184,7 +229,10 @@ int Game::getWinner(eReason* pReason)
 	
 	else if (player1->getReason() != player2->getReason())						//TODO
 	{
-		printf("BOTH player Got TIE scenario with two different reasons");
+		printf("BOTH player Got TIE scenario with two different reasons:\n"
+			"\tPlayer #1 reason: %s\n"
+			"\tPlayer #2 reason: %s\n",
+			GetReasonString(player1->getReason()).c_str(), GetReasonString(player2->getReason()).c_str());
 		reason = BOTH_LOST_DIFFERENT_REASONS;
 	}
 
@@ -263,9 +311,13 @@ void Game::writeOutputFile()
 	UINT rows, cols, i, j;
 	Piece* piece;
 	bool isPlayer1 = false;
-	char c, debug_c;
+	char c;
 	int winner;
 	eReason reason;
+
+#if DEBUG == 1
+	char debug_c;
+#endif
 
 	winner = getWinner(&reason);
 
@@ -286,13 +338,17 @@ void Game::writeOutputFile()
 			if (!piece)
 			{
 				c = ' ';
+#if DEBUG == 1
 				debug_c = '-';
+#endif
 			}
 			else
 			{
 				isPlayer1 = (piece->getOwner() == player1);
 				c = pieceToChar(piece->getOriginalType(), isPlayer1);	//need to get original type to print joker as joker
+#if DEBUG == 1
 				debug_c = c;
+#endif
 				if (c < 0)
 				{
 					cout << "Bad piece returned from function" << endl;

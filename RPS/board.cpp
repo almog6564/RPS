@@ -62,7 +62,7 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 		else
 		{
 			dprint("Player #%d moved its %c [if J: %c] from (%d,%d) to (%d,%d)\n",
-				p1owner->getPlayerId(), pieceToChar(originalType), pieceToChar(type),
+				p1owner->getPlayerId()+1, pieceToChar(originalType), pieceToChar(type),
 				fromX, fromY, toX, toY);
 			setPieceAt(nullptr, fromX, fromY);
 		}
@@ -70,6 +70,7 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 	}
 	else //piece found at cell
 	{
+
 		p2type = p2->getType();
 		p2owner = p2->getOwner();
 
@@ -86,18 +87,29 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 		}
 
 		dprint("MATCH: Player#%d [%c already at (%d,%d)] VS Player #%d [%c from (%d,%d)] ... ",
-			p2owner->getPlayerId(), pieceToChar(p2->getType()), toX, toY, p1owner->getPlayerId(), pieceToChar(type), fromX, fromY);
+			p2owner->getPlayerId()+1, pieceToChar(p2->getType()), toX, toY, p1owner->getPlayerId(), pieceToChar(type), fromX, fromY);
 
 		if (type == BOMB || p2type == BOMB)
 		{
-			if(type != p2type)
-				dprint("Player #%d WINS!\n", type == BOMB ? p1owner->getPlayerId() : p2owner->getPlayerId());
+			if (type != p2type)
+			{
+				dprint("Player #%d WINS!\n", type == BOMB ? p1owner->getPlayerId()+1 : p2owner->getPlayerId()+1);
+			}
 			else
+			{
 				dprint("It's a TIE!\n");
+			}
 
 			removePiece(toX, toY);
 			if (moved)
 				removePiece(fromX, fromY);
+
+			if (!moved && type == FLAG)
+			{
+				//flag was positioned but lost, need to know that flag existed
+				p1owner->incOriginalFlagCount();
+			} 
+
 			return 0;
 		}
 
@@ -116,11 +128,11 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 					return -1;
 			}
 
-			dprint("Player #%d WINS!\n", p1owner->getPlayerId());
+			dprint("Player #%d WINS!\n", p1owner->getPlayerId()+1);
 			break;
 
 		case LOSE:
-			dprint("Player #%d LOSES!\n", p1owner->getPlayerId());
+			dprint("Player #%d LOSES!\n", p1owner->getPlayerId()+1);
 			if (moved)
 				removePiece(fromX, fromY);
 			break;
@@ -131,17 +143,6 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 				removePiece(fromX, fromY);
 			removePiece(toX, toY);
 
-			/* Treat the case on which all the flags were eaten during positioning 
-				by a tie of two flags, otherwise afterwards it looks like there
-				were no flags positioned */
-			if (!moved && type == FLAG && p2type == FLAG &&
-				p1owner->getTypeCount(FLAG) == 0 && p2owner->getTypeCount(FLAG) == 0)
-			{
-				p1owner->setHasLost();
-				p1owner->setReason(ALL_FLAGS_EATEN_DURING_POSITIONING);
-				p2owner->setHasLost();
-				p2owner->setReason(ALL_FLAGS_EATEN_DURING_POSITIONING);
-			}
 			break;
 
 		default: //ERROR
@@ -149,7 +150,14 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 			return -1;
 		}
 
+		if (score != WIN && type == FLAG)
+		{
+			//flag was positioned but lost, need to know that flag existed
+			p1owner->incOriginalFlagCount();
+		}
+
 	}
+
 	return 0;
 }
 
@@ -190,7 +198,7 @@ int Board::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY)
 	if (p1PlayerId != playerID)
 	{
 		printf("[Board::movePiece] player #%d tried to move piece %c at fromX <%d> fromY <%d> which belongs to player #%d \n", 
-			playerID, pieceToChar(type), fromX, fromY, p1PlayerId);
+			playerID+1, pieceToChar(type), fromX, fromY, p1PlayerId+1);
 
 		return ERROR;
 	}
@@ -204,7 +212,7 @@ int Board::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY)
 	if (fromX == toX && fromY == toY)
 	{
 		printf("[Board::movePiece] piece %c of player #%d at <%d> fromY <%d> same position: toX <%d> toY <%d>\n",
-			pieceToChar(p1->getOriginalType()), p1->getOwner()->getPlayerId(), fromX, fromY, toX, toY);
+			pieceToChar(p1->getOriginalType()), p1->getOwner()->getPlayerId()+1, fromX, fromY, toX, toY);
 
 		return ERROR;
 	}
@@ -214,7 +222,7 @@ int Board::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY)
 		if (fromX != toX && fromY != toY)	//diagonal
 		{
 			printf("[Board::movePiece] piece %c of player #%d at <%d> fromY <%d> cannot move diagonally to toX <%d> toY <%d>\n",
-				pieceToChar(p1->getOriginalType()), p1->getOwner()->getPlayerId(), fromX, fromY, toX, toY);
+				pieceToChar(p1->getOriginalType()), p1->getOwner()->getPlayerId()+1, fromX, fromY, toX, toY);
 
 			return ERROR;
 		}
@@ -223,7 +231,7 @@ int Board::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY)
 	}
 
 	printf("[Board::movePiece] piece %c of player #%d at <%d> fromY <%d> tried to move more than one cell to: toX <%d> toY <%d>\n",
-		pieceToChar(p1->getOriginalType()), p1->getOwner()->getPlayerId(), fromX, fromY, toX, toY);
+		pieceToChar(p1->getOriginalType()), p1->getOwner()->getPlayerId()+1, fromX, fromY, toX, toY);
 
 	return ERROR;
 
@@ -249,7 +257,7 @@ int Board::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
 	if (!p1->isJoker())
 	{
 		printf("changeJokerType: player #%d piece <%c> at fromX <%d> fromY <%d> is not a Joker\n", 
-			p1->getOwner()->getPlayerId(), charToPiece(p1->getType()), fromX, fromY);
+			p1->getOwner()->getPlayerId()+1, charToPiece(p1->getType()), fromX, fromY);
 		return -1;
 	}
 

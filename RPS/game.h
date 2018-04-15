@@ -28,7 +28,7 @@ class Game
 	
 	void runSingleMove(Player* player);
 
-	void checkPlayersFlags(Player* player);
+	void checkPlayersFlagCountLessThanMax(Player* player);
 
 	int positionSinglePiece(Player* player);
 
@@ -102,6 +102,8 @@ public:
 
 	void resetPieceFiles();
 
+private:
+	void checkWhetherFlagsWereCaptured(void);
 };
 
 

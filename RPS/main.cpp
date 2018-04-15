@@ -14,8 +14,11 @@ int main()
 	string p2p = "player2.rps_board";
 	string p2m = "player2.rps_moves";
 	string output = "rps.output";
-	int	winner;
+
+#if DEBUG == 1
 	eReason reason;
+	int	winner;
+#endif
 
 	FileParser* fileParser = new FileParser(p1p, p2p, p1m, p2m, output);
 	if (fileParser->initializeFiles()) //initialization failed
@@ -56,10 +59,11 @@ int main()
 			game->runMove();
 
 	} while (false);
-	
-	winner = game->getWinner(&reason);
 
+#if DEBUG == 1
+	winner = game->getWinner(&reason);
 	dprint("\n\n ########## FINISHED GAME - RESULTS ##########\n\nWINNER is : %d\n", winner);
+#endif
 
 	game->writeOutputFile();
 
