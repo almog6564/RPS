@@ -3,7 +3,7 @@
 
 #include "defs.h"
 #include "player.h"
-#include "board.h"
+#include "myBoard.h"
 #include "parser.h"
 
 using namespace std;
@@ -19,7 +19,7 @@ class Move
 class Game
 {
 	Player* player1, *player2;
-	Board* board;
+	MyBoard* board;
 	UINT M, N;
 	UINT R1, P1, S1, B1, J1, F1;
 	UINT R2, P2, S2, B2, J2, F2;

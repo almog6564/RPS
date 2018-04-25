@@ -1,10 +1,10 @@
-#include "board.h"
+#include "myBoard.h"
 #include <iostream>
 #include "cstdio"
 
 using namespace std;
 
-Board::Board(UINT N, UINT M) : rows(N), cols(M)
+MyBoard::MyBoard(UINT N, UINT M) : rows(N), cols(M)
 {
 	table = new Piece**[N];
 
@@ -14,7 +14,7 @@ Board::Board(UINT N, UINT M) : rows(N), cols(M)
 	}
 }
 
-Piece* Board::getPieceAt(UINT col, UINT row)
+Piece* MyBoard::getPieceAt(UINT col, UINT row)
 {
 	if (col > cols || row > rows || row < 1 || col < 1)
 		return nullptr;
@@ -22,7 +22,7 @@ Piece* Board::getPieceAt(UINT col, UINT row)
 	return table[row-1][col-1];
 }
 
-void Board::setPieceAt(Piece* p, UINT col, UINT row)
+void MyBoard::setPieceAt(Piece* p, UINT col, UINT row)
 {
 	if (col > cols || row > rows || row < 1 || col < 1)
 		return;
@@ -30,7 +30,7 @@ void Board::setPieceAt(Piece* p, UINT col, UINT row)
 	table[row-1][col-1] = p;
 }
 
-void Board::removePiece(UINT col, UINT row)
+void MyBoard::removePiece(UINT col, UINT row)
 {
 	if (col > cols || row > rows || row < 1 || col < 1)
 		return;
@@ -48,7 +48,7 @@ void Board::removePiece(UINT col, UINT row)
 /**
  * This function assumes legal dimensions.
  */
-int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY)
+int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY)
 {
 	Piece* p2;
 	eScore score;
@@ -176,7 +176,7 @@ int Board::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UI
 }
 
 
-int Board::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY)
+int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY)
 {
 	Piece* p1;
 	UINT p1PlayerId;
@@ -251,7 +251,7 @@ int Board::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY)
 
 }
 
-int Board::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
+int MyBoard::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
 {
 	Piece* p1;
 
@@ -282,7 +282,7 @@ int Board::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
 	return 0;
 }
 
-void Board::getBoardDimensions(UINT* pCols, UINT* pRows)
+void MyBoard::getBoardDimensions(UINT* pCols, UINT* pRows)
 {
 	if (pCols)
 		*pCols = cols;
@@ -291,7 +291,7 @@ void Board::getBoardDimensions(UINT* pCols, UINT* pRows)
 		*pRows = rows;
 }
 
-Board::~Board()
+MyBoard::~MyBoard()
 {
 	for (UINT i = 0; i < rows; i++)
 	{

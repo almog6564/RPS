@@ -61,15 +61,22 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
-    <ClInclude Include="board.h" />
+    <ClInclude Include="Board.h" />
+    <ClInclude Include="FightInfo.h" />
+    <ClInclude Include="JokerChange.h" />
+    <ClInclude Include="Move.h" />
+    <ClInclude Include="myBoard.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="piece.h" />
+    <ClInclude Include="PiecePosition.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="PlayerAlgorithm.h" />
+    <ClInclude Include="Point.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="board.cpp" />
+    <ClCompile Include="myBoard.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parser.cpp" />
