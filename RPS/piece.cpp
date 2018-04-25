@@ -6,11 +6,30 @@ using namespace std;
 
 
 Piece::Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* playerOwner) :
-	type(typeArg), winAgainst(winAgainstArg), owner(playerOwner) {}
+	type(typeArg), winAgainst(winAgainstArg), owner(playerOwner) 
+{
+	position = new MyPoint(0, 0);
+}
+
+const Point& Piece::getPosition() const
+{
+	return (Point&)(*position);
+}
+
+void Piece::setPiecePosition(int col, int row)
+{
+	position->setNewPosition(col, row);
+}
+
+
+char Piece::getPiece() const
+{
+	return pieceToChar(getOriginalType());
+}
 
 Piece::~Piece()
 {
-	//owner->decTypeCounter(type, type);
+	delete position;
 }
 
 
@@ -41,11 +60,6 @@ eScore Piece::match(Piece* p)
 Joker::Joker(ePieceType currentTypeArg, Player * owner): Piece(JOKER, UNDEF, owner)
 {
 	currentType = currentTypeArg;	
-}
-
-Joker::~Joker()
-{
-	//owner->decTypeCounter(currentType, JOKER);
 }
 
 int Joker::setCurrentType(ePieceType newType)

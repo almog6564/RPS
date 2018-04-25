@@ -3,11 +3,12 @@
 #define _BOARD_
 
 #include "piece.h"
-
+#include "Board.h"
+#include "MyPoint.h"
 
 using namespace std;
 
-class MyBoard
+class MyBoard : public Board
 {
 	const UINT rows;
 	const UINT cols;
@@ -24,8 +25,10 @@ public:
 
 	~MyBoard();
 
+	virtual int getPlayer(const Point& pos) const;
+
 	/*
-	This function recievs a postion on board (x,y) and return a pointer to the piece, if there is one.
+	This function receives a position on board (x,y) and return a pointer to the piece, if there is one.
 	@returns -
 			a pointer to a Piece, if there is one in (col, row)
 			a null pointer, if cell is empty, or illegal (col, row) input (exceeds the size of the board)

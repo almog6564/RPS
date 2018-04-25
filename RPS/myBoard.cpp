@@ -14,7 +14,33 @@ MyBoard::MyBoard(UINT N, UINT M) : rows(N), cols(M)
 	}
 }
 
-Piece* MyBoard::getPieceAt(UINT col, UINT row)
+int MyBoard::getPlayer(const Point& pos) const
+{
+	UINT col, row;
+	int ret = 0;
+	Piece* p = nullptr;
+
+	do 
+	{
+		col = (UINT)pos.getX();
+		row = (UINT)pos.getY();
+
+		if (col > cols || row > rows || row < 1 || col < 1)
+			break;
+
+		p = table[row - 1][col - 1];
+
+		if (!p)
+			break;
+
+		ret = p->getOwner()->getPlayerId() + 1;
+
+	} while (false);
+
+	return ret;
+}
+
+Piece* MyBoard::getPieceAt(UINT col, UINT row) 
 {
 	if (col > cols || row > rows || row < 1 || col < 1)
 		return nullptr;
@@ -28,18 +54,24 @@ void MyBoard::setPieceAt(Piece* p, UINT col, UINT row)
 		return;
 
 	table[row-1][col-1] = p;
+
+	if (p)
+	{
+		p->setPiecePosition(col, row);
+	}
 }
 
 void MyBoard::removePiece(UINT col, UINT row)
 {
 	if (col > cols || row > rows || row < 1 || col < 1)
 		return;
-
+	
 	Piece* p = table[row - 1][col - 1];
 
 	if (p)
 	{
 		p->owner->decTypeCounter(p->getType(), p->getOriginalType());
+
 		delete table[row - 1][col - 1];
 		table[row - 1][col - 1] = nullptr;
 	}
@@ -63,6 +95,7 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 	if (!p2) //Piece was not found
 	{
 		setPieceAt(p, toX, toY);
+
 		if (!moved) //first positioning
 			return (p1owner->incTypeCount(type, originalType) == -1);
 		else

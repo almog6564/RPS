@@ -128,8 +128,8 @@ int Game::validatePositionFiles()
 
 void Game::resetPieceFiles()
 {
-	player1->getPlayerFileContext()->setPieceFileToStart();
-	player2->getPlayerFileContext()->setPieceFileToStart();
+	player1->getPlayerFileContext().setPieceFileToStart();
+	player2->getPlayerFileContext().setPieceFileToStart();
 }
 
 
@@ -271,12 +271,12 @@ string Game::GetReasonString(eReason reason)
 		if (player1->getHasLost())
 		{
 			playerNumber = 1;
-			line = player1->getPlayerFileContext()->moves->getCurrentLineNum();
+			line = player1->getPlayerFileContext().moves->getCurrentLineNum();
 		}
 		else
 		{
 			playerNumber = 2;
-			line = player2->getPlayerFileContext()->moves->getCurrentLineNum();
+			line = player2->getPlayerFileContext().moves->getCurrentLineNum();
 		}
 		sprintf(temp, "Bad Moves input file for player %d - line %d", playerNumber, line);
 		return (string)temp;
@@ -288,12 +288,12 @@ string Game::GetReasonString(eReason reason)
 		if (player1->getHasLost())
 		{
 			playerNumber = 1;
-			line = player1->getPlayerFileContext()->pieces->getCurrentLineNum();
+			line = player1->getPlayerFileContext().pieces->getCurrentLineNum();
 		}
 		else
 		{
 			playerNumber = 2;
-			line = player2->getPlayerFileContext()->pieces->getCurrentLineNum();
+			line = player2->getPlayerFileContext().pieces->getCurrentLineNum();
 		}
 		sprintf(temp, "Bad Positioning input file for player %d - line %d", playerNumber, line);
 		return (string)temp;
@@ -302,8 +302,8 @@ string Game::GetReasonString(eReason reason)
 	case BOTH_BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
-		line = player1->getPlayerFileContext()->pieces->getCurrentLineNum();
-		line2 = player2->getPlayerFileContext()->pieces->getCurrentLineNum();
+		line = player1->getPlayerFileContext().pieces->getCurrentLineNum();
+		line2 = player2->getPlayerFileContext().pieces->getCurrentLineNum();
 
 		sprintf(temp, "Bad Positioning input file for both players - player 1: line %d, player 2: line %d", line, line2);
 		return (string)temp;
