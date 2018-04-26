@@ -2,9 +2,13 @@
 
 using namespace std;
 
-Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext& fileContext) 
+Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext, bool automaticPlayer) 
 	: ID(ID), R(R), P(P), S(S), B(B), J(J), F(F), fileContext(fileContext)
 {
+	algorithm = automaticPlayer ? new AutoPlayerAlgorithm() : new FilePlayerAlgorithm();
+		
+
+		
 	pieceCounters[ROCK] = 0; pieceCounters[SCISSORS] = 0; pieceCounters[PAPER] = 0;
 	pieceCounters[BOMB] = 0; pieceCounters[JOKER] = 0; pieceCounters[FLAG] = 0;
 	movingPiecesCtr = 0;
