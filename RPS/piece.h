@@ -3,20 +3,37 @@
 #define _PIECE_
 
 #include "defs.h"
+#include "PiecePosition.h"
 #include "player.h"
+#include "MyPoint.h"
 
 
-class Piece
+class Piece : public PiecePosition
 {
 	const ePieceType type;
 	ePieceType winAgainst;
 
 	
 public:
+	MyPoint * position = nullptr;
 
 	Player * owner;
 
 	Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* owner);
+
+	~Piece();
+
+	const Point& getPosition() const;
+
+	//does not check boundaries
+	void setPiecePosition(int col, int row);
+	char getPiece() const; // R, P, S, B, J or F
+
+
+	char getJokerRep() const // ONLY for Joker: R, P, S or B -- non-Joker may return ‘#’
+	{
+		return '#';
+	}
 
 	/*
 	This function does a match between the piece and a given second piece accordint to the rules of Rock, Paper, Scissors.
@@ -51,8 +68,6 @@ public:
 
 
 	virtual bool isJoker();
-
-	virtual ~Piece();
 
 };
 
@@ -93,8 +108,6 @@ class Joker : public Piece
 public:
 	Joker(ePieceType currentTypeArg, Player* owner);
 
-	~Joker() override;
-
 	//override original function, so match function wouldn't have to know if its Joker
 	ePieceType getType()const override
 	{
@@ -108,6 +121,11 @@ public:
 	bool isJoker() override
 	{
 		return true;
+	}
+
+	char getJokerRep() const override // ONLY for Joker: R, P, S or B -- non-Joker may return ‘#’
+	{
+		return getType();
 	}
 };
 
