@@ -8,13 +8,13 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 {
 	board = new MyBoard(N, M);
 	if (autoPlayer1)
-		player1 = new Player(0, R1, P1, S1, B1, J1, F1, fileParser->getPlayerFileContext(0), true);
+		player1 = new Player(0, R1, P1, S1, B1, J1, F1);
 	else
 		player1 = new Player(0, R1, P1, S1, B1, J1, F1, fileParser->getPlayerFileContext(0), false);
 	if (AutoPlayer2)
-		player2 = new Player(1, R2, P2, S2, B2, J2, F2, fileParser->getPlayerFileContext(1), true);
+		player2 = new Player(1, R2, P2, S2, B2, J2, F2);
 	else
-		player2 = new Player(1, R1, P1, S1, B1, J1, F1, fileParser->getPlayerFileContext(1), false);
+		player2 = new Player(1, R1, P1, S1, B1, J1, F2, fileParser->getPlayerFileContext(1), false);
 
 	turn = 0;
 }
@@ -136,8 +136,8 @@ int Game::validatePositionFiles()
 
 void Game::resetPieceFiles()
 {
-	player1->getPlayerFileContext().setPieceFileToStart();
-	player2->getPlayerFileContext().setPieceFileToStart();
+	player1->getPlayerFileContext()->setPieceFileToStart();
+	player2->getPlayerFileContext()->setPieceFileToStart();
 }
 
 
@@ -279,12 +279,12 @@ string Game::GetReasonString(eReason reason)
 		if (player1->getHasLost())
 		{
 			playerNumber = 1;
-			line = player1->getPlayerFileContext().moves->getCurrentLineNum();
+			line = player1->getPlayerFileContext()->moves->getCurrentLineNum();
 		}
 		else
 		{
 			playerNumber = 2;
-			line = player2->getPlayerFileContext().moves->getCurrentLineNum();
+			line = player2->getPlayerFileContext()->moves->getCurrentLineNum();
 		}
 		sprintf(temp, "Bad Moves input file for player %d - line %d", playerNumber, line);
 		return (string)temp;
@@ -296,12 +296,12 @@ string Game::GetReasonString(eReason reason)
 		if (player1->getHasLost())
 		{
 			playerNumber = 1;
-			line = player1->getPlayerFileContext().pieces->getCurrentLineNum();
+			line = player1->getPlayerFileContext()->pieces->getCurrentLineNum();
 		}
 		else
 		{
 			playerNumber = 2;
-			line = player2->getPlayerFileContext().pieces->getCurrentLineNum();
+			line = player2->getPlayerFileContext()->pieces->getCurrentLineNum();
 		}
 		sprintf(temp, "Bad Positioning input file for player %d - line %d", playerNumber, line);
 		return (string)temp;
@@ -310,8 +310,8 @@ string Game::GetReasonString(eReason reason)
 	case BOTH_BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
-		line = player1->getPlayerFileContext().pieces->getCurrentLineNum();
-		line2 = player2->getPlayerFileContext().pieces->getCurrentLineNum();
+		line = player1->getPlayerFileContext()->pieces->getCurrentLineNum();
+		line2 = player2->getPlayerFileContext()->pieces->getCurrentLineNum();
 
 		sprintf(temp, "Bad Positioning input file for both players - player 1: line %d, player 2: line %d", line, line2);
 		return (string)temp;

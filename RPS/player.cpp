@@ -2,13 +2,13 @@
 
 using namespace std;
 
-Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext& fileContext, bool autoPlayer) 
+Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext /*=NULL*/, bool autoPlayer /*=true*/) 
 	: ID(ID), R(R), P(P), S(S), B(B), J(J), F(F), fileContext(fileContext)
 {
 	if (autoPlayer)
 		algorithm = new AutoPlayerAlgorithm();
 	else
-		algorithm = new FilePlayerAlgorithm();
+		algorithm = new FilePlayerAlgorithm(*fileContext);
 
 	pieceCounters[ROCK] = 0; pieceCounters[SCISSORS] = 0; pieceCounters[PAPER] = 0;
 	pieceCounters[BOMB] = 0; pieceCounters[JOKER] = 0; pieceCounters[FLAG] = 0;
@@ -30,7 +30,7 @@ bool Player::isAlive()
 bool Player::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
 						 UINT * jokerX, UINT * jokerY, ePieceType* newRep)
 {
-	eFileStatus status = fileContext.getNextMove(fromX, fromY, toX, toY, isJoker, jokerX, jokerY, newRep);
+	eFileStatus status = fileContext->getNextMove(fromX, fromY, toX, toY, isJoker, jokerX, jokerY, newRep);
 	switch (status)
 	{
 	case FILE_SUCCESS:
@@ -50,7 +50,7 @@ bool Player::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, boo
 
 int Player::getNextPiece(ePieceType* type, UINT * toX, UINT * toY, ePieceType* jokerType)
 {
-	if (fileContext.getNextPiece(type, toX, toY, jokerType) != FILE_SUCCESS)
+	if (fileContext->getNextPiece(type, toX, toY, jokerType) != FILE_SUCCESS)
 		return -1;
 	return 0;
 }
@@ -147,7 +147,7 @@ int Player::incTypeCount(ePieceType type, ePieceType originalType, bool updateOn
 	return 0;
 }
 
-PlayerFileContext& Player::getPlayerFileContext()
+PlayerFileContext* Player::getPlayerFileContext()
 {
 	return fileContext;
 }
@@ -160,7 +160,7 @@ void Player::validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols)
 
 	while (true)
 	{
-		status = fileContext.getNextPiece(&type, &x, &y, &jokerType);
+		status = fileContext->getNextPiece(&type, &x, &y, &jokerType);
 
 		if (x > cols || y > rows || x < 1 || y < 1)
 		{

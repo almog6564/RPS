@@ -104,12 +104,12 @@ int FileParser::initializeFiles()
 }
 
 
-PlayerFileContext& FileParser::getPlayerFileContext(int playerNumber)
+PlayerFileContext* FileParser::getPlayerFileContext(int playerNumber)
 {
 	if (playerNumber == 0)
-		return *p1;
+		return p1;
 	else
-		return *p2;
+		return p2;
 }
 
 

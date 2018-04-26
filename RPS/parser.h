@@ -181,7 +181,7 @@ public:
 			 PlayerFileContext of player2 if playerNumber == 1,	
 			 otherwise nullptr
 	*/
-	PlayerFileContext& getPlayerFileContext(int playerNumber);
+	PlayerFileContext* getPlayerFileContext(int playerNumber);
 
 	~FileParser();
 };

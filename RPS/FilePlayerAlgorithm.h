@@ -1,10 +1,15 @@
 #ifndef __FILE_PLAYER_ALGORITHM_H_
 #define __FILE_PLAYER_ALGORITHM_H_
+
 #include "PlayerAlgorithm.h"
+#include "player.h"
+
 class FilePlayerAlgorithm : public PlayerAlgorithm
 {
+	PlayerFileContext& fileContext;
+
 public:
-	FilePlayerAlgorithm();
+	FilePlayerAlgorithm(PlayerFileContext& fileContext);
 	~FilePlayerAlgorithm();
 
 	void getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill);
