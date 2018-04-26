@@ -1,4 +1,7 @@
-#pragma once
+
+#ifndef _MY_POINT_
+#define _MY_POINT_
+
 #include "Point.h"
 
 class MyPoint : public Point
@@ -27,4 +30,6 @@ public:
 
 	~MyPoint() {}
 };
+
+#endif
 

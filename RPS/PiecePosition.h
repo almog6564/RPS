@@ -1,3 +1,5 @@
+#ifndef __PIECE_POSITION_H_
+#define __PIECE_POSITION_H_
 
 //--------------------------
 // PiecePosition Interface
@@ -22,3 +24,5 @@ public:
 	virtual char getJokerRep() const = 0; // ONLY for Joker: R, P, S or B -- non-Joker may return ‘#’
 	virtual ~PiecePosition() {}
 };
+
+#endif

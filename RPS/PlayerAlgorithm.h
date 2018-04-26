@@ -1,3 +1,5 @@
+#ifndef __PLAYER_ALGORITHM_H_
+#define __PLAYER_ALGORITHM_H_
 
 //--------------------------
 // PlayerAlgorithm Interface
@@ -28,3 +30,5 @@ public:
 	virtual unique_ptr<JokerChange> getJokerChange() = 0; // nullptr if no change is requested
 	virtual ~PlayerAlgorithm() {}
 };
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef __FIGHT_INFO_H_
+#define __FIGHT_INFO_H_
 
 //--------------------------
 // FightInfo Interface
@@ -22,3 +24,5 @@ public:
 	virtual int getWinner() const = 0; // 0 - both lost / tie, 1 - player 1 won, 2 - player 2 won
 	virtual ~FightInfo() {}
 };
+
+#endif

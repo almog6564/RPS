@@ -4,6 +4,9 @@
 #include "defs.h"
 #include "parser.h"
 #include <iostream>
+#include "PlayerAlgorithm.h"
+#include "AutoPlayerAlgorithm.h"
+#include "FilePlayerAlgorithm.h"
 
 
 class Player
@@ -18,10 +21,11 @@ class Player
 	eReason reason;
 	bool hasMoreMoves;
 	PlayerFileContext& fileContext;
+	PlayerAlgorithm* algorithm;
 	
 
 public:
-	Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext& fileContext);
+	Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext& fileContext, bool autoPlayer);
 
 	/*
 	This function checks if the Player is still "Alive", i.e. still have at least one flag and one moving piece left. 

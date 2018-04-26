@@ -1,3 +1,5 @@
+#ifndef __JOKER_CHANGE_H_
+#define __JOKER_CHANGE_H_
 
 //--------------------------
 // JokerChange Interface
@@ -20,3 +22,5 @@ public:
 	virtual char getJokerNewRep() const = 0; // R, P, S or B (but NOT J and NOT F)
 	virtual ~JokerChange() {}
 };
+
+#endif

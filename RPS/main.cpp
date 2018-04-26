@@ -9,6 +9,7 @@ int main()
 	int M, N, R, P, S, B, J, F;
 	M = N = 10;
 	R = 2; P = 5; S = 1; B = 2; J = 2; F = 1;
+	bool autoPlayer1 = false , autoPlayer2 = false;
 	string p1p = "player1.rps_board";
 	string p1m = "player1.rps_moves";
 	string p2p = "player2.rps_board";
@@ -30,7 +31,7 @@ int main()
 	do 
 	{
 		 game = new Game(M, N, R, P, S, B, J, F,
-			R, P, S, B, J, F, fileParser);
+			R, P, S, B, J, F, fileParser, autoPlayer1, autoPlayer2);
 
 		/* First positioning */
 		if (game->validatePositionFiles())

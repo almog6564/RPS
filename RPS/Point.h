@@ -1,3 +1,5 @@
+#ifndef __POINT_H_
+#define __POINT_H_
 
 //--------------------------
 // Point Interface
@@ -11,3 +13,5 @@ public:
 	virtual int getY() const = 0;
 	virtual ~Point() {}
 };
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef __MOVE_H_
+#define __MOVE_H_
 
 //--------------------------
 // Move Interface
@@ -23,3 +25,5 @@ public:
 	virtual const Point& getTo() const = 0;
 	virtual ~Move() {}
 };
+
+#endif
