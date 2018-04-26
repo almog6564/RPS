@@ -6,8 +6,8 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 				 R2(R2), P2(P2), S2(S2), B2(B2), J2(J2), F2(F2), fileParser(fileParser)
 {
 	board = new MyBoard(N, M);
-	player1 = new Player(0, R1, P1, S1, B1, J1, F1, fileParser->getPlayerFileContext(0));
-	player2 = new Player(1, R2, P2, S2, B2, J2, F2, fileParser->getPlayerFileContext(1));
+	//player1 = new Player(0, R1, P1, S1, B1, J1, F1, fileParser->getPlayerFileContext(0));
+	//player2 = new Player(1, R2, P2, S2, B2, J2, F2, fileParser->getPlayerFileContext(1));
 	turn = 0;
 }
 

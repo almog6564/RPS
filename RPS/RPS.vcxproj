@@ -61,8 +61,10 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClInclude Include="AutoPlayerAlgorithm.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="FightInfo.h" />
+    <ClInclude Include="FilePlayerAlgorithm.h" />
     <ClInclude Include="JokerChange.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="myBoard.h" />
@@ -76,6 +78,8 @@
     <ClInclude Include="Point.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AutoPlayerAlgorithm.cpp" />
+    <ClCompile Include="FilePlayerAlgorithm.cpp" />
     <ClCompile Include="myBoard.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
