@@ -1,23 +1,41 @@
+
 #include "game.h"
+#include "MyMove.h"
+#include "MyJokerChange.h"
+
+using namespace std;
 
 Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 						   UINT R2, UINT P2, UINT S2, UINT B2, UINT J2, UINT F2, FileParser* fileParser,
-						   bool autoPlayer1, bool AutoPlayer2)
+						   bool autoPlayer1, bool autoPlayer2)
 	:M(M), N(N), R1(R1), P1(P1), S1(S1), B1(B1), J1(J1), F1(F1),
 				 R2(R2), P2(P2), S2(S2), B2(B2), J2(J2), F2(F2), fileParser(fileParser)
 {
-	board = new MyBoard(N, M);		//make UNIQUE PTR
+	board = new MyBoard(N, M);
 
 	if (autoPlayer1)
+	{
 		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1);
+		player1Algorithm = new AutoPlayerAlgorithm();
+	}
+
 	else
+	{
 		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1, fileParser->getPlayerFileContext(0), false);
+		player1Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(0));
+	}
 
 
-	if (AutoPlayer2)
+	if (autoPlayer2)
+	{
 		player2Context = new PlayerContext(1, R2, P2, S2, B2, J2, F2);
+		player2Algorithm = new AutoPlayerAlgorithm();
+	}
 	else
+	{
 		player2Context = new PlayerContext(1, R1, P1, S1, B1, J1, F2, fileParser->getPlayerFileContext(1), false);
+		player2Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(1));
+	}
 
 	turn = 0;
 }
@@ -34,53 +52,62 @@ Game::~Game()
 void Game::runMove()
 {
 	if (turn == 0) //player 1's turn
-		runSingleMove(player1Context);
+		runSingleMove(player1Context,player1Algorithm);
 	else //player 2's turn
-		runSingleMove(player2Context);
+		runSingleMove(player2Context,player2Algorithm);
 	turn += 1;
 	turn %= 2;
 }
 
-void Game::runSingleMove(PlayerContext* player)
+void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAlgo)
 {
-	UINT fromX, fromY, toX, toY;
-	bool isJoker;
-	UINT jokerX, jokerY;
 	ePieceType newRep;
 
-	dprint("\n\n ************ Starting MOVE: Player #%d ************ \n\n", player->getPlayerId()+1);
-
-	if (player->getHasMoreMoves())
+	do 
 	{
-		if (player->getNextMove(&fromX, &fromY, &toX, &toY, &isJoker, &jokerX, &jokerY, &newRep))
+		dprint("\n\n ************ Starting MOVE: Player #%d ************ \n\n", playerContext->getPlayerId() + 1);
+
+		if (!playerContext->getHasMoreMoves())
 		{
-			//true means getNextMove succeeded
-			if (board->movePiece(player->getPlayerId(), fromX, fromY, toX, toY))
+			dprint("No more moves!");
+			break;
+		}
+
+		auto move = playerAlgo->getMove();
+		auto jokerChange = playerAlgo->getJokerChange();
+
+		const Point& from = move->getFrom(), &to = move->getTo();
+
+		if (from.getX() == 0 || from.getY() == 0 || to.getX() == 0 || to.getY() == 0)
+		{
+			playerContext->setHasMoreMoves(false);
+			break;
+		}
+
+		if (board->movePiece(playerContext->getPlayerId(), from.getX(), from.getY(), to.getX(), to.getY()))
+		{
+			//non zero value means some kind of error in move file
+			playerContext->setHasLost();
+			playerContext->setReason(BAD_MOVES_INPUT_FILE);
+			return;
+		}
+
+		if (jokerChange)
+		{
+			const Point& jokerPos = jokerChange->getJokerChangePosition();
+			newRep = charToPiece(jokerChange->getJokerNewRep());
+
+			if (board->changeJokerType(jokerPos.getX(), jokerPos.getY(), newRep))
 			{
-				//non zero value means some kind of error in move file
-				player->setHasLost();
-				player->setReason(BAD_MOVES_INPUT_FILE);
+				playerContext->setHasLost();
+				playerContext->setReason(BAD_MOVES_INPUT_FILE);
 				return;
 			}
-
-			if (isJoker)
-			{
-				if (board->changeJokerType(jokerX, jokerY, newRep))
-				{
-					player->setHasLost();
-					player->setReason(BAD_MOVES_INPUT_FILE);
-					return;
-				}
-			}
-
-			checkWhetherFlagsWereCaptured();
-				
 		}
-		else
-		{
-			player->setHasMoreMoves(false);
-		}
-	}
+
+		checkWhetherFlagsWereCaptured();
+
+	} while (false);
 }
 
 void Game::checkPlayersFlagCountLessThanMax(PlayerContext* player)

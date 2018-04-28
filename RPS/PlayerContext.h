@@ -19,7 +19,7 @@ class PlayerContext
 	PlayerFileContext* fileContext;	
 
 public:
-	PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext = NULL, bool autoPlayer = true);
+	PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext = nullptr, bool autoPlayer = true);
 
 	/*
 	This function checks if the Player is still "Alive", i.e. still have at least one flag and one moving piece left. 

@@ -22,7 +22,7 @@ class Game
 	FileParser* fileParser;
 	int turn; //0=player1, 1=player2
 	
-	void runSingleMove(PlayerContext* player);
+	void runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAlgo);
 
 	void checkPlayersFlagCountLessThanMax(PlayerContext* player);
 
