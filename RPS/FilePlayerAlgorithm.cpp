@@ -2,19 +2,111 @@
 #include "MyMove.h"
 #include "MyPoint.h"
 #include "MyJokerChange.h"
+#include "MyPiecePosition.h"
 
 using namespace std;
 
 
-FilePlayerAlgorithm::FilePlayerAlgorithm(PlayerFileContext & fileContext): fileContext(fileContext)
+FilePlayerAlgorithm::FilePlayerAlgorithm(PlayerFileContext & fileContext, UINT rows, UINT cols) :
+	fileContext(fileContext), rows(rows), cols(cols), hasMoreMoves(true), nextJokerChange(nullptr) {};
+
+
+/*
+	Returns how many pieces are in the file.
+	If 0 - no pieces in file or some pieces had error.
+*/
+UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 {
-	hasMoreMoves = true;
-	nextJokerChange = nullptr;
+	UINT x, y;
+	ePieceType type, jokerType;
+	eFileStatus status;
+	UINT pieceCounter = 0;
+
+	/* Initialize temporary boolean array to check if theres pieces from the same player*/
+	bool** tmpBoard = new bool*[rows];
+
+	for (UINT i = 0; i < rows; i++)
+		tmpBoard[i] = new bool[cols]();	//() initializes the elements to false
+
+
+	while (true)
+	{
+		status = fileContext.getNextPiece(&type, &x, &y, &jokerType);
+
+		if (x > cols || y > rows || x < 1 || y < 1)
+		{
+			printf("[Player::validatePlayerPositions] player #%d dimensions check failed: "
+				"x=%d, y=%d WHILE: cols=%d and rows=%d\n",
+				player, x, y, cols, rows);
+
+			status = FILE_BAD_FORMAT;
+		}
+
+
+		switch (status)
+		{
+		case FILE_EOF_REACHED:
+			break;
+
+		case FILE_ERROR:
+		case FILE_BAD_FORMAT:
+		//	setHasLost();
+		//	setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
+			break;
+
+		case FILE_SUCCESS:
+			if (tmpBoard[y - 1][x - 1])
+			{
+				printf("ERROR [player #%d] - while checking position for piece %c at (%d,%d), position is already occupied\n",
+					player, pieceToChar(type), x, y);
+
+				pieceCounter = 0;
+			//	setHasLost();
+			//	setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
+			}
+			else
+			{
+				dprint("got piece: %c %d %d joker: %c\n", pieceToChar(type), x, y, pieceToChar(jokerType));
+				tmpBoard[y - 1][x - 1] = true;
+				pieceCounter++;
+			}
+			break;
+		}
+	}
+
+	for (UINT i = 0; i < rows; i++)
+		delete[] tmpBoard[i];
+
+	delete[] tmpBoard;
+
+	return pieceCounter;
 }
+
 
 void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill) 
 {
+	UINT x, y;
+	ePieceType type, jokerType;
+	UINT piecesCtr = 0;
+	unique_ptr<MyPiecePosition> piece;
 
+	//this function validates there's no collisions between pieces of the same player
+	//it must be before the actual positioning
+	piecesCtr = validatePlayerPositions(player);
+
+	if (piecesCtr == 0)
+		return;
+
+	//if we're here than all pieces are valid
+
+	vectorToFill.resize(piecesCtr);
+
+	for (int i = 0; i < piecesCtr; i++)
+	{
+		fileContext.getNextPiece(&type, &x, &y, &jokerType);
+
+		vectorToFill[i] = make_unique<MyPiecePosition>(x, y, pieceToChar(type), pieceToChar(jokerType));
+	}
 }
 
 unique_ptr<Move> FilePlayerAlgorithm::getMove()

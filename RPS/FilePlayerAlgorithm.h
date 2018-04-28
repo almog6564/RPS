@@ -9,9 +9,12 @@ class FilePlayerAlgorithm : public PlayerAlgorithm
 	PlayerFileContext& fileContext;
 	unique_ptr<JokerChange> nextJokerChange;
 	bool hasMoreMoves;
+	UINT rows, cols;
 
+	UINT validatePlayerPositions(int player);
 public:
-	FilePlayerAlgorithm(PlayerFileContext& fileContext);
+	FilePlayerAlgorithm(PlayerFileContext& fileContext, UINT rows, UINT cols);
+
 	~FilePlayerAlgorithm() {};
 
 	void getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill);

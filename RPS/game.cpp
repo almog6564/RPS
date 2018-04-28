@@ -22,7 +22,7 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	else
 	{
 		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1, fileParser->getPlayerFileContext(0), false);
-		player1Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(0));
+		player1Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(0), N, M);
 	}
 
 
@@ -34,7 +34,7 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	else
 	{
 		player2Context = new PlayerContext(1, R1, P1, S1, B1, J1, F2, fileParser->getPlayerFileContext(1), false);
-		player2Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(1));
+		player2Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(1), N, M);
 	}
 
 	turn = 0;
@@ -154,7 +154,7 @@ int Game::validatePositionFiles()
 	for (UINT i = 0; i < N; i++)
 		tmpBoard[i] = new bool[M]();	//() initializes the elements to false
 
-	player1Context->validatePlayerPositions(tmpBoard, N, M);
+	//player1Context->validatePlayerPositions(tmpBoard, N, M);
 
 	dprint("validatePlayerPositions #1 %s\n",player1Context->getHasLost() ? "FAILED" : "SUCCESS");
 
@@ -162,7 +162,7 @@ int Game::validatePositionFiles()
 		for (UINT j = 0; j < M; j++)
 			tmpBoard[i][j] = false;
 
-	player2Context->validatePlayerPositions(tmpBoard, N, M);
+	//player2Context->validatePlayerPositions(tmpBoard, N, M);
 
 	dprint("validatePlayerPositions #2 %s\n", player2Context->getHasLost() ? "FAILED" : "SUCCESS");
 
