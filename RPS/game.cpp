@@ -67,13 +67,20 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 	{
 		dprint("\n\n ************ Starting MOVE: Player #%d ************ \n\n", playerContext->getPlayerId() + 1);
 
-		if (!playerContext->getHasMoreMoves())
+		auto move = playerAlgo->getMove();
+		if (move == nullptr)
 		{
 			dprint("No more moves!");
 			break;
 		}
+	
+		if (move->getFrom().getX() == 0) //illegal move
+		{
+			playerContext->setHasLost();
+			playerContext->setReason(BAD_MOVES_INPUT_FILE);
+			break;
+		}
 
-		auto move = playerAlgo->getMove();
 		auto jokerChange = playerAlgo->getJokerChange();
 
 		const Point& from = move->getFrom(), &to = move->getTo();
