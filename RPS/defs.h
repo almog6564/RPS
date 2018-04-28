@@ -3,6 +3,7 @@
 #define _DEFS_
 
 #include "cstdio"
+#include <memory>
 
 typedef unsigned int UINT;
 

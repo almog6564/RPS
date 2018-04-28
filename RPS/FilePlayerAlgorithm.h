@@ -2,7 +2,7 @@
 #define __FILE_PLAYER_ALGORITHM_H_
 
 #include "PlayerAlgorithm.h"
-#include "player.h"
+#include "parser.h"
 
 class FilePlayerAlgorithm : public PlayerAlgorithm
 {
@@ -21,7 +21,7 @@ public:
 	unique_ptr<Move> getMove();
 	unique_ptr<JokerChange> getJokerChange() // nullptr if no change is requested
 	{
-		//return nextJokerChange;
+		//
 	}
 };
 

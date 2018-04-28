@@ -1,14 +1,10 @@
-#include "player.h"
+#include "PlayerContext.h"
 
 using namespace std;
 
-Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext /*=NULL*/, bool autoPlayer /*=true*/) 
+PlayerContext::PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext /*=NULL*/, bool autoPlayer /*=true*/) 
 	: ID(ID), R(R), P(P), S(S), B(B), J(J), F(F), fileContext(fileContext)
 {
-	if (autoPlayer)
-		algorithm = new AutoPlayerAlgorithm();
-	else
-		algorithm = new FilePlayerAlgorithm(*fileContext);
 
 	pieceCounters[ROCK] = 0; pieceCounters[SCISSORS] = 0; pieceCounters[PAPER] = 0;
 	pieceCounters[BOMB] = 0; pieceCounters[JOKER] = 0; pieceCounters[FLAG] = 0;
@@ -18,7 +14,7 @@ Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFi
 	hasLost = false;
 }
 
-bool Player::isAlive()
+bool PlayerContext::isAlive()
 {
 	if (hasLost || pieceCounters[FLAG] == 0 || movingPiecesCtr == 0)
 		return false;
@@ -26,35 +22,35 @@ bool Player::isAlive()
 	return true;
 }
 
-bool Player::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
+bool PlayerContext::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
 						 UINT * jokerX, UINT * jokerY, ePieceType* newRep)
 {
 	//call algorithm's getMove()
 }
 
-int Player::getNextPiece(ePieceType* type, UINT * toX, UINT * toY, ePieceType* jokerType)
+int PlayerContext::getNextPiece(ePieceType* type, UINT * toX, UINT * toY, ePieceType* jokerType)
 {
 	if (fileContext->getNextPiece(type, toX, toY, jokerType) != FILE_SUCCESS)
 		return -1;
 	return 0;
 }
 
-void Player::updateScore()	//for future use
+void PlayerContext::updateScore()	//for future use
 {
 	score++;
 }
 
-bool Player::getHasMoreMoves()
+bool PlayerContext::getHasMoreMoves()
 {
 	//return algorithm->getHasMoreMoves();
 }
 
-void Player::setHasMoreMoves(bool val)
+void PlayerContext::setHasMoreMoves(bool val)
 {
 	//hasMoreMoves = val;
 }
 
-void Player::decTypeCounter(ePieceType type, ePieceType originalType /* = UNDEF */, bool updateOnlyMovingCounter /* = false */)
+void PlayerContext::decTypeCounter(ePieceType type, ePieceType originalType /* = UNDEF */, bool updateOnlyMovingCounter /* = false */)
 {
 	if (!updateOnlyMovingCounter)
 	{
@@ -96,7 +92,7 @@ void Player::decTypeCounter(ePieceType type, ePieceType originalType /* = UNDEF 
 }
 
 
-int Player::incTypeCount(ePieceType type, ePieceType originalType, bool updateOnlyMovingCounter /* = false */)
+int PlayerContext::incTypeCount(ePieceType type, ePieceType originalType, bool updateOnlyMovingCounter /* = false */)
 {
 	if(!updateOnlyMovingCounter)
 		pieceCounters[originalType]++;
@@ -131,12 +127,12 @@ int Player::incTypeCount(ePieceType type, ePieceType originalType, bool updateOn
 	return 0;
 }
 
-PlayerFileContext* Player::getPlayerFileContext()
+PlayerFileContext* PlayerContext::getPlayerFileContext()
 {
 	return fileContext;
 }
 
-void Player::validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols)
+void PlayerContext::validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols)
 {
 	UINT x, y;
 	ePieceType type, jokerType;

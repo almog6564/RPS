@@ -4,12 +4,9 @@
 #include "defs.h"
 #include "parser.h"
 #include <iostream>
-#include "PlayerAlgorithm.h"
-#include "AutoPlayerAlgorithm.h"
-#include "FilePlayerAlgorithm.h"
 
 
-class Player
+class PlayerContext
 {
 	const UINT ID;
 	UINT pieceCounters[PIECE_COUNT];
@@ -19,12 +16,10 @@ class Player
 	bool hasLost;
 	UINT R, P, S, B, J, F;
 	eReason reason;
-	PlayerFileContext* fileContext;
-	PlayerAlgorithm* algorithm;
-	
+	PlayerFileContext* fileContext;	
 
 public:
-	Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext = NULL, bool autoPlayer = true);
+	PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext = NULL, bool autoPlayer = true);
 
 	/*
 	This function checks if the Player is still "Alive", i.e. still have at least one flag and one moving piece left. 
@@ -36,7 +31,7 @@ public:
 
 	/*
 	Get the next move of Player from moves file.
-	The function gets pointers to all relevat fields of a move, and update their values.
+	The function gets pointers to all relevant fields of a move, and update their values.
 		@returns -
 			true - If a move is still available in moves file, given pointers will be assigned with values.
 			false - No moves left in moves file.

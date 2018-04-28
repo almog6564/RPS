@@ -2,15 +2,19 @@
 #define _GAME_
 
 #include "defs.h"
-#include "player.h"
+#include "PlayerContext.h"
 #include "myBoard.h"
 #include "parser.h"
+#include "AutoPlayerAlgorithm.h"
+#include "FilePlayerAlgorithm.h"
 
 using namespace std;
 
 class Game
 {
-	Player* player1, *player2;
+	PlayerContext*		player1Context,		*player2Context;
+	PlayerAlgorithm*	player1Algorithm,	*player2Algorithm;
+
 	MyBoard* board;
 	UINT M, N;
 	UINT R1, P1, S1, B1, J1, F1;
@@ -18,11 +22,11 @@ class Game
 	FileParser* fileParser;
 	int turn; //0=player1, 1=player2
 	
-	void runSingleMove(Player* player);
+	void runSingleMove(PlayerContext* player);
 
-	void checkPlayersFlagCountLessThanMax(Player* player);
+	void checkPlayersFlagCountLessThanMax(PlayerContext* player);
 
-	int positionSinglePiece(Player* player);
+	int positionSinglePiece(PlayerContext* player);
 
 
 public:

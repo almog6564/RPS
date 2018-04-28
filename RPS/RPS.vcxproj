@@ -65,6 +65,10 @@
     <RemoteCppCompileToolExe>g++-5.3.0</RemoteCppCompileToolExe>
     <RemoteLdToolExe>g++-5.3.0</RemoteLdToolExe>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <RemoteCppCompileToolExe>g++-5.3.0</RemoteCppCompileToolExe>
+    <RemoteLdToolExe>g++-5.3.0</RemoteLdToolExe>
+  </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="AutoPlayerAlgorithm.h" />
     <ClInclude Include="Board.h" />
@@ -81,7 +85,7 @@
     <ClInclude Include="parser.h" />
     <ClInclude Include="piece.h" />
     <ClInclude Include="PiecePosition.h" />
-    <ClInclude Include="player.h" />
+    <ClInclude Include="PlayerContext.h" />
     <ClInclude Include="PlayerAlgorithm.h" />
     <ClInclude Include="Point.h" />
   </ItemGroup>
@@ -95,7 +99,7 @@
     <ClCompile Include="MyMove.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="piece.cpp" />
-    <ClCompile Include="player.cpp" />
+    <ClCompile Include="PlayerContext.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -103,6 +107,11 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <CppLanguageStandard>c++1y</CppLanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
     </ClCompile>
