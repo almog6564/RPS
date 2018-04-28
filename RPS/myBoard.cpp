@@ -80,7 +80,7 @@ void MyBoard::removePiece(UINT col, UINT row)
 /**
  * This function assumes legal dimensions.
  */
-int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY)
+int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY, MyFightInfo* fightInfo /*= nullptr*/)
 {
 	Piece* p2;
 	eScore score;
@@ -156,6 +156,10 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 
 
 		//pieces belong to different players, MATCH!
+		//fightInfo
+		MyFightInfo fightInfo2;
+		*fightInfo = fightInfo2;
+
 		score = p->match(p2);
 		switch (score)
 		{
@@ -209,7 +213,7 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 }
 
 
-int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY)
+int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY, MyFightInfo* fightInfo /*=nullptr*/)
 {
 	Piece* p1;
 	UINT p1PlayerId;

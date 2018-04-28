@@ -79,6 +79,7 @@
     <ClInclude Include="myBoard.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="MyFightInfo.h" />
     <ClInclude Include="MyJokerChange.h" />
     <ClInclude Include="MyMove.h" />
     <ClInclude Include="MyPiecePosition.h" />
