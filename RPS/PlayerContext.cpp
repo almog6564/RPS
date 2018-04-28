@@ -132,53 +132,6 @@ PlayerFileContext* PlayerContext::getPlayerFileContext()
 	return fileContext;
 }
 
-void PlayerContext::validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols)
-{
-	UINT x, y;
-	ePieceType type, jokerType;
-	eFileStatus status;
 
-	while (true)
-	{
-		status = fileContext->getNextPiece(&type, &x, &y, &jokerType);
-
-		if (x > cols || y > rows || x < 1 || y < 1)
-		{
-			printf("[Player::validatePlayerPositions] player #%d dimensions check failed: "
-				"x=%d, y=%d WHILE: cols=%d and rows=%d\n",
-				ID+1, x, y, cols, rows);
-
-			status = FILE_BAD_FORMAT;
-		}
-
-
-		switch (status)
-		{
-		case FILE_EOF_REACHED:
-			return;
-
-		case FILE_ERROR:
-		case FILE_BAD_FORMAT:
-			setHasLost();
-			setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
-			return;
-
-		case FILE_SUCCESS:
-			if (tmpBoard[y-1][x-1])
-			{
-				printf("ERROR [player #%d] - while checking position for piece %c at (%d,%d), position is already occupied\n",
-					ID+1, pieceToChar(type), x, y);
-				setHasLost();
-				setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
-			}
-			else
-			{
-				dprint("got piece: %c %d %d joker: %c\n", pieceToChar(type), x, y, pieceToChar(jokerType));
-				tmpBoard[y-1][x-1] = true;
-			}
-			break;
-		}
-	}
-}
 
 
