@@ -15,7 +15,6 @@ Player::Player(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFi
 	movingPiecesCtr = 0;
 	originalFlagsCnt = 0;
 	score = 0;
-	hasMoreMoves = true;
 	hasLost = false;
 }
 
@@ -30,22 +29,7 @@ bool Player::isAlive()
 bool Player::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
 						 UINT * jokerX, UINT * jokerY, ePieceType* newRep)
 {
-	eFileStatus status = fileContext->getNextMove(fromX, fromY, toX, toY, isJoker, jokerX, jokerY, newRep);
-	switch (status)
-	{
-	case FILE_SUCCESS:
-		hasMoreMoves = true;
-		return true;
-	case FILE_EOF_REACHED:
-	case FILE_ERROR:
-		return false;
-	case FILE_BAD_FORMAT:
-		hasLost = 1;
-		reason = BAD_MOVES_INPUT_FILE;
-		return false;
-	default:
-		return false;
-	}
+	//call algorithm's getMove()
 }
 
 int Player::getNextPiece(ePieceType* type, UINT * toX, UINT * toY, ePieceType* jokerType)
@@ -62,12 +46,12 @@ void Player::updateScore()	//for future use
 
 bool Player::getHasMoreMoves()
 {
-	return hasMoreMoves;
+	//return algorithm->getHasMoreMoves();
 }
 
 void Player::setHasMoreMoves(bool val)
 {
-	hasMoreMoves = val;
+	//hasMoreMoves = val;
 }
 
 void Player::decTypeCounter(ePieceType type, ePieceType originalType /* = UNDEF */, bool updateOnlyMovingCounter /* = false */)

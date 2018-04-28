@@ -19,7 +19,6 @@ class Player
 	bool hasLost;
 	UINT R, P, S, B, J, F;
 	eReason reason;
-	bool hasMoreMoves;
 	PlayerFileContext* fileContext;
 	PlayerAlgorithm* algorithm;
 	

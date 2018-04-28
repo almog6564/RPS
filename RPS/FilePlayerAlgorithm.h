@@ -7,6 +7,8 @@
 class FilePlayerAlgorithm : public PlayerAlgorithm
 {
 	PlayerFileContext& fileContext;
+	bool hasMoreMoves;
+	//unique_ptr<MyJokerChange> nextJokerChange;
 
 public:
 	FilePlayerAlgorithm(PlayerFileContext& fileContext);
@@ -17,7 +19,10 @@ public:
 	void notifyOnOpponentMove(const Move& move); // called only on opponent’s move
 	void notifyFightResult(const FightInfo& fightInfo); // called only if there was a fight
 	unique_ptr<Move> getMove();
-	unique_ptr<JokerChange> getJokerChange(); // nullptr if no change is requested
+	unique_ptr<JokerChange> getJokerChange() // nullptr if no change is requested
+	{
+		//return nextJokerChange;
+	}
 };
 
 #endif

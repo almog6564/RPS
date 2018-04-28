@@ -60,6 +60,11 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <RemoteCCompileToolExe>g++</RemoteCCompileToolExe>
+    <RemoteCppCompileToolExe>g++-5.3.0</RemoteCppCompileToolExe>
+    <RemoteLdToolExe>g++-5.3.0</RemoteLdToolExe>
+  </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="AutoPlayerAlgorithm.h" />
     <ClInclude Include="Board.h" />
@@ -70,6 +75,8 @@
     <ClInclude Include="myBoard.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="MyJokerChange.h" />
+    <ClInclude Include="MyMove.h" />
     <ClInclude Include="MyPoint.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="piece.h" />
@@ -84,11 +91,22 @@
     <ClCompile Include="myBoard.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyJokerChange.cpp" />
+    <ClCompile Include="MyMove.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="piece.cpp" />
     <ClCompile Include="player.cpp" />
   </ItemGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <CLanguageStandard>c11</CLanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <CppLanguageStandard>c++1y</CppLanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>
