@@ -81,6 +81,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="MyJokerChange.h" />
     <ClInclude Include="MyMove.h" />
+    <ClInclude Include="MyPiecePosition.h" />
     <ClInclude Include="MyPoint.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="piece.h" />
@@ -97,6 +98,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyJokerChange.cpp" />
     <ClCompile Include="MyMove.cpp" />
+    <ClCompile Include="MyPiecePosition.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="piece.cpp" />
     <ClCompile Include="PlayerContext.cpp" />
