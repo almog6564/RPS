@@ -5,7 +5,7 @@
 using namespace std;
 
 
-Piece::Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* playerOwner) :
+Piece::Piece(ePieceType typeArg, ePieceType winAgainstArg, PlayerContext* playerOwner) :
 	type(typeArg), winAgainst(winAgainstArg), owner(playerOwner) 
 {
 	position = new MyPoint(0, 0);
@@ -57,7 +57,7 @@ eScore Piece::match(Piece* p)
 	return false;
 }
 
-Joker::Joker(ePieceType currentTypeArg, Player * owner): Piece(JOKER, UNDEF, owner)
+Joker::Joker(ePieceType currentTypeArg, PlayerContext* owner): Piece(JOKER, UNDEF, owner)
 {
 	currentType = currentTypeArg;	
 }
@@ -109,7 +109,7 @@ ePieceType Joker::getWinAgainst() const
 	return ret;
 }
 
-Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType)
+Piece* createNewPiece(PlayerContext* owner, ePieceType type, ePieceType jokerType)
 {
 	Piece* p = nullptr;
 

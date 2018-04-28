@@ -4,7 +4,7 @@
 
 #include "defs.h"
 #include "PiecePosition.h"
-#include "player.h"
+#include "PlayerContext.h"
 #include "MyPoint.h"
 
 
@@ -17,9 +17,9 @@ class Piece : public PiecePosition
 public:
 	MyPoint * position = nullptr;
 
-	Player * owner;
+	PlayerContext* owner;
 
-	Piece(ePieceType typeArg, ePieceType winAgainstArg, Player* owner);
+	Piece(ePieceType typeArg, ePieceType winAgainstArg, PlayerContext* owner);
 
 	~Piece();
 
@@ -61,7 +61,7 @@ public:
 		return winAgainst;
 	}
 
-	Player* getOwner()const
+	PlayerContext* getOwner()const
 	{
 		return owner;
 	}
@@ -74,31 +74,31 @@ public:
 class Rock : public Piece
 {
 public:
-	Rock(Player* owner) : Piece(ROCK, SCISSORS, owner) {};
+	Rock(PlayerContext* owner) : Piece(ROCK, SCISSORS, owner) {};
 };
 
 class Scissors : public Piece
 {
 public:
-	Scissors(Player* owner) : Piece(SCISSORS, PAPER, owner) {};
+	Scissors(PlayerContext* owner) : Piece(SCISSORS, PAPER, owner) {};
 };
 
 class Paper : public Piece
 {
 public:
-	Paper(Player* owner) : Piece(PAPER, ROCK, owner) {};
+	Paper(PlayerContext* owner) : Piece(PAPER, ROCK, owner) {};
 };
 
 class Flag : public Piece
 {
 public:
-	Flag(Player* owner) : Piece(FLAG, UNDEF, owner) {};
+	Flag(PlayerContext* owner) : Piece(FLAG, UNDEF, owner) {};
 };
 
 class Bomb : public Piece
 {
 public:
-	Bomb(Player* owner) : Piece(BOMB, UNDEF, owner) {};
+	Bomb(PlayerContext* owner) : Piece(BOMB, UNDEF, owner) {};
 };
 
 class Joker : public Piece
@@ -106,7 +106,7 @@ class Joker : public Piece
 	ePieceType currentType;
 
 public:
-	Joker(ePieceType currentTypeArg, Player* owner);
+	Joker(ePieceType currentTypeArg, PlayerContext* owner);
 
 	//override original function, so match function wouldn't have to know if its Joker
 	ePieceType getType()const override
@@ -130,7 +130,7 @@ public:
 };
 
 
-Piece* createNewPiece(Player* owner, ePieceType type, ePieceType jokerType = UNDEF);
+Piece* createNewPiece(PlayerContext* owner, ePieceType type, ePieceType jokerType = UNDEF);
 
 #endif //_PIECE_
 

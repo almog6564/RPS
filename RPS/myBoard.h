@@ -78,5 +78,5 @@ public:
 
 
 
-#endif //_BOARD_
+#endif //_MY_BOARD_
 

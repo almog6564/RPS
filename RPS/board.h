@@ -1,5 +1,5 @@
-#ifndef __BOARD_H_
-#define __BOARD_H_
+#ifndef _BOARD_
+#define _BOARD_
 
 //--------------------------
 // Board Interface

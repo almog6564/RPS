@@ -85,7 +85,7 @@
     <ClInclude Include="parser.h" />
     <ClInclude Include="piece.h" />
     <ClInclude Include="PiecePosition.h" />
-    <ClInclude Include="player.h" />
+    <ClInclude Include="PlayerContext.h" />
     <ClInclude Include="PlayerAlgorithm.h" />
     <ClInclude Include="Point.h" />
   </ItemGroup>
@@ -99,7 +99,7 @@
     <ClCompile Include="MyMove.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="piece.cpp" />
-    <ClCompile Include="player.cpp" />
+    <ClCompile Include="PlayerContext.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

@@ -6,15 +6,18 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	:M(M), N(N), R1(R1), P1(P1), S1(S1), B1(B1), J1(J1), F1(F1),
 				 R2(R2), P2(P2), S2(S2), B2(B2), J2(J2), F2(F2), fileParser(fileParser)
 {
-	board = new MyBoard(N, M);
+	board = new MyBoard(N, M);		//make UNIQUE PTR
+
 	if (autoPlayer1)
-		player1 = new Player(0, R1, P1, S1, B1, J1, F1);
+		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1);
 	else
-		player1 = new Player(0, R1, P1, S1, B1, J1, F1, fileParser->getPlayerFileContext(0), false);
+		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1, fileParser->getPlayerFileContext(0), false);
+
+
 	if (AutoPlayer2)
-		player2 = new Player(1, R2, P2, S2, B2, J2, F2);
+		player2Context = new PlayerContext(1, R2, P2, S2, B2, J2, F2);
 	else
-		player2 = new Player(1, R1, P1, S1, B1, J1, F2, fileParser->getPlayerFileContext(1), false);
+		player2Context = new PlayerContext(1, R1, P1, S1, B1, J1, F2, fileParser->getPlayerFileContext(1), false);
 
 	turn = 0;
 }
@@ -22,21 +25,23 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 Game::~Game()
 {
 	delete board;
-	delete player1;
-	delete player2;
+	delete player1Context;
+	delete player2Context;
+	delete player1Algorithm;
+	delete player2Algorithm;
 }
 
 void Game::runMove()
 {
 	if (turn == 0) //player 1's turn
-		runSingleMove(player1);
+		runSingleMove(player1Context);
 	else //player 2's turn
-		runSingleMove(player2);
+		runSingleMove(player2Context);
 	turn += 1;
 	turn %= 2;
 }
 
-void Game::runSingleMove(Player* player)
+void Game::runSingleMove(PlayerContext* player)
 {
 	UINT fromX, fromY, toX, toY;
 	bool isJoker;
@@ -78,7 +83,7 @@ void Game::runSingleMove(Player* player)
 	}
 }
 
-void Game::checkPlayersFlagCountLessThanMax(Player * player)
+void Game::checkPlayersFlagCountLessThanMax(PlayerContext* player)
 {
 	if (player->getHasLost())
 		return;
@@ -95,8 +100,8 @@ void Game::checkPlayersFlagCountLessThanMax(Player * player)
 
 bool Game::endGame()
 {
-	if (player1->isAlive() && player2->isAlive() && (player1->getHasMoreMoves() 
-		|| player2->getHasMoreMoves()))
+	if (player1Context->isAlive() && player2Context->isAlive() && (player1Context->getHasMoreMoves() 
+		|| player2Context->getHasMoreMoves()))
 		return false;
 	return true;
 }
@@ -109,17 +114,17 @@ int Game::validatePositionFiles()
 	for (UINT i = 0; i < N; i++)
 		tmpBoard[i] = new bool[M]();	//() initializes the elements to false
 
-	player1->validatePlayerPositions(tmpBoard, N, M);
+	player1Context->validatePlayerPositions(tmpBoard, N, M);
 
-	dprint("validatePlayerPositions #1 %s\n",player1->getHasLost() ? "FAILED" : "SUCCESS");
+	dprint("validatePlayerPositions #1 %s\n",player1Context->getHasLost() ? "FAILED" : "SUCCESS");
 
 	for (UINT i = 0; i < N; i++)
 		for (UINT j = 0; j < M; j++)
 			tmpBoard[i][j] = false;
 
-	player2->validatePlayerPositions(tmpBoard, N, M);
+	player2Context->validatePlayerPositions(tmpBoard, N, M);
 
-	dprint("validatePlayerPositions #2 %s\n", player2->getHasLost() ? "FAILED" : "SUCCESS");
+	dprint("validatePlayerPositions #2 %s\n", player2Context->getHasLost() ? "FAILED" : "SUCCESS");
 
 
 	for (UINT i = 0; i < N; i++)
@@ -127,7 +132,7 @@ int Game::validatePositionFiles()
 
 	delete [] tmpBoard;
 
-	if (player1->getHasLost() || player2->getHasLost())
+	if (player1Context->getHasLost() || player2Context->getHasLost())
 		return -1;
 	return 0;
 
@@ -136,29 +141,29 @@ int Game::validatePositionFiles()
 
 void Game::resetPieceFiles()
 {
-	player1->getPlayerFileContext()->setPieceFileToStart();
-	player2->getPlayerFileContext()->setPieceFileToStart();
+	player1Context->getPlayerFileContext()->setPieceFileToStart();
+	player2Context->getPlayerFileContext()->setPieceFileToStart();
 }
 
 
 void Game::checkWhetherFlagsWereCaptured(void)
 {
-	if (player1->getTypeCount(FLAG) == 0 && player1->getOriginalFlagCount() > 0 &&
-		player2->getTypeCount(FLAG) > 0)
+	if (player1Context->getTypeCount(FLAG) == 0 && player1Context->getOriginalFlagCount() > 0 &&
+		player2Context->getTypeCount(FLAG) > 0)
 	{
-		if (player1->getHasLost() == false)
+		if (player1Context->getHasLost() == false)
 		{
-			player1->setHasLost();
-			player1->setReason(FLAGS_CAPTURED);
+			player1Context->setHasLost();
+			player1Context->setReason(FLAGS_CAPTURED);
 		}
 	}
-	else if (player2->getTypeCount(FLAG) == 0 && player2->getOriginalFlagCount() > 0 &&
-		player1->getTypeCount(FLAG) > 0)
+	else if (player2Context->getTypeCount(FLAG) == 0 && player2Context->getOriginalFlagCount() > 0 &&
+		player1Context->getTypeCount(FLAG) > 0)
 	{
-		if (player2->getHasLost() == false)
+		if (player2Context->getHasLost() == false)
 		{
-			player2->setHasLost();
-			player2->setReason(FLAGS_CAPTURED);
+			player2Context->setHasLost();
+			player2Context->setReason(FLAGS_CAPTURED);
 		}
 	}
 }
@@ -166,12 +171,12 @@ void Game::checkWhetherFlagsWereCaptured(void)
 int Game::positionPiece(int player)
 {
 	if (player == 0)
-		return positionSinglePiece(player1);
+		return positionSinglePiece(player1Context);
 	else
-		return positionSinglePiece(player2);
+		return positionSinglePiece(player2Context);
 }
 
-int Game::positionSinglePiece(Player* player)
+int Game::positionSinglePiece(PlayerContext* player)
 {
 	ePieceType type, jokerType;
 	UINT x, y;
@@ -188,21 +193,21 @@ int Game::positionSinglePiece(Player* player)
 
 void Game::flagsCheck()
 {
-	checkPlayersFlagCountLessThanMax(player1);
-	checkPlayersFlagCountLessThanMax(player2);
+	checkPlayersFlagCountLessThanMax(player1Context);
+	checkPlayersFlagCountLessThanMax(player2Context);
 
 	checkWhetherFlagsWereCaptured();
 	
-	if (player1->getTypeCount(FLAG) == 0 && player1->getOriginalFlagCount() > 0 &&
-		player2->getTypeCount(FLAG) == 0 && player2->getOriginalFlagCount() > 0)
+	if (player1Context->getTypeCount(FLAG) == 0 && player1Context->getOriginalFlagCount() > 0 &&
+		player2Context->getTypeCount(FLAG) == 0 && player2Context->getOriginalFlagCount() > 0)
 	{
-		if (player1->getHasLost() == false &&
-			player2->getHasLost() == false)
+		if (player1Context->getHasLost() == false &&
+			player2Context->getHasLost() == false)
 		{
-			player1->setHasLost();
-			player1->setReason(ALL_FLAGS_EATEN_DURING_POSITIONING);
-			player2->setHasLost();
-			player2->setReason(ALL_FLAGS_EATEN_DURING_POSITIONING);
+			player1Context->setHasLost();
+			player1Context->setReason(ALL_FLAGS_EATEN_DURING_POSITIONING);
+			player2Context->setHasLost();
+			player2Context->setReason(ALL_FLAGS_EATEN_DURING_POSITIONING);
 		}
 	}
 
@@ -213,41 +218,41 @@ int Game::getWinner(eReason* pReason)
 	int winner = 0;
 	eReason reason = INVALID_REASON;
 
-	if (player1->getHasLost() && !player2->getHasLost())
+	if (player1Context->getHasLost() && !player2Context->getHasLost())
 	{
-		reason = player1->getReason();
+		reason = player1Context->getReason();
 		winner = 2; //player2 wins
 	}
 
-	else if (!player1->getHasLost() && player2->getHasLost())
+	else if (!player1Context->getHasLost() && player2Context->getHasLost())
 	{
-		reason = player2->getReason();
+		reason = player2Context->getReason();
 		winner = 1; //player1 wins
 	}
 
 	/*********** Tie Scenarios ***********/
 
 	//if no moves left but both players still alive
-	else if (!player1->getHasMoreMoves() && !player2->getHasMoreMoves() &&
-		!player1->getHasLost() && !player2->getHasLost())
+	else if (!player1Context->getHasMoreMoves() && !player2Context->getHasMoreMoves() &&
+		!player1Context->getHasLost() && !player2Context->getHasLost())
 	{
 		reason = MOVES_INPUT_FILES_DONE;
 	}
 
-	else if (player1->getReason() == player2->getReason())
+	else if (player1Context->getReason() == player2Context->getReason())
 	{
-		if (player1->getReason() == ALL_FLAGS_EATEN_DURING_POSITIONING)		//identified in checkPlayersFlags
+		if (player1Context->getReason() == ALL_FLAGS_EATEN_DURING_POSITIONING)		//identified in checkPlayersFlags
 			reason = ALL_FLAGS_EATEN_DURING_POSITIONING;
 		else
-			reason = (eReason)MAKE_REASON_DOUBLE(player1->getReason());
+			reason = (eReason)MAKE_REASON_DOUBLE(player1Context->getReason());
 	}
 	
-	else if (player1->getReason() != player2->getReason())						//TODO
+	else if (player1Context->getReason() != player2Context->getReason())						//TODO
 	{
 		printf("BOTH player Got TIE scenario with two different reasons:\n"
 			"\tPlayer #1 reason: %s\n"
 			"\tPlayer #2 reason: %s\n",
-			GetReasonString(player1->getReason()).c_str(), GetReasonString(player2->getReason()).c_str());
+			GetReasonString(player1Context->getReason()).c_str(), GetReasonString(player2Context->getReason()).c_str());
 		reason = BOTH_LOST_DIFFERENT_REASONS;
 	}
 
@@ -276,15 +281,15 @@ string Game::GetReasonString(eReason reason)
 		return "A tie - all flags are eaten by both players in the position files";
 
 	case BAD_MOVES_INPUT_FILE:
-		if (player1->getHasLost())
+		if (player1Context->getHasLost())
 		{
 			playerNumber = 1;
-			line = player1->getPlayerFileContext()->moves->getCurrentLineNum();
+			line = player1Context->getPlayerFileContext()->moves->getCurrentLineNum();
 		}
 		else
 		{
 			playerNumber = 2;
-			line = player2->getPlayerFileContext()->moves->getCurrentLineNum();
+			line = player2Context->getPlayerFileContext()->moves->getCurrentLineNum();
 		}
 		sprintf(temp, "Bad Moves input file for player %d - line %d", playerNumber, line);
 		return (string)temp;
@@ -293,15 +298,15 @@ string Game::GetReasonString(eReason reason)
 	case BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
 	case BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
 	case BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
-		if (player1->getHasLost())
+		if (player1Context->getHasLost())
 		{
 			playerNumber = 1;
-			line = player1->getPlayerFileContext()->pieces->getCurrentLineNum();
+			line = player1Context->getPlayerFileContext()->pieces->getCurrentLineNum();
 		}
 		else
 		{
 			playerNumber = 2;
-			line = player2->getPlayerFileContext()->pieces->getCurrentLineNum();
+			line = player2Context->getPlayerFileContext()->pieces->getCurrentLineNum();
 		}
 		sprintf(temp, "Bad Positioning input file for player %d - line %d", playerNumber, line);
 		return (string)temp;
@@ -310,8 +315,8 @@ string Game::GetReasonString(eReason reason)
 	case BOTH_BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
-		line = player1->getPlayerFileContext()->pieces->getCurrentLineNum();
-		line2 = player2->getPlayerFileContext()->pieces->getCurrentLineNum();
+		line = player1Context->getPlayerFileContext()->pieces->getCurrentLineNum();
+		line2 = player2Context->getPlayerFileContext()->pieces->getCurrentLineNum();
 
 		sprintf(temp, "Bad Positioning input file for both players - player 1: line %d, player 2: line %d", line, line2);
 		return (string)temp;
@@ -359,7 +364,7 @@ void Game::writeOutputFile()
 			}
 			else
 			{
-				isPlayer1 = (piece->getOwner() == player1);
+				isPlayer1 = (piece->getOwner() == player1Context);
 				c = pieceToChar(piece->getOriginalType(), isPlayer1);	//need to get original type to print joker as joker
 #if DEBUG == 1
 				debug_c = c;

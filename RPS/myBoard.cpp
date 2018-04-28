@@ -84,7 +84,7 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 {
 	Piece* p2;
 	eScore score;
-	Player *p1owner, *p2owner;
+	PlayerContext* p1owner, *p2owner;
 	ePieceType type, originalType, p2type;
 
 	type = p->getType();
