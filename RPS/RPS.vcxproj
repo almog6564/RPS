@@ -65,6 +65,10 @@
     <RemoteCppCompileToolExe>g++-5.3.0</RemoteCppCompileToolExe>
     <RemoteLdToolExe>g++-5.3.0</RemoteLdToolExe>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <RemoteCppCompileToolExe>g++-5.3.0</RemoteCppCompileToolExe>
+    <RemoteLdToolExe>g++-5.3.0</RemoteLdToolExe>
+  </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="AutoPlayerAlgorithm.h" />
     <ClInclude Include="Board.h" />
@@ -103,6 +107,11 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <CppLanguageStandard>c++1y</CppLanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
     </ClCompile>

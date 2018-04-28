@@ -9,6 +9,7 @@ using namespace std;
 FilePlayerAlgorithm::FilePlayerAlgorithm(PlayerFileContext & fileContext): fileContext(fileContext)
 {
 	hasMoreMoves = true;
+	//nextJokerChange = make_unique<MyJokerChange>(0, 0, 'R');
 }
 
 FilePlayerAlgorithm::~FilePlayerAlgorithm()
@@ -29,24 +30,21 @@ unique_ptr<Move> FilePlayerAlgorithm::getMove()
 	switch (status)
 	{
 	case FILE_SUCCESS:
-		hasMoreMoves = true;
 		break;
 	case FILE_EOF_REACHED:
-		//hasMoreMoves = false? not done in ex.1
+		hasMoreMoves = false;
 	case FILE_ERROR:
 	case FILE_BAD_FORMAT:
 		//hasLost = 1; 
 		//reason = BAD_MOVES_INPUT_FILE; 
 	default:
-	    return make_unique<MyMove>(0,0,0,0); //invalid move will represent an invalid move
-		//can simply return nullptr
+		return nullptr;
 	}
 	if (isJoker)
-		//nextJokerChange = make_unique<MyJokerChange>(jokerX, jokerY, newRep);
-	//else
-		//nextJokerChange = nullptr;
+		nextJokerChange = make_unique<MyJokerChange>(jokerX, jokerY, newRep);
+	else
+		nextJokerChange = nullptr;
 
-	//instead can be done by holding a uniqe_ptr<MyMove> as field in class, and using reset to update it
 	return make_unique<MyMove>(fromX, fromY, toX, toY);
 }
 

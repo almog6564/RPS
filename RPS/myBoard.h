@@ -1,6 +1,6 @@
 
-#ifndef _BOARD_
-#define _BOARD_
+#ifndef _MY_BOARD_
+#define _MY_BOARD_
 
 #include "piece.h"
 #include "Board.h"
