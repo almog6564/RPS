@@ -2,6 +2,7 @@
 #include "MyMove.h"
 #include "MyPoint.h"
 #include "MyJokerChange.h"
+#include "MyPiecePosition.h"
 
 using namespace std;
 
@@ -45,13 +46,13 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 		switch (status)
 		{
 		case FILE_EOF_REACHED:
-			return;
+			break;
 
 		case FILE_ERROR:
 		case FILE_BAD_FORMAT:
 		//	setHasLost();
 		//	setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
-			return;
+			break;
 
 		case FILE_SUCCESS:
 			if (tmpBoard[y - 1][x - 1])
@@ -84,7 +85,6 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 
 void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill) 
 {
-
 	UINT x, y;
 	ePieceType type, jokerType;
 	UINT piecesCtr = 0;
