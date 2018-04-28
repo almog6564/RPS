@@ -9,15 +9,12 @@ using namespace std;
 FilePlayerAlgorithm::FilePlayerAlgorithm(PlayerFileContext & fileContext): fileContext(fileContext)
 {
 	hasMoreMoves = true;
-	//nextJokerChange = make_unique<MyJokerChange>(0, 0, 'R');
-}
-
-FilePlayerAlgorithm::~FilePlayerAlgorithm()
-{
+	nextJokerChange = nullptr;
 }
 
 void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill) 
 {
+
 }
 
 unique_ptr<Move> FilePlayerAlgorithm::getMove()
@@ -25,6 +22,9 @@ unique_ptr<Move> FilePlayerAlgorithm::getMove()
 	UINT fromX, fromY, toX, toY, jokerX, jokerY;
 	bool isJoker;
 	ePieceType newRep;
+
+	if (!hasMoreMoves)
+		return nullptr;
 
 	eFileStatus status = fileContext.getNextMove(&fromX, &fromY, &toX, &toY, &isJoker, &jokerX, &jokerY, &newRep);
 	switch (status)
@@ -34,9 +34,9 @@ unique_ptr<Move> FilePlayerAlgorithm::getMove()
 	case FILE_EOF_REACHED:
 		hasMoreMoves = false;
 	case FILE_ERROR:
+		return nullptr;
 	case FILE_BAD_FORMAT:
-		//hasLost = 1; 
-		//reason = BAD_MOVES_INPUT_FILE; 
+		return make_unique<MyMove>(0, 0, 0, 0);
 	default:
 		return nullptr;
 	}

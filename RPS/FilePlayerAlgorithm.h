@@ -12,7 +12,7 @@ class FilePlayerAlgorithm : public PlayerAlgorithm
 
 public:
 	FilePlayerAlgorithm(PlayerFileContext& fileContext);
-	~FilePlayerAlgorithm();
+	~FilePlayerAlgorithm() {};
 
 	void getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill);
 	void notifyOnInitialBoard(const Board& b, const std::vector<unique_ptr<FightInfo>>& fights);
@@ -21,7 +21,7 @@ public:
 	unique_ptr<Move> getMove();
 	unique_ptr<JokerChange> getJokerChange() // nullptr if no change is requested
 	{
-		//
+		return move(nextJokerChange);
 	}
 };
 
