@@ -432,23 +432,25 @@ void Game::positionAllPieces()
 	UINT x, y;
 	ePieceType type, jokerType;
 	Piece* p = nullptr;
+	unique_ptr<MyFightInfo> fight;
 	vector<unique_ptr<PiecePosition>>::iterator it;
-	vector<unique_ptr<PiecePosition>> vec(0);
-
-	/* Player1 Posi tioning */
+	vector<unique_ptr<PiecePosition>> pieceVec(0);
+	vector<unique_ptr<FightInfo>> fightVec(0);
+	
+	/* Player1 Positioning */
 
 	do 
 	{
-		player1Algorithm->getInitialPositions(1, vec);
+		player1Algorithm->getInitialPositions(1, pieceVec);
 
-		if (vec.size == 0)
+		if (pieceVec.size() == 0)
 		{
 			player1Context->setHasLost();
 			player1Context->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
 			break;
 		}
 
-		for (const auto& piecePos : vec)
+		for (const auto& piecePos : pieceVec)
 		{
 			x = piecePos->getPosition().getX();
 			y = piecePos->getPosition().getY();
@@ -456,7 +458,12 @@ void Game::positionAllPieces()
 			jokerType = charToPiece(piecePos->getJokerRep());
 
 			p = createNewPiece(player1Context, type, jokerType);
-			board->positionPiece(p, x, y);
+			board->positionPiece(p, x, y, 0, 0, 0, fight);
+
+			if (fight.get() != nullptr)
+			{
+				fightVec.push_back(move(fight));
+			}
 		}
 
 

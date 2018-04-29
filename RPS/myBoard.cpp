@@ -79,8 +79,8 @@ void MyBoard::removePiece(UINT col, UINT row)
 
 /**
  * This function assumes legal dimensions.
- */
-int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY, MyFightInfo* fightInfo /*= nullptr*/)
+*/
+int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY, unique_ptr<MyFightInfo>& fight /*= nullptr*/)
 {
 	Piece* p2;
 	eScore score;
@@ -132,10 +132,13 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 		{
 			if (type != p2type)
 			{
+				fight = make_unique<MyFightInfo>(new MyFightInfo(toX, toY, BOMB, type == BOMB ? p1owner->getPlayerId() + 1 : p2owner->getPlayerId() + 1));
+
 				dprint("Player #%d WINS!\n", type == BOMB ? p1owner->getPlayerId()+1 : p2owner->getPlayerId()+1);
 			}
 			else
 			{
+				fight = make_unique<MyFightInfo>(new MyFightInfo(toX, toY, BOMB, 0));
 				dprint("It's a TIE!\n");
 			}
 
@@ -156,9 +159,6 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 
 
 		//pieces belong to different players, MATCH!
-		//fightInfo
-		MyFightInfo fightInfo2;
-		*fightInfo = fightInfo2;
 
 		score = p->match(p2);
 		switch (score)
@@ -172,11 +172,14 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 				if (p1owner->incTypeCount(type, originalType))
 					return -1;
 			}
-
+			fight = make_unique<MyFightInfo>(new MyFightInfo(toX, toY, type, p1owner->getPlayerId() + 1));
 			dprint("Player #%d WINS!\n", p1owner->getPlayerId()+1);
 			break;
 
 		case LOSE:
+
+			fight = make_unique<MyFightInfo>(new MyFightInfo(toX, toY, p2type, p2owner->getPlayerId() + 1));
+
 			dprint("Player #%d LOSES!\n", p1owner->getPlayerId()+1);
 			if (moved)
 				removePiece(fromX, fromY);
@@ -186,6 +189,9 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 
 		case TIE:
 			dprint("It's a TIE!\n");
+
+			fight = make_unique<MyFightInfo>(new MyFightInfo(toX, toY, p2type, 0));
+
 			if (moved)
 				removePiece(fromX, fromY);
 			else

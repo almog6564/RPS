@@ -29,6 +29,11 @@ public:
 		this->winner = other.winner;
 	}
 
+	MyFightInfo(MyFightInfo& other)
+	{
+		*this = other;
+	}
+
 	const Point& getPosition() const
 	{
 		return *(move(position));

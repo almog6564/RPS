@@ -67,8 +67,7 @@ public:
 			0 - function finished with no errors.
 			1 - function finished with error, or a player has lost due to an illegal action
 	*/
-	int positionPiece(Piece* p, UINT toX, UINT toY, int moved = 0, UINT fromX = 0, UINT fromY = 0, MyFightInfo* fightInfo = nullptr);
-
+	int positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY, unique_ptr<MyFightInfo>& fight /*= nullptr*/);
 	int changeJokerType(UINT fromX, UINT fromY, ePieceType newType);
 
 	void getBoardDimensions(UINT* pCols, UINT* pRows);
