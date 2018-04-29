@@ -420,3 +420,39 @@ void Game::writeOutputFile()
 	dprint("\n");
 
 }
+
+void Game::positionAllPieces()
+{
+	UINT x, y;
+	ePieceType type, jokerType;
+	Piece* p = nullptr;
+	vector<unique_ptr<PiecePosition>>::iterator it;
+	vector<unique_ptr<PiecePosition>> vec(0);
+
+	/* Player1 Posi tioning */
+
+	do 
+	{
+		player1Algorithm->getInitialPositions(1, vec);
+
+		if (vec.size == 0)
+		{
+			player1Context->setHasLost();
+			player1Context->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
+			break;
+		}
+
+		for (const auto& piecePos : vec)
+		{
+			x = piecePos->getPosition().getX();
+			y = piecePos->getPosition().getY();
+			type = charToPiece(piecePos->getPiece());
+			jokerType = charToPiece(piecePos->getJokerRep());
+
+			p = createNewPiece(player1Context, type, jokerType);
+			board->positionPiece(p, x, y);
+		}
+
+
+	} while (false);
+}
