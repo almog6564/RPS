@@ -224,7 +224,7 @@ int Game::positionSinglePiece(PlayerContext* player)
 	if (!player->getNextPiece(&type, &x, &y, &jokerType))
 	{
 		Piece* p = createNewPiece(player, type, jokerType);
-		board->positionPiece(p, x, y);
+		//board->positionPiece(p, x, y);
 		return 0;
 	}
 
@@ -427,30 +427,30 @@ void Game::writeOutputFile()
 
 }
 
+
 void Game::positionAllPieces()
 {
 	UINT x, y;
 	ePieceType type, jokerType;
 	Piece* p = nullptr;
 	unique_ptr<MyFightInfo> fight;
-	vector<unique_ptr<PiecePosition>>::iterator it;
-	vector<unique_ptr<PiecePosition>> pieceVec(0);
+	vector<unique_ptr<PiecePosition>> p1PieceVec(0), p2PieceVec(0);
 	vector<unique_ptr<FightInfo>> fightVec(0);
 	
 	/* Player1 Positioning */
 
 	do 
 	{
-		player1Algorithm->getInitialPositions(1, pieceVec);
+		player1Algorithm->getInitialPositions(1, p1PieceVec);
 
-		if (pieceVec.size() == 0)
+		if (p1PieceVec.size() == 0)
 		{
 			player1Context->setHasLost();
 			player1Context->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
 			break;
 		}
 
-		for (const auto& piecePos : pieceVec)
+		for (const auto& piecePos : p1PieceVec)
 		{
 			x = piecePos->getPosition().getX();
 			y = piecePos->getPosition().getY();
@@ -458,7 +458,28 @@ void Game::positionAllPieces()
 			jokerType = charToPiece(piecePos->getJokerRep());
 
 			p = createNewPiece(player1Context, type, jokerType);
-			board->positionPiece(p, x, y, 0, 0, 0, fight);
+			board->positionPiece(p, x, y, fight);
+
+		}
+
+		player2Algorithm->getInitialPositions(2, p2PieceVec);
+
+		if (p2PieceVec.size() == 0)
+		{
+			player2Context->setHasLost();
+			player2Context->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
+			break;
+		}
+
+		for (const auto& piecePos : p2PieceVec)
+		{
+			x = piecePos->getPosition().getX();
+			y = piecePos->getPosition().getY();
+			type = charToPiece(piecePos->getPiece());
+			jokerType = charToPiece(piecePos->getJokerRep());
+
+			p = createNewPiece(player1Context, type, jokerType);
+			board->positionPiece(p, x, y, fight);
 
 			if (fight.get() != nullptr)
 			{
@@ -466,6 +487,8 @@ void Game::positionAllPieces()
 			}
 		}
 
+		player1Algorithm->notifyOnInitialBoard(*board, fightVec);
+		player2Algorithm->notifyOnInitialBoard(*board, fightVec);
 
 	} while (false);
 }

@@ -80,7 +80,7 @@ void MyBoard::removePiece(UINT col, UINT row)
 /**
  * This function assumes legal dimensions.
 */
-int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, UINT fromY, unique_ptr<MyFightInfo>& fight /*= nullptr*/)
+int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, unique_ptr<MyFightInfo>& fight, int moved, UINT fromX, UINT fromY)
 {
 	Piece* p2;
 	eScore score;
@@ -132,13 +132,13 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 		{
 			if (type != p2type)
 			{
-				fight = make_unique<MyFightInfo>(new MyFightInfo(toX, toY, BOMB, type == BOMB ? p1owner->getPlayerId() + 1 : p2owner->getPlayerId() + 1));
+				fight = make_unique<MyFightInfo>(toX, toY, BOMB, type == BOMB ? p1owner->getPlayerId() + 1 : p2owner->getPlayerId() + 1);
 
 				dprint("Player #%d WINS!\n", type == BOMB ? p1owner->getPlayerId()+1 : p2owner->getPlayerId()+1);
 			}
 			else
 			{
-				fight = make_unique<MyFightInfo>(new MyFightInfo(toX, toY, BOMB, 0));
+				fight = make_unique<MyFightInfo>(toX, toY, BOMB, 0);
 				dprint("It's a TIE!\n");
 			}
 
@@ -172,13 +172,13 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 				if (p1owner->incTypeCount(type, originalType))
 					return -1;
 			}
-			fight = make_unique<MyFightInfo>(new MyFightInfo(toX, toY, type, p1owner->getPlayerId() + 1));
+			fight = make_unique<MyFightInfo>(toX, toY, type, p1owner->getPlayerId() + 1);
 			dprint("Player #%d WINS!\n", p1owner->getPlayerId()+1);
 			break;
 
 		case LOSE:
 
-			fight = make_unique<MyFightInfo>(new MyFightInfo(toX, toY, p2type, p2owner->getPlayerId() + 1));
+			fight = make_unique<MyFightInfo>(toX, toY, p2type, p2owner->getPlayerId() + 1);
 
 			dprint("Player #%d LOSES!\n", p1owner->getPlayerId()+1);
 			if (moved)
@@ -190,7 +190,7 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, int moved, UINT fromX, 
 		case TIE:
 			dprint("It's a TIE!\n");
 
-			fight = make_unique<MyFightInfo>(new MyFightInfo(toX, toY, p2type, 0));
+			fight = make_unique<MyFightInfo>(toX, toY, p2type, 0);
 
 			if (moved)
 				removePiece(fromX, fromY);
@@ -283,7 +283,8 @@ int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY
 
 			return ERROR;
 		}
-		return positionPiece(p1, toX, toY, 1, fromX, fromY);
+		auto fight = make_unique<MyFightInfo>();
+		return positionPiece(p1, toX, toY, fight, 1, fromX, fromY);
 
 	}
 
