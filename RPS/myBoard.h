@@ -5,6 +5,7 @@
 #include "piece.h"
 #include "Board.h"
 #include "MyPoint.h"
+#include "MyFightInfo.h"
 
 using namespace std;
 
@@ -54,7 +55,7 @@ public:
 		0 - function finished with no errors.
 		1 - function finished with error, or a player has lost due to an illegal action
 	*/
-	int movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY);
+	int movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY, MyFightInfo* fightInfo = nullptr);
 
 	/*
 	This function recieves a pointer to Piece and a position to place it on board.
@@ -66,7 +67,7 @@ public:
 			0 - function finished with no errors.
 			1 - function finished with error, or a player has lost due to an illegal action
 	*/
-	int positionPiece(Piece* p, UINT toX, UINT toY, int moved = 0, UINT fromX = 0, UINT fromY = 0);
+	int positionPiece(Piece* p, UINT toX, UINT toY, int moved = 0, UINT fromX = 0, UINT fromY = 0, MyFightInfo* fightInfo = nullptr);
 
 	int changeJokerType(UINT fromX, UINT fromY, ePieceType newType);
 
