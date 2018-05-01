@@ -30,6 +30,11 @@ public:
 		return *this;
 	}
 
+	MyFightInfo(MyFightInfo& other)
+	{
+		*this = other;
+	}
+
 	const Point& getPosition() const
 	{
 		return *(move(position));

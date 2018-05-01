@@ -98,6 +98,7 @@ public:
 
 	void writeOutputFile();
 
+	void positionAllPieces();
 	void resetPieceFiles();
 
 private:
