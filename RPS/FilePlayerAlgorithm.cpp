@@ -101,7 +101,7 @@ void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr
 
 	vectorToFill.resize(piecesCtr);
 
-	for (int i = 0; i < piecesCtr; i++)
+	for (UINT i = 0; i < piecesCtr; i++)
 	{
 		fileContext.getNextPiece(&type, &x, &y, &jokerType);
 

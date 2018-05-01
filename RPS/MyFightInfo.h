@@ -10,12 +10,12 @@ using namespace std;
 class MyFightInfo : public FightInfo
 {
 	unique_ptr<Point> position;
-	char opponentPiece;
+	char piece;
 	int winner;
 
 public:
-	MyFightInfo(UINT x, UINT y, char opponentPiece, int winner) : 
-		position(make_unique<MyPoint>(x, y)), opponentPiece(opponentPiece), winner(winner) {}
+	MyFightInfo(UINT x, UINT y, char piece, int winner) : 
+		position(make_unique<MyPoint>(x, y)), piece(piece), winner(winner) {}
 
 	MyFightInfo() {}
 
@@ -24,9 +24,10 @@ public:
 		// check for self-assignment
 		if (&other == this)
 			return *this;
-		this->opponentPiece = other.opponentPiece;
+		this->piece = other.piece;
 		this->position = move(other.position);
 		this->winner = other.winner;
+		return *this;
 	}
 
 	const Point& getPosition() const
@@ -34,9 +35,9 @@ public:
 		return *(move(position));
 	}
 
-	char getOpponentPiece() const // R, P, S, B or F (but NOT J)
+	char getPiece(int player) const // R, P, S, B or F (but NOT J)
 	{
-		return opponentPiece;
+		return piece;
 	}
 
 	int getWinner() const // 0 - both lost / tie, 1 - player 1 won, 2 - player 2 won
@@ -44,7 +45,10 @@ public:
 		return winner;
 	}
 
-	void setPosition() {}
+	void setPosition() 
+	{
+
+	}
 };
 
 #endif 
