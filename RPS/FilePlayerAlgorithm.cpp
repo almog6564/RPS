@@ -8,7 +8,7 @@ using namespace std;
 
 
 FilePlayerAlgorithm::FilePlayerAlgorithm(PlayerFileContext & fileContext, UINT rows, UINT cols) :
-	fileContext(fileContext), rows(rows), cols(cols), hasMoreMoves(true), nextJokerChange(nullptr) {};
+	playerFileContext(fileContext), rows(rows), cols(cols), hasMoreMoves(true), nextJokerChange(nullptr) {};
 
 
 /*
@@ -31,7 +31,7 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 
 	while (true)
 	{
-		status = fileContext.getNextPiece(&type, &x, &y, &jokerType);
+		status = playerFileContext.getNextPiece(&type, &x, &y, &jokerType);
 
 		if (x > cols || y > rows || x < 1 || y < 1)
 		{
@@ -52,6 +52,9 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 		case FILE_BAD_FORMAT:
 		//	setHasLost();
 		//	setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
+
+			pieceCounter = 0;
+
 			break;
 
 		case FILE_SUCCESS:
@@ -74,6 +77,8 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 		}
 	}
 
+	playerFileContext.setPieceFileToStart();
+
 	for (UINT i = 0; i < rows; i++)
 		delete[] tmpBoard[i];
 
@@ -90,9 +95,13 @@ void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr
 	UINT piecesCtr = 0;
 	unique_ptr<MyPiecePosition> piece;
 
+	dprint("FilePlayerAlgorithm::getInitialPositions");
+
 	//this function validates there's no collisions between pieces of the same player
 	//it must be before the actual positioning
 	piecesCtr = validatePlayerPositions(player);
+
+	dprint("validatePlayerPositions counter is %d\n", piecesCtr);
 
 	if (piecesCtr == 0)
 		return;
@@ -103,7 +112,8 @@ void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr
 
 	for (UINT i = 0; i < piecesCtr; i++)
 	{
-		fileContext.getNextPiece(&type, &x, &y, &jokerType);
+		//no need to check return values because we know all are valid
+		playerFileContext.getNextPiece(&type, &x, &y, &jokerType);
 
 		vectorToFill[i] = make_unique<MyPiecePosition>(x, y, pieceToChar(type), pieceToChar(jokerType));
 	}
@@ -118,7 +128,7 @@ unique_ptr<Move> FilePlayerAlgorithm::getMove()
 	if (!hasMoreMoves)
 		return nullptr;
 
-	eFileStatus status = fileContext.getNextMove(&fromX, &fromY, &toX, &toY, &isJoker, &jokerX, &jokerY, &newRep);
+	eFileStatus status = playerFileContext.getNextMove(&fromX, &fromY, &toX, &toY, &isJoker, &jokerX, &jokerY, &newRep);
 	switch (status)
 	{
 	case FILE_SUCCESS:

@@ -9,7 +9,7 @@ int main()
 	int M, N, R, P, S, B, J, F;
 	M = N = 10;
 	R = 2; P = 5; S = 1; B = 2; J = 2; F = 1;
-	bool autoPlayer1 = false , autoPlayer2 = false;
+	bool bIsPlayer1Auto = false ,  bIsPlayer2Auto = false;
 	string p1p = "player1.rps_board";
 	string p1m = "player1.rps_moves";
 	string p2p = "player2.rps_board";
@@ -31,24 +31,9 @@ int main()
 	do 
 	{
 		 game = new Game(M, N, R, P, S, B, J, F,
-			R, P, S, B, J, F, fileParser, autoPlayer1, autoPlayer2);
+			R, P, S, B, J, F, fileParser, bIsPlayer1Auto, bIsPlayer2Auto);
 
-		/* First positioning */
-		if (game->validatePositionFiles())
-		{
-			//end game
-			dprint("Validation of piece files FAILED\n");
-			break;
-		}
-
-		dprint("Validated of position files SUCCESS\n");
-
-		game->resetPieceFiles();
-
-		while (!game->positionPiece(0));
-		dprint("Positioning of pieces 0 on board SUCCEEDED!\n");
-
-		while (!game->positionPiece(1));
+		 game->positionAllPieces();
 
 		dprint("Positioning of pieces on board ENDED!\n");
 

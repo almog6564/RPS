@@ -6,7 +6,7 @@
 
 class FilePlayerAlgorithm : public PlayerAlgorithm
 {
-	PlayerFileContext& fileContext;
+	PlayerFileContext& playerFileContext;
 	unique_ptr<JokerChange> nextJokerChange;
 	bool hasMoreMoves;
 	UINT rows, cols;

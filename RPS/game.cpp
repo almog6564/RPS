@@ -447,7 +447,7 @@ void Game::positionAllPieces()
 	UINT x, y;
 	ePieceType type, jokerType;
 	Piece* p = nullptr;
-	unique_ptr<MyFightInfo> fight;
+	unique_ptr<MyFightInfo> pFight;
 	vector<unique_ptr<PiecePosition>> p1PieceVec(0), p2PieceVec(0);
 	vector<unique_ptr<FightInfo>> fightVec(0);
 	
@@ -472,9 +472,11 @@ void Game::positionAllPieces()
 			jokerType = charToPiece(piecePos->getJokerRep());
 
 			p = createNewPiece(player1Context, type, jokerType);
-			board->positionPiece(p, x, y, fight);
+			board->positionPiece(p, x, y, pFight);
 
 		}
+
+		//no need to check pFight because no fights
 
 		player2Algorithm->getInitialPositions(2, p2PieceVec);
 
@@ -493,11 +495,11 @@ void Game::positionAllPieces()
 			jokerType = charToPiece(piecePos->getJokerRep());
 
 			p = createNewPiece(player1Context, type, jokerType);
-			board->positionPiece(p, x, y, fight);
+			board->positionPiece(p, x, y, pFight);
 
-			if (fight.get() != nullptr)
+			if (pFight)
 			{
-				fightVec.push_back(move(fight));
+				fightVec.push_back(move(pFight));	//pFight will hold nullptr after move
 			}
 		}
 
