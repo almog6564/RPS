@@ -55,7 +55,7 @@ public:
 		0 - function finished with no errors.
 		1 - function finished with error, or a player has lost due to an illegal action
 	*/
-	int movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY, MyFightInfo* fightInfo = nullptr);
+	int movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY, unique_ptr<MyFightInfo>& fightInfo);
 
 	/*
 	This function recieves a pointer to Piece and a position to place it on board.
