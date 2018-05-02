@@ -65,6 +65,7 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 					player, pieceToChar(type), x, y);
 
 				pieceCounter = 0;
+				status = FILE_BAD_FORMAT;
 			//	setHasLost();
 			//	setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
 			}
@@ -79,7 +80,8 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 	
 	}
 
-	playerFileContext.setPieceFileToStart();
+	if(status == FILE_EOF_REACHED)
+		playerFileContext.setPieceFileToStart();
 
 	for (UINT i = 0; i < rows; i++)
 		delete[] tmpBoard[i];
@@ -107,10 +109,6 @@ void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr
 
 	if (piecesCtr == 0)
 		return;
-
-	if (player == 2)
-		player = 2;
-
 
 	//if we're here than all pieces are valid
 
@@ -148,7 +146,7 @@ unique_ptr<Move> FilePlayerAlgorithm::getMove()
 		return make_unique<MyMove>(0, 0, 0, 0);
 	}
 	if (isJoker)
-		nextJokerChange = make_unique<MyJokerChange>(jokerX, jokerY, newRep);
+		nextJokerChange = make_unique<MyJokerChange>(jokerX, jokerY, pieceToChar(newRep));
 	else
 		nextJokerChange = nullptr;
 
@@ -161,6 +159,7 @@ void FilePlayerAlgorithm::notifyOnInitialBoard(const Board & b, const std::vecto
 	auto a = new MyPoint(1, 1);
 	b.getPlayer(*a);
 	fights.size();
+	delete a;
 }
 
 void FilePlayerAlgorithm::notifyOnOpponentMove(const Move & move) 

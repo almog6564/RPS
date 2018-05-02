@@ -26,6 +26,7 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const std::vecto
 	auto a = new MyPoint(1, 1);
 	b.getPlayer(*a);
 	fights.size();
+	delete a;
 }
 
 void AutoPlayerAlgorithm::notifyOnOpponentMove(const Move & move)

@@ -77,6 +77,19 @@ void MyBoard::removePiece(UINT col, UINT row)
 	}
 }
 
+void MyBoard::clearBoard()
+{
+	for (UINT i = 0; i < rows; i++)
+	{
+		for (UINT j = 0; j < cols; j++)
+		{
+			delete table[i][j];
+			table[i][j] = nullptr;
+		}
+	}
+}
+
+
 /**
  * This function assumes legal dimensions.
 */
@@ -126,7 +139,7 @@ int MyBoard::positionPiece(Piece* newPiece, UINT toX, UINT toY, unique_ptr<MyFig
 		}
 
 		dprint("MATCH: Player#%d [%c already at (%d,%d)] VS Player #%d [%c from (%d,%d)] ... ",
-			existingPieceOwner->getPlayerId()+1, pieceToChar(existingPiece->getType()), toX, toY, newPieceOwner->getPlayerId(), pieceToChar(type), fromX, fromY);
+			existingPieceOwner->getPlayerId()+1, pieceToChar(existingPiece->getType()), toX, toY, newPieceOwner->getPlayerId()+1, pieceToChar(type), fromX, fromY);
 
 		if (type == BOMB || existingPieceType == BOMB)
 		{

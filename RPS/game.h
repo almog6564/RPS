@@ -35,7 +35,7 @@ public:
 	~Game();
 	/*
 	Before starting the actual game (i.e. positioning, matching and moving pieces), this function checks
-	wheather the board files are valid (i.e. correct formats and no two pieces at the same location by the 
+	whether the board files are valid (i.e. correct formats and no two pieces at the same location by the 
 	same player).
 		@returns -
 			0 - board files are valid, can start game.
@@ -45,18 +45,8 @@ public:
 	int validatePositionFiles();
 
 	/*
-	This function is called during the first positioning phase.
-	We assume that both player's boards are valid at this point.
-	This function reads the pieces files to get the next piece, creates the piece, and postions it on board.
-		@returns -
-			0 - Piece was extracted from file, created and positioned on board.
-			-1 - No pieces are left in file
-	*/
-	int positionPiece(int player);
-
-	/*
 	Before starting to move pieces according to moving files, this function makes sure that for both players
-	the number of flags that was placed is mathcing the number of flags that should have been placed (1 in this
+	the number of flags that was placed is matching the number of flags that should have been placed (1 in this
 	specific exercise).
 	If not, the illegal player(s) will be set as a losing player, with the corresponding reason.
 	*/
@@ -96,7 +86,6 @@ public:
 	void writeOutputFile();
 
 	void positionAllPieces();
-	void resetPieceFiles();
 
 private:
 	void checkWhetherFlagsWereCaptured(void);

@@ -12,6 +12,7 @@ PlayerContext::PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UI
 	originalFlagsCnt = 0;
 	score = 0;
 	hasLost = false;
+	hasMoreMoves = true;
 	autoPlayer = autoPlayer;
 }
 
