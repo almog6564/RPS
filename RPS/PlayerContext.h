@@ -17,6 +17,7 @@ class PlayerContext
 	UINT R, P, S, B, J, F;
 	eReason reason;
 	PlayerFileContext* fileContext;	
+	bool hasMoreMoves;
 
 public:
 	PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext = nullptr, bool autoPlayer = true);

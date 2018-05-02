@@ -135,12 +135,11 @@ unique_ptr<Move> FilePlayerAlgorithm::getMove()
 		break;
 	case FILE_EOF_REACHED:
 		hasMoreMoves = false;
+		return nullptr;
 	case FILE_ERROR:
-		return nullptr;
 	case FILE_BAD_FORMAT:
-		return make_unique<MyMove>(0, 0, 0, 0);
 	default:
-		return nullptr;
+		return make_unique<MyMove>(0, 0, 0, 0);
 	}
 	if (isJoker)
 		nextJokerChange = make_unique<MyJokerChange>(jokerX, jokerY, newRep);

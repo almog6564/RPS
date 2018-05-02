@@ -69,10 +69,13 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 		dprint("\n\n ************ Starting MOVE: Player #%d ************ \n\n", playerContext->getPlayerId() + 1);
 
 		/* STEP 1 */
+		if (!playerContext->getHasMoreMoves())
+			break;
 
 		auto move = playerAlgo->getMove();
 		if (!move)
 		{
+			playerContext->setHasMoreMoves(false);
 			dprint("No more moves for player %d !", playerContext->getPlayerId()+1);
 			break;
 		}

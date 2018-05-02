@@ -42,12 +42,12 @@ void PlayerContext::updateScore()	//for future use
 
 bool PlayerContext::getHasMoreMoves()
 {
-	//return algorithm->getHasMoreMoves();
+	return hasMoreMoves;
 }
 
 void PlayerContext::setHasMoreMoves(bool val)
 {
-	//hasMoreMoves = val;
+	hasMoreMoves = val;
 }
 
 void PlayerContext::decTypeCounter(ePieceType type, ePieceType originalType /* = UNDEF */, bool updateOnlyMovingCounter /* = false */)
