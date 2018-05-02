@@ -8,7 +8,7 @@ using namespace std;
 
 
 FilePlayerAlgorithm::FilePlayerAlgorithm(PlayerFileContext & fileContext, UINT rows, UINT cols) :
-	playerFileContext(fileContext), rows(rows), cols(cols), hasMoreMoves(true), nextJokerChange(nullptr) {};
+	playerFileContext(fileContext), rows(rows), cols(cols), hasMoreMoves(true), nextJokerChange(nullptr) {}
 
 
 /*
@@ -108,6 +108,10 @@ void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr
 	if (piecesCtr == 0)
 		return;
 
+	if (player == 2)
+		player = 2;
+
+
 	//if we're here than all pieces are valid
 
 	vectorToFill.resize(piecesCtr);
@@ -151,9 +155,21 @@ unique_ptr<Move> FilePlayerAlgorithm::getMove()
 	return make_unique<MyMove>(fromX, fromY, toX, toY);
 }
 
-void FilePlayerAlgorithm::notifyOnInitialBoard(const Board & b, const std::vector<unique_ptr<FightInfo>>& fights) {/*Ignore call*/ }
+void FilePlayerAlgorithm::notifyOnInitialBoard(const Board & b, const std::vector<unique_ptr<FightInfo>>& fights) 
+{
+	//just zevel for it to compile
+	auto a = new MyPoint(1, 1);
+	b.getPlayer(*a);
+	fights.size();
+}
 
-void FilePlayerAlgorithm::notifyOnOpponentMove(const Move & move) {/*Ignore call*/ }
+void FilePlayerAlgorithm::notifyOnOpponentMove(const Move & move) 
+{
+	move.getFrom();
+}
 
-void FilePlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo) {/*Ignore call*/ }
+void FilePlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo) 
+{
+	fightInfo.getWinner();
+}
 

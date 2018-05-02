@@ -477,7 +477,7 @@ void Game::positionAllPieces()
 			type = charToPiece(piecePos->getPiece());
 			jokerType = charToPiece(piecePos->getJokerRep());
 
-			p = createNewPiece(player1Context, type, jokerType);
+			p = createNewPiece(player2Context, type, jokerType);
 			board->positionPiece(p, x, y, pFight);
 
 			if (pFight)
@@ -486,7 +486,7 @@ void Game::positionAllPieces()
 			}
 		}
 
-		dprint("Fight vector includes %d fights\n", fightVec.size());
+		dprint("Fight vector includes %d fights\n", (int)fightVec.size());
 
 
 		dprint("Player 2 positioned all pieces\n");

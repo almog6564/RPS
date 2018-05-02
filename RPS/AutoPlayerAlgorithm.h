@@ -1,5 +1,6 @@
 #ifndef __AUTO_PLAYER_ALGORITHM_H_
 #define __AUTO_PLAYER_ALGORITHM_H_
+
 #include "PlayerAlgorithm.h"
 class AutoPlayerAlgorithm : public PlayerAlgorithm
 {

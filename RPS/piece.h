@@ -3,9 +3,8 @@
 #define _PIECE_
 
 #include "defs.h"
-#include "PiecePosition.h"
+#include "MyPiecePosition.h"
 #include "PlayerContext.h"
-#include "MyPoint.h"
 
 
 class Piece : public PiecePosition

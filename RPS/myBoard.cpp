@@ -80,28 +80,28 @@ void MyBoard::removePiece(UINT col, UINT row)
 /**
  * This function assumes legal dimensions.
 */
-int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, unique_ptr<MyFightInfo>& fight, int moved, UINT fromX, UINT fromY)
+int MyBoard::positionPiece(Piece* newPiece, UINT toX, UINT toY, unique_ptr<MyFightInfo>& fight, int moved, UINT fromX, UINT fromY)
 {
-	Piece* p2;
+	Piece* existingPiece;
 	eScore score;
-	PlayerContext* p1owner, *p2owner;
-	ePieceType type, originalType, p2type;
+	PlayerContext* newPieceOwner, *existingPieceOwner;
+	ePieceType type, originalType, existingPieceType;
 
-	type = p->getType();
-	originalType = p->getOriginalType();
-	p1owner = p->getOwner();
+	type = newPiece->getType();
+	originalType = newPiece->getOriginalType();
+	newPieceOwner = newPiece->getOwner();
 
-	p2 = getPieceAt(toX, toY);
-	if (!p2) //Piece was not found
+	existingPiece = getPieceAt(toX, toY);
+	if (!existingPiece) //Piece was not found
 	{
-		setPieceAt(p, toX, toY);
+		setPieceAt(newPiece, toX, toY);
 
 		if (!moved) //first positioning
-			return (p1owner->incTypeCount(type, originalType) == -1);
+			return (newPieceOwner->incTypeCount(type, originalType) == -1);
 		else
 		{
 			dprint("Player #%d moved its %c [if J: %c] from (%d,%d) to (%d,%d)\n",
-				p1owner->getPlayerId()+1, pieceToChar(originalType), pieceToChar(type),
+				newPieceOwner->getPlayerId()+1, pieceToChar(originalType), pieceToChar(type),
 				fromX, fromY, toX, toY);
 			setPieceAt(nullptr, fromX, fromY);
 		}
@@ -110,35 +110,35 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, unique_ptr<MyFightInfo>
 	else //piece found at cell
 	{
 
-		p2type = p2->getType();
-		p2owner = p2->getOwner();
+		existingPieceType = existingPiece->getType();
+		existingPieceOwner = existingPiece->getOwner();
 
-		if (p1owner == p2owner)
+		if (newPieceOwner == existingPieceOwner)
 		{
 			//both pieces belong to same player
-			p1owner->setHasLost();
+			newPieceOwner->setHasLost();
 			if (moved)
-				p1owner->setReason(BAD_MOVES_INPUT_FILE);
+				newPieceOwner->setReason(BAD_MOVES_INPUT_FILE);
 			else
-				p1owner->setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
+				newPieceOwner->setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
 
 			return -1; 
 		}
 
 		dprint("MATCH: Player#%d [%c already at (%d,%d)] VS Player #%d [%c from (%d,%d)] ... ",
-			p2owner->getPlayerId()+1, pieceToChar(p2->getType()), toX, toY, p1owner->getPlayerId(), pieceToChar(type), fromX, fromY);
+			existingPieceOwner->getPlayerId()+1, pieceToChar(existingPiece->getType()), toX, toY, newPieceOwner->getPlayerId(), pieceToChar(type), fromX, fromY);
 
-		if (type == BOMB || p2type == BOMB)
+		if (type == BOMB || existingPieceType == BOMB)
 		{
-			if (type != p2type)
+			if (type != existingPieceType)
 			{
-				fight.reset(new MyFightInfo(toX, toY, type, p2type, type == BOMB ? p1owner->getPlayerId() + 1 : p2owner->getPlayerId() + 1));
+				fight.reset(new MyFightInfo(toX, toY, type, existingPieceType, type == BOMB ? newPieceOwner->getPlayerId() + 1 : existingPieceOwner->getPlayerId() + 1));
 
-				dprint("Player #%d WINS!\n", type == BOMB ? p1owner->getPlayerId()+1 : p2owner->getPlayerId()+1);
+				dprint("Player #%d WINS!\n", type == BOMB ? newPieceOwner->getPlayerId()+1 : existingPieceOwner->getPlayerId()+1);
 			}
 			else
 			{
-				fight.reset(new MyFightInfo(toX, toY, type, p2type, 0));
+				fight.reset(new MyFightInfo(toX, toY, type, existingPieceType, 0));
 				dprint("It's a TIE!\n");
 			}
 
@@ -146,12 +146,12 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, unique_ptr<MyFightInfo>
 			if (moved)
 				removePiece(fromX, fromY);
 			else
-				delete p;
+				delete newPiece;
 
 			if (!moved && type == FLAG)
 			{
 				//flag was positioned but lost, need to know that flag existed
-				p1owner->incOriginalFlagCount();
+				newPieceOwner->incOriginalFlagCount();
 			} 
 
 			return 0;
@@ -160,49 +160,49 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, unique_ptr<MyFightInfo>
 
 		//pieces belong to different players, MATCH!
 
-		score = p->match(p2);
+		score = newPiece->match(existingPiece);
 		switch (score)
 		{
 		case WIN:
 			removePiece(toX, toY);
-			setPieceAt(p, toX, toY);
+			setPieceAt(newPiece, toX, toY);
 			setPieceAt(nullptr, fromX, fromY);
 			if (!moved)
 			{
-				if (p1owner->incTypeCount(type, originalType))
+				if (newPieceOwner->incTypeCount(type, originalType))
 					return -1;
 			}
-			fight.reset(new MyFightInfo(toX, toY, type, p2type, p1owner->getPlayerId() + 1));
-			dprint("Player #%d WINS!\n", p1owner->getPlayerId()+1);
+			fight.reset(new MyFightInfo(toX, toY, type, existingPieceType, newPieceOwner->getPlayerId() + 1));
+			dprint("Player #%d WINS!\n", newPieceOwner->getPlayerId()+1);
 			break;
 
 		case LOSE:
 
-			fight.reset(new MyFightInfo(toX, toY, type, p2type, p2owner->getPlayerId() + 1));
+			fight.reset(new MyFightInfo(toX, toY, type, existingPieceType, existingPieceOwner->getPlayerId() + 1));
 
-			dprint("Player #%d LOSES!\n", p1owner->getPlayerId()+1);
+			dprint("Player #%d LOSES!\n", newPieceOwner->getPlayerId()+1);
 			if (moved)
 				removePiece(fromX, fromY);
 			else
-				delete p;
+				delete newPiece;
 			break;
 
 		case TIE:
 			dprint("It's a TIE!\n");
 
-			fight.reset(new MyFightInfo(toX, toY, type, p2type, 0));
+			fight.reset(new MyFightInfo(toX, toY, type, existingPieceType, 0));
 
 			if (moved)
 				removePiece(fromX, fromY);
 			else
-				delete p;
+				delete newPiece;
 
 			removePiece(toX, toY);
 
 			break;
 
 		default: //ERROR
-			delete p;
+			delete newPiece;
 			cout << "invalid match result" << endl;
 			return -1;
 		}
@@ -210,7 +210,7 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, unique_ptr<MyFightInfo>
 		if (score != WIN && type == FLAG)
 		{
 			//flag was positioned but lost, need to know that flag existed
-			p1owner->incOriginalFlagCount();
+			newPieceOwner->incOriginalFlagCount();
 		}
 
 	}

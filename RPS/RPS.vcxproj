@@ -97,9 +97,11 @@
     <ClCompile Include="myBoard.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyFightInfo.cpp" />
     <ClCompile Include="MyJokerChange.cpp" />
     <ClCompile Include="MyMove.cpp" />
     <ClCompile Include="MyPiecePosition.cpp" />
+    <ClCompile Include="MyPoint.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="piece.cpp" />
     <ClCompile Include="PlayerContext.cpp" />
@@ -112,11 +114,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
+      <AdditionalOptions>-Wextra -pedantic-errors -DNDEBUG -g %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
+      <AdditionalOptions>-Wextra -pedantic-errors -DNDEBUG -g %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
