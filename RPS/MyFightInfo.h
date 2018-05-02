@@ -17,18 +17,20 @@ public:
 	MyFightInfo(UINT x, UINT y, char piece, int winner) : 
 		position(make_unique<MyPoint>(x, y)), piece(piece), winner(winner) {}
 
-	MyFightInfo() {}
+	MyFightInfo() { position.reset(nullptr); }
 
 	MyFightInfo& operator=(MyFightInfo& other)
 	{
 		// check for self-assignment
 		if (&other == this)
 			return *this;
-		this->piece = other.piece;
-		this->position = move(other.position);
-		this->winner = other.winner;
+		piece = other.piece;
+		position = move(other.position);
+		winner = other.winner;
 		return *this;
 	}
+
+	operator bool() const { return position != nullptr; }
 
 	MyFightInfo(MyFightInfo& other)
 	{

@@ -66,7 +66,9 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 	do 
 	{
 		dprint("\n\n ************ Starting MOVE: Player #%d ************ \n\n", playerContext->getPlayerId() + 1);
-		/* STEP 1 - get player's move*/
+
+		/* STEP 1 */
+
 		auto move = playerAlgo->getMove();
 		if (move == nullptr)
 		{
@@ -81,10 +83,6 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 			break;
 		}
 
-
-
-		auto jokerChange = playerAlgo->getJokerChange();
-
 		const Point& from = move->getFrom(), &to = move->getTo();
 
 		if (from.getX() == 0 || from.getY() == 0 || to.getX() == 0 || to.getY() == 0)
@@ -93,9 +91,9 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 			break;
 		}
 
-		/* STEP 2 - notify fight results */
+		/* STEP 2  */
 
-		MyFightInfo fightInfo;
+		MyFightInfo fightInfo; 
 
 		if (board->movePiece(playerContext->getPlayerId(), from.getX(), from.getY(), to.getX(), to.getY(), &fightInfo))
 		{
@@ -104,7 +102,23 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 			playerContext->setReason(BAD_MOVES_INPUT_FILE);
 			return;
 		}
-		//fightInfo.getPosition()
+
+		if (playerContext->getPlayerId() == 0)
+		{
+			player2Algorithm->notifyOnOpponentMove(*move);
+		}
+		else
+			player1Algorithm->notifyOnOpponentMove(*move);
+
+
+		if (fightInfo) //if there was a fight
+		{
+			player1Algorithm->notifyFightResult(fightInfo);
+			player2Algorithm->notifyFightResult(fightInfo);
+		}
+			
+		
+		auto jokerChange = playerAlgo->getJokerChange();
 		if (jokerChange)
 		{
 			const Point& jokerPos = jokerChange->getJokerChangePosition();
