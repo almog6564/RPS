@@ -62,6 +62,7 @@ void Game::runMove()
 void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAlgo)
 {
 	ePieceType newRep;
+	MyFightInfo fightInfo;
 
 	do 
 	{
@@ -70,9 +71,9 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 		/* STEP 1 */
 
 		auto move = playerAlgo->getMove();
-		if (move == nullptr)
+		if (!move)
 		{
-			dprint("No more moves!");
+			dprint("No more moves for player %d !", playerContext->getPlayerId()+1);
 			break;
 		}
 	
@@ -85,15 +86,7 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 
 		const Point& from = move->getFrom(), &to = move->getTo();
 
-		if (from.getX() == 0 || from.getY() == 0 || to.getX() == 0 || to.getY() == 0)
-		{
-			playerContext->setHasMoreMoves(false);
-			break;
-		}
-
 		/* STEP 2  */
-
-		MyFightInfo fightInfo; 
 
 		if (board->movePiece(playerContext->getPlayerId(), from.getX(), from.getY(), to.getX(), to.getY(), &fightInfo))
 		{
@@ -103,13 +96,14 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 			return;
 		}
 
-		if (playerContext->getPlayerId() == 0)
+		if (playerContext->getPlayerId() == 0) //player 1
 		{
 			player2Algorithm->notifyOnOpponentMove(*move);
 		}
-		else
+		else //player 2
+		{
 			player1Algorithm->notifyOnOpponentMove(*move);
-
+		}
 
 		if (fightInfo) //if there was a fight
 		{
@@ -459,6 +453,7 @@ void Game::positionAllPieces()
 
 		if (p1PieceVec.size() == 0)
 		{
+			dprint("Player 1 lost because of positioning\n");
 			player1Context->setHasLost();
 			player1Context->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
 			break;
@@ -476,12 +471,16 @@ void Game::positionAllPieces()
 
 		}
 
+		dprint("Player 1 positioned all pieces");
+
 		//no need to check pFight because no fights
 
 		player2Algorithm->getInitialPositions(2, p2PieceVec);
 
 		if (p2PieceVec.size() == 0)
 		{
+			dprint("Player 2 lost because of positioning\n");
+
 			player2Context->setHasLost();
 			player2Context->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
 			break;
@@ -502,6 +501,11 @@ void Game::positionAllPieces()
 				fightVec.push_back(move(pFight));	//pFight will hold nullptr after move
 			}
 		}
+
+		dprint("Fight vector includes %d fights\n", fightVec.size());
+
+
+		dprint("Player 2 positioned all pieces");
 
 		player1Algorithm->notifyOnInitialBoard(*board, fightVec);
 		player2Algorithm->notifyOnInitialBoard(*board, fightVec);

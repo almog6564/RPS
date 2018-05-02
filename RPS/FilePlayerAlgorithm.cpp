@@ -101,7 +101,7 @@ void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr
 	//it must be before the actual positioning
 	piecesCtr = validatePlayerPositions(player);
 
-	dprint("validatePlayerPositions counter is %d\n", piecesCtr);
+	dprint("validatePlayerPositions pieces counter is %d\n", piecesCtr);
 
 	if (piecesCtr == 0)
 		return;

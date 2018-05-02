@@ -132,13 +132,13 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, unique_ptr<MyFightInfo>
 		{
 			if (type != p2type)
 			{
-				fight = make_unique<MyFightInfo>(toX, toY, BOMB, type == BOMB ? p1owner->getPlayerId() + 1 : p2owner->getPlayerId() + 1);
+				fight.reset(new MyFightInfo(toX, toY, type, p2type, type == BOMB ? p1owner->getPlayerId() + 1 : p2owner->getPlayerId() + 1));
 
 				dprint("Player #%d WINS!\n", type == BOMB ? p1owner->getPlayerId()+1 : p2owner->getPlayerId()+1);
 			}
 			else
 			{
-				fight = make_unique<MyFightInfo>(toX, toY, BOMB, 0);
+				fight.reset(new MyFightInfo(toX, toY, type, p2type, 0));
 				dprint("It's a TIE!\n");
 			}
 
@@ -172,13 +172,13 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, unique_ptr<MyFightInfo>
 				if (p1owner->incTypeCount(type, originalType))
 					return -1;
 			}
-			fight = make_unique<MyFightInfo>(toX, toY, type, p1owner->getPlayerId() + 1);
+			fight.reset(new MyFightInfo(toX, toY, type, p2type, p1owner->getPlayerId() + 1));
 			dprint("Player #%d WINS!\n", p1owner->getPlayerId()+1);
 			break;
 
 		case LOSE:
 
-			fight = make_unique<MyFightInfo>(toX, toY, p2type, p2owner->getPlayerId() + 1);
+			fight.reset(new MyFightInfo(toX, toY, type, p2type, p2owner->getPlayerId() + 1));
 
 			dprint("Player #%d LOSES!\n", p1owner->getPlayerId()+1);
 			if (moved)
@@ -190,7 +190,7 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, unique_ptr<MyFightInfo>
 		case TIE:
 			dprint("It's a TIE!\n");
 
-			fight = make_unique<MyFightInfo>(toX, toY, p2type, 0);
+			fight.reset(new MyFightInfo(toX, toY, type, p2type, 0));
 
 			if (moved)
 				removePiece(fromX, fromY);
