@@ -221,29 +221,6 @@ void Game::checkWhetherFlagsWereCaptured(void)
 	}
 }
 
-int Game::positionPiece(int player)
-{
-	if (player == 0)
-		return positionSinglePiece(player1Context);
-	else
-		return positionSinglePiece(player2Context);
-}
-
-int Game::positionSinglePiece(PlayerContext* player)
-{
-	ePieceType type, jokerType;
-	UINT x, y;
-
-	if (!player->getNextPiece(&type, &x, &y, &jokerType))
-	{
-		Piece* p = createNewPiece(player, type, jokerType);
-		//board->positionPiece(p, x, y);
-		return 0;
-	}
-
-	return -1;
-}
-
 void Game::flagsCheck()
 {
 	checkPlayersFlagCountLessThanMax(player1Context);

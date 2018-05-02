@@ -22,24 +22,6 @@ bool PlayerContext::isAlive()
 	return true;
 }
 
-bool PlayerContext::getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
-						 UINT * jokerX, UINT * jokerY, ePieceType* newRep)
-{
-	//call algorithm's getMove()
-}
-
-int PlayerContext::getNextPiece(ePieceType* type, UINT * toX, UINT * toY, ePieceType* jokerType)
-{
-	if (fileContext->getNextPiece(type, toX, toY, jokerType) != FILE_SUCCESS)
-		return -1;
-	return 0;
-}
-
-void PlayerContext::updateScore()	//for future use
-{
-	score++;
-}
-
 bool PlayerContext::getHasMoreMoves()
 {
 	return hasMoreMoves;

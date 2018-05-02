@@ -7,9 +7,11 @@
 class FilePlayerAlgorithm : public PlayerAlgorithm
 {
 	PlayerFileContext& playerFileContext;
-	unique_ptr<JokerChange> nextJokerChange;
-	bool hasMoreMoves;
 	UINT rows, cols;
+	bool hasMoreMoves;
+	unique_ptr<JokerChange> nextJokerChange;
+	
+	
 
 	UINT validatePlayerPositions(int player);
 public:
