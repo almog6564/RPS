@@ -19,7 +19,7 @@ public:
 
 	const Point& getPosition() const
 	{
-		return *(move(position));
+		return *(position);
 	}
 	char getPiece() const // R, P, S, B, J or F
 	{

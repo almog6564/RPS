@@ -58,15 +58,11 @@ public:
 	*/
 	int incTypeCount(ePieceType type, ePieceType originalType, bool updateOnlyMovingCounter = false);
 
-	void updateScore();
-
 	bool getHasMoreMoves();
 
 	void setHasMoreMoves(bool val);
 
 	PlayerFileContext* getPlayerFileContext();
-
-	void validatePlayerPositions(bool** tmpBoard, UINT rows, UINT cols);
 
 	UINT getPlayerId()const
 	{
