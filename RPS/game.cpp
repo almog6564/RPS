@@ -441,6 +441,8 @@ void Game::positionAllPieces()
 			break;
 		}
 
+		dprint("Player 1 getInitialPositions ended successfully\n");
+
 		for (const auto& piecePos : p1PieceVec)
 		{
 			x = piecePos->getPosition().getX();
@@ -453,7 +455,7 @@ void Game::positionAllPieces()
 
 		}
 
-		dprint("Player 1 positioned all pieces");
+		dprint("Player 1 positioned all pieces\n");
 
 		//no need to check pFight because no fights
 
@@ -487,7 +489,7 @@ void Game::positionAllPieces()
 		dprint("Fight vector includes %d fights\n", fightVec.size());
 
 
-		dprint("Player 2 positioned all pieces");
+		dprint("Player 2 positioned all pieces\n");
 
 		player1Algorithm->notifyOnInitialBoard(*board, fightVec);
 		player2Algorithm->notifyOnInitialBoard(*board, fightVec);

@@ -19,7 +19,7 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 {
 	UINT x, y;
 	ePieceType type, jokerType;
-	eFileStatus status;
+	eFileStatus status = FILE_SUCCESS;
 	UINT pieceCounter = 0;
 
 	/* Initialize temporary boolean array to check if theres pieces from the same player*/
@@ -29,8 +29,9 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 		tmpBoard[i] = new bool[cols]();	//() initializes the elements to false
 
 
-	while (true)
+	while (status == FILE_SUCCESS)
 	{
+
 		status = playerFileContext.getNextPiece(&type, &x, &y, &jokerType);
 
 		if (x > cols || y > rows || x < 1 || y < 1)
@@ -75,6 +76,7 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 			}
 			break;
 		}
+	
 	}
 
 	playerFileContext.setPieceFileToStart();
@@ -95,7 +97,7 @@ void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr
 	UINT piecesCtr = 0;
 	unique_ptr<MyPiecePosition> piece;
 
-	dprint("FilePlayerAlgorithm::getInitialPositions");
+	dprint("FilePlayerAlgorithm::getInitialPositions - player %d\n", player);
 
 	//this function validates there's no collisions between pieces of the same player
 	//it must be before the actual positioning

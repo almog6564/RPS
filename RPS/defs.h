@@ -9,7 +9,7 @@ typedef unsigned int UINT;
 
 
 /***** For debug printing ******/
-#define DEBUG 0
+#define DEBUG 1
 
 #if DEBUG == 1
 #define dprint(...) printf(__VA_ARGS__)
