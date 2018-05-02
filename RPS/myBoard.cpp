@@ -219,7 +219,7 @@ int MyBoard::positionPiece(Piece* p, UINT toX, UINT toY, unique_ptr<MyFightInfo>
 }
 
 
-int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY, MyFightInfo* fightInfo /*=nullptr*/)
+int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY, unique_ptr<MyFightInfo>& fightInfo)
 {
 	Piece* p1;
 	UINT p1PlayerId;
@@ -283,8 +283,7 @@ int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY
 
 			return ERROR;
 		}
-		auto fight = make_unique<MyFightInfo>();
-		return positionPiece(p1, toX, toY, fight, 1, fromX, fromY);
+		return positionPiece(p1, toX, toY, fightInfo, 1, fromX, fromY);
 
 	}
 

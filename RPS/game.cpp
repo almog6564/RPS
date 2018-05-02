@@ -93,9 +93,9 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 
 		/* STEP 2  */
 
-		MyFightInfo fightInfo; 
+		unique_ptr<MyFightInfo> fightInfo; 
 
-		if (board->movePiece(playerContext->getPlayerId(), from.getX(), from.getY(), to.getX(), to.getY(), &fightInfo))
+		if (board->movePiece(playerContext->getPlayerId(), from.getX(), from.getY(), to.getX(), to.getY(), fightInfo))
 		{
 			//non zero value means some kind of error in move file
 			playerContext->setHasLost();
@@ -113,8 +113,8 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 
 		if (fightInfo) //if there was a fight
 		{
-			player1Algorithm->notifyFightResult(fightInfo);
-			player2Algorithm->notifyFightResult(fightInfo);
+			player1Algorithm->notifyFightResult(*fightInfo);
+			player2Algorithm->notifyFightResult(*fightInfo);
 		}
 			
 		
