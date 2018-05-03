@@ -8,7 +8,7 @@ using namespace std;
 
 
 FilePlayerAlgorithm::FilePlayerAlgorithm(PlayerFileContext & fileContext, UINT rows, UINT cols) :
-	playerFileContext(fileContext), rows(rows), cols(cols), hasMoreMoves(true), nextJokerChange(nullptr) {};
+	playerFileContext(fileContext), rows(rows), cols(cols), hasMoreMoves(true), nextJokerChange(nullptr) {}
 
 
 /*
@@ -65,6 +65,7 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 					player, pieceToChar(type), x, y);
 
 				pieceCounter = 0;
+				status = FILE_BAD_FORMAT;
 			//	setHasLost();
 			//	setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
 			}
@@ -79,7 +80,8 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 	
 	}
 
-	playerFileContext.setPieceFileToStart();
+	if(status == FILE_EOF_REACHED)
+		playerFileContext.setPieceFileToStart();
 
 	for (UINT i = 0; i < rows; i++)
 		delete[] tmpBoard[i];
@@ -144,16 +146,29 @@ unique_ptr<Move> FilePlayerAlgorithm::getMove()
 		return make_unique<MyMove>(0, 0, 0, 0);
 	}
 	if (isJoker)
-		nextJokerChange = make_unique<MyJokerChange>(jokerX, jokerY, newRep);
+		nextJokerChange = make_unique<MyJokerChange>(jokerX, jokerY, pieceToChar(newRep));
 	else
 		nextJokerChange = nullptr;
 
 	return make_unique<MyMove>(fromX, fromY, toX, toY);
 }
 
-void FilePlayerAlgorithm::notifyOnInitialBoard(const Board & b, const std::vector<unique_ptr<FightInfo>>& fights) {/*Ignore call*/ }
+void FilePlayerAlgorithm::notifyOnInitialBoard(const Board & b, const std::vector<unique_ptr<FightInfo>>& fights) 
+{
+	//just zevel for it to compile
+	auto a = new MyPoint(1, 1);
+	b.getPlayer(*a);
+	fights.size();
+	delete a;
+}
 
-void FilePlayerAlgorithm::notifyOnOpponentMove(const Move & move) {/*Ignore call*/ }
+void FilePlayerAlgorithm::notifyOnOpponentMove(const Move & move) 
+{
+	move.getFrom();
+}
 
-void FilePlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo) {/*Ignore call*/ }
+void FilePlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo) 
+{
+	fightInfo.getWinner();
+}
 

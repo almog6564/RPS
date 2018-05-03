@@ -64,17 +64,10 @@
     <RemoteCCompileToolExe>g++</RemoteCCompileToolExe>
     <RemoteCppCompileToolExe>g++-5.3.0</RemoteCppCompileToolExe>
     <RemoteLdToolExe>g++-5.3.0</RemoteLdToolExe>
-    <RemoteLinkLocalCopyOutput>true</RemoteLinkLocalCopyOutput>
-    <AdditionalSourcesToCopyMapping>C:\Users\LENOVO\Downloads\init.sh</AdditionalSourcesToCopyMapping>
-    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>$(IncludePath);$(ISenseIncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <RemoteCppCompileToolExe>g++-5.3.0</RemoteCppCompileToolExe>
     <RemoteLdToolExe>g++-5.3.0</RemoteLdToolExe>
-    <AdditionalSourcesToCopyMapping>C:\Users\LENOVO\Downloads\init.sh</AdditionalSourcesToCopyMapping>
-    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\$(LD_LIBRARY_PATH)</OutDir>
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="AutoPlayerAlgorithm.h" />
@@ -104,6 +97,7 @@
     <ClCompile Include="myBoard.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyFightInfo.cpp" />
     <ClCompile Include="MyJokerChange.cpp" />
     <ClCompile Include="MyMove.cpp" />
     <ClCompile Include="MyPiecePosition.cpp" />
@@ -120,74 +114,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
-      <DebugInformationFormat>FullDebug</DebugInformationFormat>
-      <ExceptionHandling>Enabled</ExceptionHandling>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>-Wextra -pedantic-errors -DNDEBUG -g %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <Link />
-    <Link>
-      <UnresolvedSymbolReferences>true</UnresolvedSymbolReferences>
-    </Link>
-    <Link>
-      <Relocation>true</Relocation>
-    </Link>
-    <Link>
-      <FunctionBinding>true</FunctionBinding>
-    </Link>
-    <Link>
-      <NoExecStackRequired>true</NoExecStackRequired>
-      <DebuggerSymbolInformation>true</DebuggerSymbolInformation>
-      <ShowProgress>false</ShowProgress>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
-      <Version>false</Version>
-      <Trace>false</Trace>
-      <WholeArchiveBegin>false</WholeArchiveBegin>
-    </Link>
-    <RemotePreBuildEvent>
-      <Command>
-      </Command>
-    </RemotePreBuildEvent>
-    <RemotePreLinkEvent>
-      <Command>
-      </Command>
-    </RemotePreLinkEvent>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
-    <PreLinkEvent>
-      <Command>
-      </Command>
-    </PreLinkEvent>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-    <RemotePostBuildEvent>
-      <Command>
-      </Command>
-    </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <ExceptionHandling>Disabled</ExceptionHandling>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <AdditionalOptions>-Wextra -pedantic-errors -DNDEBUG -g %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <Link />
-    <RemotePreBuildEvent>
-      <Command>source init.sh</Command>
-    </RemotePreBuildEvent>
-    <Link>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
-      <ShowProgress>false</ShowProgress>
-      <Version>false</Version>
-      <Trace>false</Trace>
-      <WholeArchiveBegin>false</WholeArchiveBegin>
-    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

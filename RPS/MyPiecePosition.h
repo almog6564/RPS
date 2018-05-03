@@ -1,4 +1,4 @@
-#ifndef __MY_PIECE_POiSITION_H_
+#ifndef __MY_PIECE_POSITION_H_
 #define __MY_PIECE_POSITION_H_
 
 #include "PiecePosition.h"

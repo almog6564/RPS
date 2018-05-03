@@ -192,13 +192,6 @@ int Game::validatePositionFiles()
 
 }
 
-void Game::resetPieceFiles()
-{
-	player1Context->getPlayerFileContext()->setPieceFileToStart();
-	player2Context->getPlayerFileContext()->setPieceFileToStart();
-}
-
-
 void Game::checkWhetherFlagsWereCaptured(void)
 {
 	if (player1Context->getTypeCount(FLAG) == 0 && player1Context->getOriginalFlagCount() > 0 &&
@@ -223,6 +216,9 @@ void Game::checkWhetherFlagsWereCaptured(void)
 
 void Game::flagsCheck()
 {
+	if (player1Context->getHasLost() || player2Context->getHasLost())
+		return;
+
 	checkPlayersFlagCountLessThanMax(player1Context);
 	checkPlayersFlagCountLessThanMax(player2Context);
 
@@ -436,6 +432,7 @@ void Game::positionAllPieces()
 		if (p1PieceVec.size() == 0)
 		{
 			dprint("Player 1 lost because of positioning\n");
+
 			player1Context->setHasLost();
 			player1Context->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
 			break;
@@ -454,10 +451,14 @@ void Game::positionAllPieces()
 			board->positionPiece(p, x, y, pFight);
 
 		}
+		//no need to check pFight because no fights
 
 		dprint("Player 1 positioned all pieces\n");
 
-		//no need to check pFight because no fights
+	} while (false);
+
+	do
+	{
 
 		player2Algorithm->getInitialPositions(2, p2PieceVec);
 
@@ -465,10 +466,16 @@ void Game::positionAllPieces()
 		{
 			dprint("Player 2 lost because of positioning\n");
 
+			board->clearBoard(); //need to clear the board because player1 positioned already
+
 			player2Context->setHasLost();
 			player2Context->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
 			break;
 		}
+
+		//don't position player 2 pieces if player 1 has lost, but check was needed for TIE scenario
+		if (player1Context->getHasLost())
+			break;
 
 		for (const auto& piecePos : p2PieceVec)
 		{
@@ -477,22 +484,24 @@ void Game::positionAllPieces()
 			type = charToPiece(piecePos->getPiece());
 			jokerType = charToPiece(piecePos->getJokerRep());
 
-			p = createNewPiece(player1Context, type, jokerType);
+			p = createNewPiece(player2Context, type, jokerType);
 			board->positionPiece(p, x, y, pFight);
 
 			if (pFight)
 			{
 				fightVec.push_back(move(pFight));	//pFight will hold nullptr after move
 			}
+
+
+
 		}
 
-		dprint("Fight vector includes %d fights\n", fightVec.size());
-
+		dprint("\nFight vector includes %d fights\n", (int)fightVec.size());
 
 		dprint("Player 2 positioned all pieces\n");
 
-		player1Algorithm->notifyOnInitialBoard(*board, fightVec);
-		player2Algorithm->notifyOnInitialBoard(*board, fightVec);
-
 	} while (false);
+
+	player1Algorithm->notifyOnInitialBoard(*board, fightVec);
+	player2Algorithm->notifyOnInitialBoard(*board, fightVec);
 }

@@ -14,22 +14,13 @@ class MyFightInfo : public FightInfo
 	int winner;
 
 public:
+
 	MyFightInfo(UINT x, UINT y, char p1piece, char p2piece, int winner) :
 		position(make_unique<MyPoint>(x, y)), p1piece(p1piece), p2piece(p2piece), winner(winner) {}
 
-	MyFightInfo() { position.reset(nullptr); }
-
-	MyFightInfo& operator=(MyFightInfo& other)
+	MyFightInfo()
 	{
-		// check for self-assignment
-		if (&other == this)
-			return *this;
-		p1piece = other.p1piece;
-		p2piece = other.p2piece;
-
-		position = move(other.position);
-		winner = other.winner;
-		return *this;
+		position.reset(nullptr);
 	}
 
 	operator bool() const { return position != nullptr; }
@@ -54,14 +45,23 @@ public:
 			return '#';
 	}
 
+
+	MyFightInfo& operator=(MyFightInfo& other)
+	{
+		// check for self-assignment
+		if (&other == this)
+			return *this;
+		p1piece = other.p1piece;
+		p2piece = other.p2piece;
+
+		position = move(other.position);
+		winner = other.winner;
+		return *this;
+	}
+
 	int getWinner() const // 0 - both lost / tie, 1 - player 1 won, 2 - player 2 won
 	{
 		return winner;
-	}
-
-	void setPosition() 
-	{
-
 	}
 };
 

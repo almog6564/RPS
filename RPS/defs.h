@@ -7,6 +7,7 @@
 
 typedef unsigned int UINT;
 
+#define UNUSED(x) (x) = (x)
 
 /***** For debug printing ******/
 #define DEBUG 1

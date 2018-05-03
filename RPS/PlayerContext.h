@@ -31,21 +31,6 @@ public:
 	bool isAlive();
 
 	/*
-	Get the next move of Player from moves file.
-	The function gets pointers to all relevant fields of a move, and update their values.
-		@returns -
-			true - If a move is still available in moves file, given pointers will be assigned with values.
-			false - No moves left in moves file.
-	*/
-	bool getNextMove(UINT * fromX, UINT * fromY, UINT * toX, UINT * toY, bool* isJoker,
-		UINT * jokerX, UINT * jokerY, ePieceType* newRep);
-
-	/*
-	Same as the getNextMove() function, just for the Pieces phase and board file.
-	*/
-	int getNextPiece(ePieceType* type, UINT * toX, UINT * toY, ePieceType* jokerType);
-
-	/*
 	This function decreases the counter of a specific Piece type. 
 	If the type of the Piece is Joker, than originalType will be set to Joker, and the correct type counter will be
 	decreased (e.g. to avoid that the ROCK counter will be decreased if a Joker that is currently a ROCK was removed.

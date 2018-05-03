@@ -47,6 +47,7 @@ public:
 	*/
 	void removePiece(UINT col, UINT row);
 
+	void clearBoard();
 	/*
 	This function recieves a playerID (0 or 1), coordinates (fromX, fromY, toX, toY).
 	This function will find the Piece placed at (fromX, fromY) on board, and if the piece is there, and owned

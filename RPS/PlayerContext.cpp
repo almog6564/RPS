@@ -12,6 +12,8 @@ PlayerContext::PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UI
 	originalFlagsCnt = 0;
 	score = 0;
 	hasLost = false;
+	hasMoreMoves = true;
+	autoPlayer = autoPlayer;
 }
 
 bool PlayerContext::isAlive()
@@ -76,8 +78,12 @@ void PlayerContext::decTypeCounter(ePieceType type, ePieceType originalType /* =
 
 int PlayerContext::incTypeCount(ePieceType type, ePieceType originalType, bool updateOnlyMovingCounter /* = false */)
 {
-	if(!updateOnlyMovingCounter)
+	if (!updateOnlyMovingCounter) 
+	{
 		pieceCounters[originalType]++;
+		//dprint("\t###\t incTypeCount: Player %d ||  type %c || originalType %c || CNT = %d\n", 
+		//	ID+1, pieceToChar(type), pieceToChar(originalType), pieceCounters[originalType]);
+	}
 
 	if (type != BOMB && type != FLAG && type != UNDEF)
 	{
