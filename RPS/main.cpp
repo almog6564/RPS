@@ -2,6 +2,7 @@
 
 #include "parser.h"
 
+using namespace std;
 
 int main()
 {
@@ -20,7 +21,7 @@ int main()
 	eReason reason;
 	int	winner;
 #endif
-
+	cout << "bla" << endl;
 	FileParser* fileParser = new FileParser(p1p, p2p, p1m, p2m, output);
 	if (fileParser->initializeFiles()) //initialization failed
 	{

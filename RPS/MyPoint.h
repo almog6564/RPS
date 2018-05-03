@@ -22,11 +22,8 @@ public:
 		return row;
 	}
 
-	void setNewPosition(int colArg, int rowArg)
-	{
-		col = colArg;
-		row = rowArg;
-	}
+	void setNewPosition(int colArg, int rowArg);
+	
 
 	~MyPoint() {}
 };
