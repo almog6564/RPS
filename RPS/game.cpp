@@ -16,7 +16,7 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	if (autoPlayer1)
 	{
 		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1);
-		player1Algorithm = new AutoPlayerAlgorithm();
+		player1Algorithm = new AutoPlayerAlgorithm(N, M, R1, P1, S1, B1, J1, F1);
 	}
 
 	else
@@ -29,7 +29,7 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	if (autoPlayer2)
 	{
 		player2Context = new PlayerContext(1, R2, P2, S2, B2, J2, F2);
-		player2Algorithm = new AutoPlayerAlgorithm();
+		player2Algorithm = new AutoPlayerAlgorithm(N, M, R1, P1, S1, B1, J1, F1);;
 	}
 	else
 	{
