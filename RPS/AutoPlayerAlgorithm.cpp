@@ -17,7 +17,12 @@ AutoPlayerAlgorithm::~AutoPlayerAlgorithm()
 void AutoPlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill)
 {
 	player = player;
-	vectorToFill.size();
+	vectorToFill.size();	
+	//take the flag and place randomly on board
+	//on 4 places around it try to put jokers as bomb and real bombs around flag
+	//all the rest RPS put randomly on board
+	//randomize pina and randomize if pina
+	//randomize scenario
 }
 
 void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const std::vector<unique_ptr<FightInfo>>& fights)

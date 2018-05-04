@@ -216,11 +216,14 @@ void Game::checkWhetherFlagsWereCaptured(void)
 
 void Game::flagsCheck()
 {
+	if (player1Context->getHasLost() || player2Context->getHasLost())
+		return;
+
 	checkPlayersFlagCountLessThanMax(player1Context);
 	checkPlayersFlagCountLessThanMax(player2Context);
 
 	checkWhetherFlagsWereCaptured();
-	
+
 	if (player1Context->getTypeCount(FLAG) == 0 && player1Context->getOriginalFlagCount() > 0 &&
 		player2Context->getTypeCount(FLAG) == 0 && player2Context->getOriginalFlagCount() > 0)
 	{
@@ -419,16 +422,17 @@ void Game::positionAllPieces()
 	unique_ptr<MyFightInfo> pFight;
 	vector<unique_ptr<PiecePosition>> p1PieceVec(0), p2PieceVec(0);
 	vector<unique_ptr<FightInfo>> fightVec(0);
-	
+
 	/* Player1 Positioning */
 
-	do 
+	do
 	{
 		player1Algorithm->getInitialPositions(1, p1PieceVec);
 
 		if (p1PieceVec.size() == 0)
 		{
 			dprint("Player 1 lost because of positioning\n");
+
 			player1Context->setHasLost();
 			player1Context->setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
 			break;
@@ -469,6 +473,10 @@ void Game::positionAllPieces()
 			break;
 		}
 
+		//don't position player 2 pieces if player 1 has lost, but check was needed for TIE scenario
+		if (player1Context->getHasLost())
+			break;
+
 		for (const auto& piecePos : p2PieceVec)
 		{
 			x = piecePos->getPosition().getX();
@@ -483,15 +491,14 @@ void Game::positionAllPieces()
 			{
 				fightVec.push_back(move(pFight));	//pFight will hold nullptr after move
 			}
-
-			dprint("\nFight vector includes %d fights\n", (int)fightVec.size());
-
-			dprint("Player 2 positioned all pieces\n");
-
 		}
 
-		player1Algorithm->notifyOnInitialBoard(*board, fightVec);
-		player2Algorithm->notifyOnInitialBoard(*board, fightVec);
+		dprint("\nFight vector includes %d fights\n", (int)fightVec.size());
+
+		dprint("Player 2 positioned all pieces\n");
 
 	} while (false);
+
+	player1Algorithm->notifyOnInitialBoard(*board, fightVec);
+	player2Algorithm->notifyOnInitialBoard(*board, fightVec);
 }
