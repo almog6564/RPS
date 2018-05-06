@@ -105,6 +105,7 @@
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="piece.cpp" />
     <ClCompile Include="PlayerContext.cpp" />
+    <ClCompile Include="InitalPositionsUtilities.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

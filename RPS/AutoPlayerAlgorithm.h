@@ -12,6 +12,9 @@ class PositioningScenario;
 typedef std::unordered_set<MyPiecePosition, PiecePositionHasher, PiecePositionComparator> BoardSet;
 typedef std::vector<unique_ptr<PiecePosition>> PieceVector;
 
+#define addAllToVector(c,cc)	for (UINT i = 0; i < initPieceCnt.c; i++) movingPieceVector.push_back(cc);
+
+
 class RandomContext {
 
 	std::mt19937& gen;
@@ -74,6 +77,7 @@ public:
 	unique_ptr<JokerChange> getJokerChange(); // nullptr if no change is requested
 };
 
+void positionMovingPiece(int x, int y, PieceVector &vectorToFill, BoardSet &boardSet, char pieceType, char jokerType = '#');
 
 class PositioningScenario
 {
