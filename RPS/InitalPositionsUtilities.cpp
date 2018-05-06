@@ -1,5 +1,6 @@
 
 #include "AutoPlayerAlgorithm.h"
+#include "parser.h"
 #include <algorithm>
 
 using namespace std;
@@ -19,6 +20,7 @@ void positionBomb(UINT& bombsUsed, int bombX, int bombY, PieceVector& vectorToFi
 
 	addPieceToVectorAndBoard(boardSet, vectorToFill, bombX, bombY, 'B');
 
+	bombsUsed++;
 }
 
 void positionFlag(int i, int x, int y, PieceVector &vectorToFill, BoardSet &boardSet)
@@ -40,7 +42,6 @@ void positionMovingPiece(int x, int y, PieceVector &vectorToFill, BoardSet &boar
 	}
 
 	addPieceToVectorAndBoard(boardSet, vectorToFill, x, y, pieceType, jokerType);
-
 }
 
 
@@ -234,3 +235,40 @@ int AutoPlayerAlgorithm::positionFlagsAndBombs(RandomContext& rndCtx,
 	return bombsUsed;
 }
 
+
+void positionRestOfMovingPiecesRandomly(int pieceIndex, int initialMovingCnt,
+	RandomContext &rndCtx, BoardSet &boardSet, vector<char> movingPieceVector, PieceVector& vectorToFill)
+{
+	int x, y;
+	char random_RPSB_jokerType;
+
+	for (int i = pieceIndex; i < initialMovingCnt;)
+	{
+		do
+		{
+			//choose place randomly
+			x = rndCtx.getRandomCol();
+			y = rndCtx.getRandomRow();
+
+			//if chose already 
+			if (boardSet.count(MyPiecePosition(x, y, movingPieceVector[i])) == 0)
+				break;
+
+		} while (true);
+
+		if (movingPieceVector[i] != 'J')
+		{
+			positionMovingPiece(x, y, vectorToFill, boardSet, movingPieceVector[i]);
+		}
+		else
+		{
+			//getRandomCorner+1 will generate number between 1-4 (ROCK,PAPER,SCISSORS,BOMB in ePieceType enum)
+
+			random_RPSB_jokerType = pieceToChar((ePieceType)(rndCtx.getRandomCorner() + 1));
+
+			positionMovingPiece(x, y, vectorToFill, boardSet, 'J', random_RPSB_jokerType);
+		}
+
+		i++;
+	}
+}

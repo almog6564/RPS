@@ -1,7 +1,6 @@
 
 
 #include "AutoPlayerAlgorithm.h"
-#include "parser.h"
 
 using namespace std;
 
@@ -34,10 +33,13 @@ AutoPlayerAlgorithm::~AutoPlayerAlgorithm()
 
 void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToFill)
 {
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Parameters Initialization **/
 	BoardSet boardSet;	
 	vector<char> movingPieceVector;
-	int initialMovingCnt, pieceIndex = 0, bombsUsed, x, y;
+	int initialMovingCnt, pieceIndex = 0, bombsUsed;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/* Random Generators Context */
 	random_device				seed;
@@ -46,55 +48,41 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 		rowNumGen(1, boardRows), colNumGen(1, boardCols);
 	RandomContext rndCtx(gen, colNumGen, rowNumGen, cornerGen, binaryGen);
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	dprint("\n#### Initial Positions || Player %d\n", player);
 	dprint("\t - Scnario: areFlagsOnCoreners = %d, areMovingOnCorners = %d\n", scenario->areFlagsOnCorners, scenario->areMovingOnCorners);
 
 	vectorToFill.clear(); //sanity
 
-	/**** Position All Flags and Some Bombs *****/
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**** Position All Flags (and maybe some Bombs around them) *****/
 
 	bombsUsed = positionFlagsAndBombs(rndCtx, boardSet, vectorToFill);
 
-	//all flags are positioned now
-
-
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/********* Moving Pieces Section **********/
 
 	fillListWithMovingPieces(movingPieceVector, bombsUsed);
 	initialMovingCnt = (int) movingPieceVector.size();
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/** if chosen by scenario, moving pieces will be set on the corners to counter attack flags on corners **/
+
 	placeMovingPiecesOnCorners(movingPieceVector, initialMovingCnt, rndCtx, vectorToFill, boardSet, pieceIndex);
 
-	//Position the rest of the pieces randomly on board
-	
-	addAllToVector(J, 'J'); //add Jokers, don't place them on the corners
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	for (int i = pieceIndex; i < initialMovingCnt;)
-	{
-		do
-		{
-			//choose place randomly
-			x = colNumGen(gen);
-			y = rowNumGen(gen);
+	/********* Position the rest of the pieces randomly on board ***********/
 
-			//if chose already 
-			if (boardSet.count(MyPiecePosition(x, y, movingPieceVector[i])) == 0)
-				break;
+	//add the Jokers, don't place them on the corners (its a waste!)
+	addAllToVector(J, 'J'); 
 
-		} while (true);
+	positionRestOfMovingPiecesRandomly(pieceIndex, initialMovingCnt, rndCtx, boardSet, movingPieceVector, vectorToFill);
 
-		if(movingPieceVector[i] != 'J')
-			positionMovingPiece(x, y, vectorToFill, boardSet, movingPieceVector[i]);
-		else
-		{
-			//cornerGen+1 will generate number between 1-4 (ROCK,PAPER,SCISSORS,BOMB in ePieceType enum)
-
-			positionMovingPiece(x, y, vectorToFill, boardSet, 'J', pieceToChar((ePieceType)(cornerGen(gen) + 1)));
-		}
-
-		i++;
-	}
 }
 
 void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<FightInfo>>& fights)

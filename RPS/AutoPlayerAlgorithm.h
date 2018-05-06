@@ -8,37 +8,12 @@
 #include <random>
 
 class PositioningScenario;
+class RandomContext;
 
 typedef std::unordered_set<MyPiecePosition, PiecePositionHasher, PiecePositionComparator> BoardSet;
 typedef std::vector<unique_ptr<PiecePosition>> PieceVector;
 
 #define addAllToVector(c,cc)	for (UINT i = 0; i < initPieceCnt.c; i++) movingPieceVector.push_back(cc);
-
-
-class RandomContext {
-
-	std::mt19937& gen;
-	std::uniform_int_distribution<>& colNumGen;
-	std::uniform_int_distribution<>& rowNumGen;
-	std::uniform_int_distribution<>& cornerGen;
-	std::uniform_int_distribution<>& binaryGen;
-
-public:
-	RandomContext(std::mt19937& gen, std::uniform_int_distribution<>& colNumGen,
-		std::uniform_int_distribution<>& rowNumGen, std::uniform_int_distribution<>& cornerGen,
-		std::uniform_int_distribution<>& binaryGen)
-		: gen(gen), colNumGen(colNumGen), rowNumGen(rowNumGen), cornerGen(cornerGen), binaryGen(binaryGen) {};
-
-	int getRandomCorner() { return cornerGen(gen); }
-
-	int getRandomCol() { return colNumGen(gen); }
-
-	int getRandomRow() { return rowNumGen(gen); }
-
-	int getRandomBinary() { return binaryGen(gen); }
-
-	std::mt19937& getRandomGenerator() { return gen; }
-};
 
 
 class AutoPlayerAlgorithm : public PlayerAlgorithm
@@ -79,6 +54,9 @@ public:
 
 void positionMovingPiece(int x, int y, PieceVector &vectorToFill, BoardSet &boardSet, char pieceType, char jokerType = '#');
 
+void positionRestOfMovingPiecesRandomly(int pieceIndex, int initialMovingCnt,
+	RandomContext &rndCtx, BoardSet &boardSet, vector<char> movingPieceVector, PieceVector& vectorToFill);
+
 class PositioningScenario
 {
 public:
@@ -88,5 +66,32 @@ public:
 	PositioningScenario(bool areFlagsOnCorners, bool areMovingOnCorners) :
 		areFlagsOnCorners(areFlagsOnCorners), areMovingOnCorners(areMovingOnCorners) {};
 };
+
+
+class RandomContext {
+
+	std::mt19937& gen;
+	std::uniform_int_distribution<>& colNumGen;
+	std::uniform_int_distribution<>& rowNumGen;
+	std::uniform_int_distribution<>& cornerGen;
+	std::uniform_int_distribution<>& binaryGen;
+
+public:
+	RandomContext(std::mt19937& gen, std::uniform_int_distribution<>& colNumGen,
+		std::uniform_int_distribution<>& rowNumGen, std::uniform_int_distribution<>& cornerGen,
+		std::uniform_int_distribution<>& binaryGen)
+		: gen(gen), colNumGen(colNumGen), rowNumGen(rowNumGen), cornerGen(cornerGen), binaryGen(binaryGen) {};
+
+	int getRandomCorner() { return cornerGen(gen); }
+
+	int getRandomCol() { return colNumGen(gen); }
+
+	int getRandomRow() { return rowNumGen(gen); }
+
+	int getRandomBinary() { return binaryGen(gen); }
+
+	std::mt19937& getRandomGenerator() { return gen; }
+};
+
 
 #endif
