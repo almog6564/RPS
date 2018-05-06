@@ -7,6 +7,7 @@
 using namespace std;
 
 #define addAllToVector(c,cc)	for (UINT i = 0; i < initPieceCnt.c; i++) movingPieceVector.push_back(cc);
+int generateUniqueCorner(RandomContext &rndCtx, bool * selectedCorners);
 
 
 AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F)
@@ -161,19 +162,7 @@ int AutoPlayerAlgorithm::positionFlagsAndBombs(RandomContext& rndCtx,
 
 		for (int i = 0; i < corners; i++)
 		{
-			do
-			{
-				select = rndCtx.getRandomCorner();
-
-				if (selectedCorners[select] == true) //already flag on this corner
-					select = rndCtx.getRandomCorner();
-				else
-				{
-					selectedCorners[select] = true;
-					break;
-				}
-
-			} while (true);
+			select = generateUniqueCorner(rndCtx, selectedCorners);
 
 			chooseCorner(select, rndCtx, cornerX, cornerY, 
 				&bomb1X, &bomb1Y, &bomb2X, &bomb2Y);
@@ -225,8 +214,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 	/** Parameters Initialization **/
 	BoardSet boardSet;	
 	vector<char> movingPieceVector;
-	int initialMovingCnt, corners, select, cornerX, cornerY, pieceIndex = 0, bombsUsed, x, y;
-	bool selectedCorners[4] = { false };
+	int initialMovingCnt, pieceIndex = 0, bombsUsed, x, y;
 
 	/* Random Generators Context */
 	random_device				seed;
@@ -254,35 +242,8 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 
 	fillListWithMovingPieces(movingPieceVector, bombsUsed);
 	initialMovingCnt = (int) movingPieceVector.size();
-	
-	if (scenario->areMovingOnCorners && !scenario->areFlagsOnCorners)
-	{
-		shuffle(movingPieceVector.begin(), movingPieceVector.end(), gen);
 
-		corners = (initialMovingCnt < 4) ? (initialMovingCnt) : 4;
-
-		for (int i = 0; i < corners; i++)
-		{
-			do
-			{
-				select = cornerGen(gen);
-
-				if (selectedCorners[select] == true) //already flag on this corner
-					select = cornerGen(gen);
-				else
-				{
-					selectedCorners[select] = true;
-					break;
-				}
-
-			} while (true);
-
-			chooseCorner(select, rndCtx, cornerX, cornerY);
-
-			positionMovingPiece(cornerX, cornerY, vectorToFill, boardSet, movingPieceVector[pieceIndex++]);
-
-		}
-	}
+	placeMovingPiecesOnCorners(movingPieceVector, initialMovingCnt, rndCtx, vectorToFill, boardSet, pieceIndex);
 
 	//Position the rest of the pieces randomly on board
 	
@@ -312,6 +273,54 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 		}
 
 		i++;
+	}
+}
+
+
+int generateUniqueCorner(RandomContext &rndCtx, bool * selectedCorners)
+{
+	int select;
+
+	do
+	{
+		select = rndCtx.getRandomCol();
+
+		if (selectedCorners[select] == true) //already flag on this corner
+			select = rndCtx.getRandomCol();
+		else
+		{
+			selectedCorners[select] = true;
+			break;
+		}
+
+	} while (true);			
+	
+	return select;
+}
+
+void AutoPlayerAlgorithm::placeMovingPiecesOnCorners(vector<char> &movingPieceVector,
+	int initialMovingCnt, RandomContext &rndCtx, PieceVector& vectorToFill, BoardSet& boardSet, 
+	int &pieceIndex)
+{
+
+	int select, cornerX, cornerY, corners;
+	bool selectedCorners[4] = { false };
+
+	if (scenario->areMovingOnCorners && !scenario->areFlagsOnCorners)
+	{
+		shuffle(movingPieceVector.begin(), movingPieceVector.end(), rndCtx.getRandomGenerator());
+
+		corners = (initialMovingCnt < 4) ? (initialMovingCnt) : 4;
+
+		for (int i = 0; i < corners; i++)
+		{
+			select = generateUniqueCorner(rndCtx, selectedCorners);
+
+			chooseCorner(select, rndCtx, cornerX, cornerY);
+
+			positionMovingPiece(cornerX, cornerY, vectorToFill, boardSet, movingPieceVector[pieceIndex++]);
+
+		}
 	}
 }
 

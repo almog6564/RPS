@@ -33,6 +33,8 @@ public:
 	int getRandomRow() { return rowNumGen(gen); }
 
 	int getRandomBinary() { return binaryGen(gen); }
+
+	std::mt19937& getRandomGenerator() { return gen; }
 };
 
 
@@ -60,6 +62,11 @@ public:
 	~AutoPlayerAlgorithm();
 
 	void getInitialPositions(int player, PieceVector& vectorToFill);
+
+	void placeMovingPiecesOnCorners(vector<char> &movingPieceVector,
+		int initialMovingCnt, RandomContext &rndCtx, PieceVector& vectorToFill, BoardSet& boardSet,
+		int &pieceIndex);
+
 	void notifyOnInitialBoard(const Board& b, const std::vector<unique_ptr<FightInfo>>& fights);
 	void notifyOnOpponentMove(const Move& move); // called only on opponent’s move
 	void notifyFightResult(const FightInfo& fightInfo); // called only if there was a fight
