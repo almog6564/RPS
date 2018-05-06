@@ -2,25 +2,30 @@
 #include "AutoPlayerAlgorithm.h"
 #include <algorithm>
 
+using namespace std;
+
+
+void addPieceToVectorAndBoard(BoardSet &boardSet, PieceVector &vectorToFill, 
+	int x, int y, char pieceType, char jokerType = '#')
+{
+	vectorToFill.push_back(make_unique<MyPiecePosition>(x, y, pieceType, jokerType));
+	boardSet.emplace(x, y, pieceType, jokerType);
+}
 
 void positionBomb(UINT& bombsUsed, int bombX, int bombY, PieceVector& vectorToFill,
 	BoardSet& boardSet)
 {
 	dprint("\t - Bomb #%d choosed position (%d,%d)\n", bombsUsed + 1, bombX, bombY);
 
-	vectorToFill.push_back(make_unique<MyPiecePosition>(bombX, bombY, 'B'));
-	boardSet.insert(MyPiecePosition(bombX, bombY, 'B'));
-	bombsUsed++;
+	addPieceToVectorAndBoard(boardSet, vectorToFill, bombX, bombY, 'B');
 
 }
-
 
 void positionFlag(int i, int x, int y, PieceVector &vectorToFill, BoardSet &boardSet)
 {
 	dprint("\t - Flag #%d choosed position (%d,%d)\n", i + 1, x, y);
 
-	vectorToFill.push_back(make_unique<MyPiecePosition>(x, y, 'F'));
-	boardSet.insert(MyPiecePosition(x, y, 'F'));
+	addPieceToVectorAndBoard(boardSet, vectorToFill, x, y, 'F');
 }
 
 void positionMovingPiece(int x, int y, PieceVector &vectorToFill, BoardSet &boardSet, char pieceType, char jokerType)
@@ -34,8 +39,8 @@ void positionMovingPiece(int x, int y, PieceVector &vectorToFill, BoardSet &boar
 		dprint("\t - Joker from type (%c) choosed position (%d,%d)\n", jokerType, x, y);
 	}
 
-	vectorToFill.push_back(make_unique<MyPiecePosition>(x, y, pieceType, jokerType));
-	boardSet.insert(MyPiecePosition(x, y, pieceType, jokerType));
+	addPieceToVectorAndBoard(boardSet, vectorToFill, x, y, pieceType, jokerType);
+
 }
 
 
@@ -59,7 +64,7 @@ void positionFlagRandomly(RandomContext& rndCtx, BoardSet &boardSet, int flagInd
 }
 
 
-int generateUniqueCorner(RandomContext &rndCtx, bool * selectedCorners)
+int generateUniqueCorner(RandomContext &rndCtx, vector<bool>& selectedCorners)
 {
 	int select;
 
@@ -86,7 +91,7 @@ void AutoPlayerAlgorithm::placeMovingPiecesOnCorners(vector<char> &movingPieceVe
 {
 
 	int select, cornerX, cornerY, corners;
-	bool selectedCorners[4] = { false };
+	vector<bool> selectedCorners = { false, false, false, false };
 
 	if (scenario->areMovingOnCorners && !scenario->areFlagsOnCorners)
 	{
@@ -169,7 +174,9 @@ int AutoPlayerAlgorithm::positionFlagsAndBombs(RandomContext& rndCtx,
 {
 	/* Other static variables */
 	int cornerX, cornerY, select, corners, bomb1X, bomb1Y, bomb2X, bomb2Y;
-	bool selectedCorners[4] = { false };
+
+	vector<bool> selectedCorners = { false, false, false, false };
+
 	UINT bombsUsed = 0, chooseBomb;
 	bool shouldUseOneBombPerFlag = initPieceCnt.B < initPieceCnt.F;
 

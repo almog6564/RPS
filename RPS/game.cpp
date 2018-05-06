@@ -533,8 +533,6 @@ void Game::positionAllPieces()
 
 	printBoard();
 
-	exit(0);
-
 	player1Algorithm->notifyOnInitialBoard(*board, fightVec);
 	player2Algorithm->notifyOnInitialBoard(*board, fightVec);
 }
