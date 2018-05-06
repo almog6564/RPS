@@ -83,6 +83,8 @@ public:
 
 	string GetReasonString(eReason reason);
 
+	void printBoard();
+
 	void writeOutputFile();
 
 	void positionAllPieces();
@@ -90,7 +92,6 @@ public:
 private:
 	void checkWhetherFlagsWereCaptured(void);
 };
-
 
 
 

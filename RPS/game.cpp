@@ -352,6 +352,49 @@ string Game::GetReasonString(eReason reason)
 	}
 }
 
+void Game::printBoard()
+{
+	UINT rows, cols, i, j;
+	board->getBoardDimensions(&cols, &rows);
+	Piece* piece;
+	bool isPlayer1 = false;
+
+#if DEBUG == 1
+	char debug_c;
+#endif
+
+	dprint("\n\n ##### BOARD #####\n\n");
+
+	for (i = 1; i <= rows; i++)
+	{
+		for (j = 1; j <= cols; j++)
+		{
+			piece = board->getPieceAt(j, i);
+
+			if (!piece)
+			{
+				debug_c = '-';
+			}
+			else
+			{
+				isPlayer1 = (piece->getOwner() == player1Context);
+#if DEBUG == 1
+				debug_c = pieceToChar(piece->getOriginalType(), isPlayer1);	//need to get original type to print joker as joker
+#endif
+				if (debug_c < 0)
+				{
+					cout << "Bad piece returned from function" << endl;
+					return;
+				}
+			}
+
+			dprint("%c", debug_c);
+		}
+		dprint("\n");
+	}
+	dprint("\n");
+}
+
 void Game::writeOutputFile()
 {
 	UINT rows, cols, i, j;
@@ -360,10 +403,6 @@ void Game::writeOutputFile()
 	char c;
 	int winner;
 	eReason reason;
-
-#if DEBUG == 1
-	char debug_c;
-#endif
 
 	winner = getWinner(&reason);
 
@@ -374,7 +413,6 @@ void Game::writeOutputFile()
 	*(fileParser->output->file) << "Reason: " << GetReasonString(reason) << "\n\n"; //2nd line: reason, 3rd line: empty
 
 	dprint("writeOutputFile: got reason string, reason = (%d) [%s]\n", reason, GetReasonString(reason).c_str());
-	dprint("\n\n ##### BOARD #####\n\n");
 	for (i = 1; i <= rows; i++)
 	{
 		for (j = 1; j <= cols; j++)
@@ -384,17 +422,11 @@ void Game::writeOutputFile()
 			if (!piece)
 			{
 				c = ' ';
-#if DEBUG == 1
-				debug_c = '-';
-#endif
 			}
 			else
 			{
 				isPlayer1 = (piece->getOwner() == player1Context);
 				c = pieceToChar(piece->getOriginalType(), isPlayer1);	//need to get original type to print joker as joker
-#if DEBUG == 1
-				debug_c = c;
-#endif
 				if (c < 0)
 				{
 					cout << "Bad piece returned from function" << endl;
@@ -403,14 +435,12 @@ void Game::writeOutputFile()
 			}
 
 			*(fileParser->output->file) << c;
-			dprint("%c", debug_c);
 		}
 		*(fileParser->output->file) << '\n';
-		dprint("\n");
 	}
 	fileParser->output->file->flush();	//actual write to the file
-	dprint("\n");
 
+	printBoard();
 }
 
 
@@ -455,6 +485,8 @@ void Game::positionAllPieces()
 
 		dprint("Player 1 positioned all pieces\n");
 
+		printBoard();
+
 	} while (false);
 
 	do
@@ -498,6 +530,10 @@ void Game::positionAllPieces()
 		dprint("Player 2 positioned all pieces\n");
 
 	} while (false);
+
+	printBoard();
+
+	exit(0);
 
 	player1Algorithm->notifyOnInitialBoard(*board, fightVec);
 	player2Algorithm->notifyOnInitialBoard(*board, fightVec);

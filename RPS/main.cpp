@@ -11,7 +11,7 @@ int main()
 	int M, N, R, P, S, B, J, F;
 	M = N = 10;
 	R = 2; P = 5; S = 1; B = 2; J = 2; F = 1;
-	bool bIsPlayer1Auto = false ,  bIsPlayer2Auto = false;
+	bool bIsPlayer1Auto = true ,  bIsPlayer2Auto = true;
 	string p1p = "player1.rps_board";
 	string p1m = "player1.rps_moves";
 	string p2p = "player2.rps_board";
@@ -22,7 +22,7 @@ int main()
 	eReason reason;
 	int	winner;
 #endif
-	cout << "bla" << endl;
+
 	FileParser* fileParser = new FileParser(p1p, p2p, p1m, p2m, output);
 	if (fileParser->initializeFiles()) //initialization failed
 	{

@@ -29,8 +29,30 @@ public:
 	{
 		return jokerRep;
 	}
-
 };
+
+struct PiecePositionHasher
+{
+	size_t operator()(const PiecePosition & obj) const
+	{
+		return (size_t)(obj.getPosition().getX() << 16 || obj.getPosition().getY());
+	}
+};
+
+struct PiecePositionComparator
+{
+	bool operator()(const PiecePosition & obj1, const PiecePosition & obj2) const
+	{
+		if (obj1.getPosition().getX() == obj2.getPosition().getX() &&
+			obj1.getPosition().getY() == obj2.getPosition().getY())
+			return true;
+		else
+			return false;
+	}
+};
+
+
+
 
 #endif
 

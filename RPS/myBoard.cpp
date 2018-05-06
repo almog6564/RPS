@@ -139,7 +139,9 @@ int MyBoard::positionPiece(Piece* newPiece, UINT toX, UINT toY, unique_ptr<MyFig
 		}
 
 		dprint("MATCH: Player#%d [%c already at (%d,%d)] VS Player #%d [%c from (%d,%d)] ... ",
-			existingPieceOwner->getPlayerId()+1, pieceToChar(existingPiece->getType()), toX, toY, newPieceOwner->getPlayerId()+1, pieceToChar(type), fromX, fromY);
+			existingPieceOwner->getPlayerId()+1, pieceToChar(existingPiece->getType()), toX, toY, 
+			newPieceOwner->getPlayerId()+1, pieceToChar(type), 
+			(moved) ? fromX : toX, (moved) ? fromY : toY);
 
 		if (type == BOMB || existingPieceType == BOMB)
 		{

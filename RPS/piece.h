@@ -29,13 +29,13 @@ public:
 	char getPiece() const; // R, P, S, B, J or F
 
 
-	char getJokerRep() const // ONLY for Joker: R, P, S or B -- non-Joker may return ‘#’
+	char getJokerRep() const override // ONLY for Joker: R, P, S or B -- non-Joker may return ‘#’
 	{
 		return '#';
 	}
 
 	/*
-	This function does a match between the piece and a given second piece accordint to the rules of Rock, Paper, Scissors.
+	This function does a match between the piece and a given second piece according to the rules of Rock, Paper, Scissors.
 		@returns -
 			WIN - the Piece won p.
 			LOSE - the piece lost to p.
