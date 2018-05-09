@@ -48,7 +48,7 @@ private:
 
 	bool checkForAdjecentOpponent(const MyPiecePosition& pos, const MyPiecePosition other);
 
-	unique_ptr<Move> checkAllAdjecentOpponents(const MyPiecePosition& piece, vector<bool> boolVec, int x, int y);
+	unique_ptr<Move> checkAllAdjecentOpponents(const MyPiecePosition& piece, vector<bool>& boolVec, int x, int y);
 
 	unique_ptr<JokerChange> checkAllAdjecentOpponents(const MyPiecePosition & joker, int x, int y);
 

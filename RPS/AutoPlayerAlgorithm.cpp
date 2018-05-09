@@ -161,8 +161,9 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToMove()
 {
 	++nextPieceToMove;
-	while (nextPieceToMove != boardSet.end())
+	while (nextPieceToMove != boardSet.end()) 
 	{
+		//save iterator of current,iterate until reached current, when reached end return to begin
 		char tempType = (nextPieceToMove)->getPiece();
 		char tempJoker = (nextPieceToMove)->getJokerRep();
 		if (tempType == 'P' || tempType == 'S' || tempType == 'R' ||
@@ -187,7 +188,7 @@ const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToAttack()
 	return *nextPieceToAttack; //return the piece inside the iterator
 }
 
-unique_ptr<Move> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & piece, vector<bool> boolVec, int x, int y)
+unique_ptr<Move> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & piece, vector<bool>& boolVec, int x, int y)
 {
 	if (checkForAdjecentOpponent(piece, MyPiecePosition(x - 1, y)))
 	{
@@ -249,7 +250,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyP
 	return nullptr;
 }
 
-//pos will be recieved as a lvalue reference, and other as rvalue reference
+//pos will be received as a lvalue reference, and other as rvalue reference
 bool AutoPlayerAlgorithm::checkForAdjecentOpponent(const MyPiecePosition& pos, const MyPiecePosition other)
 {
 	MyPoint point = pos.getPosition();
@@ -260,24 +261,49 @@ bool AutoPlayerAlgorithm::checkForAdjecentOpponent(const MyPiecePosition& pos, c
 
 unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 {
-	/*look for petential win or flee*/
+	unique_ptr<Move> nextMove;
+	vector<bool> fleeArr = { true, true, true, true }; //[left, right, up, down]
+
+	/*look for potential win or flee*/
 	for (auto& piece : boardSet)
 	{
-		vector<bool> fleeArr = { true, true, true, true }; //[left, right, up, down]
+		
 		const MyPoint point = piece.getPosition();
 		int x = point.getX(), y = point.getY();
-		unique_ptr<Move> nextMove = checkAllAdjecentOpponents(piece, fleeArr, x, y);
+		nextMove = move(checkAllAdjecentOpponents(piece, fleeArr, x, y));
+
 		if (nextMove)
+		{
 			return move(nextMove);
-		
-		//flee(fleeArr&)
+		}
+		else if( find(fleeArr.begin(), fleeArr.end(), false) != fleeArr.end())
+		{
+			//if not all are true, it means that there is an opponent piece stronger than me,
+			//try to flee from it
+			nextMove = move(getLegalMove(point, fleeArr));
+
+			if (nextMove)
+			{
+				return move(nextMove);
+			}
+		}
 	}
 
 	/*perform random move*/
-	MyPiecePosition nextPieceToMove = getNextPieceToMove();
-	MyPoint point = nextPieceToMove.getPosition();
+	
+	do 
+	{
+		const MyPiecePosition& nextPieceToMove = getNextPieceToMove();
+		MyPoint point = nextPieceToMove.getPosition();
 
-	return unique_ptr<Move>();
+		nextMove = move(getLegalMove(point));
+		if (nextMove)
+			break;
+
+	} while (true);
+	
+	//TODOS: 1. joker change 2. get next piece 3. end of get move
+
 }
 
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
