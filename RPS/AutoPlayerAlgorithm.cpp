@@ -196,33 +196,39 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	/*look for petential win or flee*/
 	for (auto& piece : boardSet)
 	{
+		vector<bool> fleeArr = { false, false, false, false };
 		MyPoint point = piece.getPosition();
 		int x = point.getX(), y = point.getY();
 		if (checkForAdjecentOpponent(piece, MyPiecePosition(x - 1, y)));
 		{
 			if (piece >= MyPiecePosition(x - 1, y)) //potential win
 				return make_unique<MyMove>(x, y, x-1, y);
-			//else flee(x, left) 
+			else 
+				fleeArr[0] = true;
 		}
 		
 		if (checkForAdjecentOpponent(piece, MyPiecePosition(x + 1, y)));
 		{
 			if (piece >= MyPiecePosition(x + 1, y)) //potential win
 				return make_unique<MyMove>(x, y, x + 1, y);
-			//else flee(x, right) 
+			else 
+				fleeArr[1] = true;
 		}
 		if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y - 1)));
 		{
 			if (piece >= MyPiecePosition(x, y - 1)) //potential win
 				return make_unique<MyMove>(x, y, x, y - 1);
-			//else flee(y, down) 
+			else 
+				fleeArr[2] = true;
 		}
 		if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y + 1)));
 		{
 			if (piece >= MyPiecePosition(x, y + 1)) //potential win
 				return make_unique<MyMove>(x, y, x, y + 1);
-			//else flee(y, up) 
+			else 
+				fleeArr[3] = true;
 		}
+		//flee(fleeArr&)
 	}
 
 	/*perform random move*/
