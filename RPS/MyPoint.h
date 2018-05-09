@@ -12,6 +12,21 @@ class MyPoint : public Point
 public:
 	MyPoint(int col, int row) : col(col), row(row) {};
 
+	MyPoint() {} //empty c'tor
+
+	MyPoint& operator=(const Point& other) 
+	{
+		col = other.getX();
+		row = other.getY();
+		return *this;
+	}
+
+	MyPoint(const Point& other) //copy c'tor
+	{
+		col = other.getX();
+		row = other.getY();
+	}
+
 	int getX() const override
 	{
 		return col;
@@ -29,6 +44,8 @@ public:
 	}
 
 	~MyPoint() {}
+
+	MyPoint(MyPoint&&) = default; //default move constructor
 };
 
 #endif

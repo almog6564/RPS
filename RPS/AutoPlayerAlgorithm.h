@@ -21,6 +21,14 @@ class AutoPlayerAlgorithm : public PlayerAlgorithm
 private:
 	PositioningScenario* scenario;
 	UINT boardRows, boardCols;
+	BoardSet opponentsPieces;
+	BoardSet boardSet; //serves as playersPieces
+	MyPoint lastMove;
+	BoardSet::iterator nextPieceToMove;
+	BoardSet::iterator nextPieceToAttack;
+
+
+	int ID;
 
 	struct { 
 		UINT R, P, S, B, J, F;
@@ -33,9 +41,15 @@ private:
 
 	void fillListWithMovingPieces(std::vector<char>& movingPieceList, int bombUsed);
 
+	const MyPiecePosition& getNextPieceToMove();
+
+	const MyPiecePosition & getNextPieceToAttack();
+
+	bool checkForAdjecentOpponent(const MyPiecePosition& pos, const MyPiecePosition& other);
+
 public:
-	AutoPlayerAlgorithm(UINT boardRows, UINT boardCols, 
-		UINT R, UINT P, UINT S, UINT B, UINT J, UINT F);
+	AutoPlayerAlgorithm(UINT boardRows, UINT boardCols,
+		UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID);
 
 	~AutoPlayerAlgorithm();
 

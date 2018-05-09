@@ -5,7 +5,7 @@
 using namespace std;
 
 
-AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F)
+AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID): ID(ID)
 {
 	random_device				seed;			//Will be used to obtain a seed for the random number engine
 	mt19937						gen(seed());	//Standard mersenne_twister_engine seeded with seed()
@@ -22,7 +22,9 @@ AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, U
 	initPieceCnt.B = B;
 	initPieceCnt.J = J;
 	initPieceCnt.F = F;
-
+	//initialize private Board
+	//privateBoard = vector<PieceVector>(rows);
+	//for (UINT i = 0; i < rows; i++) privateBoard[i] = vector<unique_ptr<PiecePosition>>(cols);
 }
 
 
@@ -35,7 +37,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Parameters Initialization **/
-	BoardSet boardSet;	
+	//BoardSet boardSet;	
 	vector<char> movingPieceVector;
 	int initialMovingCnt, pieceIndex = 0, bombsUsed;
 
@@ -82,30 +84,125 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 	addAllToVector(J, 'J'); 
 
 	positionRestOfMovingPiecesRandomly(pieceIndex, initialMovingCnt, rndCtx, boardSet, movingPieceVector, vectorToFill);
-
+	
 }
 
 void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<FightInfo>>& fights)
 {
-	//just zevel for it to compile
-	auto a = new MyPoint(1, 1);
-	b.getPlayer(*a);
-	fights.size();
-	delete a;
+	int owner;
+	//global changin MyPoint
+	for (UINT i = 1; i < boardRows; i++)
+	{
+		for (UINT j = 1; j < boardCols; j++)
+		{
+			owner = b.getPlayer(MyPoint(j, i)); //move constructor will be called
+			if (owner == 0 || owner == ID) //Point is empty or owned by player
+				continue;
+			else
+				opponentsPieces.emplace(i, j);
+		}
+	}
+	for (auto& fight : fights)
+	{
+		if (fight->getWinner() != ID) //player lost fight, remove piece from players set, and update piece type
+		{
+			MyPoint tempPoint = fight->getPosition();
+			char type = fight->getPiece(ID == 1 ? 2 : 1);
+			boardSet.erase(boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
+			auto& piece = *opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
+			piece.setPieceType(type);
+			if (type == 'P' || type == 'R' || type == 'S')
+				piece.setMovingPiece(true);
+		}
+	}
+	nextPieceToMove = boardSet.begin(); //start with first piece
+	nextPieceToAttack = opponentsPieces.begin();
 }
+
 
 void AutoPlayerAlgorithm::notifyOnOpponentMove(const Move & move)
 {
-	move.getFrom();
+	//update opponent's piece, because the key is imutable, remove and insert a new piece
+	auto& t = *opponentsPieces.find(MyPiecePosition(move.getFrom().getX(), move.getFrom().getY()));
+	char type = t.getPiece();
+	opponentsPieces.erase(t);
+	opponentsPieces.insert(MyPiecePosition(move.getTo().getX(), move.getTo().getY(), type, true));
+	//save last move for next_move decision
+	lastMove = move.getTo(); //call copy c'tor
 }
 
 void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 {
-	fightInfo.getPiece(1);
+	MyPoint tempPoint = fightInfo.getPosition();
+	if (fightInfo.getWinner() != ID) //player lost fight, remove piece from players set, and update piece type and if moving
+	{
+		char type = fightInfo.getPiece(ID == 1 ? 2 : 1);
+		auto& piece = *opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
+		boardSet.erase(boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
+		piece.setPieceType(type);
+		if (type == 'P' || type == 'R' || type == 'S')
+			piece.setMovingPiece(true);
+	}
+	else //player won, remove opponent's piece
+	{
+		opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
+	}
+
+	/*TIE!!!*/
+}
+
+const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToMove()
+{
+	while (nextPieceToMove != boardSet.end())
+	{
+		char tempType = (nextPieceToMove)->getPiece();
+		char tempJoker = (nextPieceToMove)->getJokerRep();
+		if (tempType == 'P' || tempType == 'S' || tempType == 'R' ||
+			(tempType == 'J' && (tempJoker == 'P' || tempType == 'S' || tempType == 'R'))) //A moving piece
+			break;
+		else
+			++nextPieceToMove; //move the pointer to the next iterator
+	}
+	return *nextPieceToMove; //return the piece inside the iterator
+}
+
+const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToAttack()
+{
+	while (nextPieceToAttack != opponentsPieces.end())
+	{
+		if ((nextPieceToAttack)->isMoving()) //prefer to attack a potential flag
+			++nextPieceToAttack; //move to the next iterator
+		else
+			break;
+	}
+	return *nextPieceToAttack; //return the piece inside the iterator
+}
+
+bool AutoPlayerAlgorithm::checkForAdjecentOpponent(const MyPiecePosition & pos, const MyPiecePosition& other)
+{
+	MyPoint point = pos.getPosition();
+	if (opponentsPieces.find(other) != opponentsPieces.end())
+		return true;
+	return false;
 }
 
 unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 {
+	//MyPiecePosition nextPieceToMove = getNextPieceToMove();
+	//MyPiecePosition nextPieceToAttack = getNextPieceToAttack();
+
+	//create temps
+	for (auto& piece : boardSet)
+	{
+		if (checkForAdjecentOpponent(piece, MyPiecePosition(piece.getPosition().getX() - 1, piece.getPosition().getY())));
+			//complete;
+		if (checkForAdjecentOpponent(piece, MyPiecePosition(piece.getPosition().getX() + 1, piece.getPosition().getY())));
+			//complete;
+		if (checkForAdjecentOpponent(piece, MyPiecePosition(piece.getPosition().getX(), piece.getPosition().getY() - 1)));
+			//complete;
+		if (checkForAdjecentOpponent(piece, MyPiecePosition(piece.getPosition().getX(), piece.getPosition().getY() + 1)));
+			//complete
+	}
 	return unique_ptr<Move>();
 }
 

@@ -169,7 +169,6 @@ void AutoPlayerAlgorithm::fillListWithMovingPieces(vector<char>& movingPieceVect
 		movingPieceVector.push_back('B');
 }
 
-
 int AutoPlayerAlgorithm::positionFlagsAndBombs(RandomContext& rndCtx,
 	BoardSet& boardSet, PieceVector& vectorToFill)
 {
