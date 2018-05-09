@@ -20,6 +20,8 @@ public:
 
 	MyPiecePosition(UINT x, UINT y, char pieceType = '?', char jokerRep = '#', bool movingPiece = false);
 
+	MyPiecePosition(MyPiecePosition& other) = default;
+
 	MyPiecePosition(const MyPiecePosition& other) //copy c'tor
 	{
 		pieceType = other.pieceType;
@@ -53,6 +55,16 @@ public:
 	void setMovingPiece(bool b) const
 	{
 		movingPiece = b;
+	}
+
+	bool operator>=(const MyPiecePosition& other) const
+	{
+		char otherPieceType = other.getPiece();
+		if (((pieceType == 'R' || jokerRep == 'R') && (otherPieceType == 'S' || otherPieceType == '?')) ||
+			((pieceType == 'S' || jokerRep == 'S') && (otherPieceType == 'P' || otherPieceType == '?')) ||
+			((pieceType == 'P' || jokerRep == 'P') && (otherPieceType == 'R' || otherPieceType == '?')))
+			return false;
+		return true;
 	}
 
 	MyPiecePosition(MyPiecePosition&&) = default; //default move constructor
