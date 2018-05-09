@@ -196,7 +196,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	/*look for petential win or flee*/
 	for (auto& piece : boardSet)
 	{
-		vector<bool> fleeArr = { false, false, false, false };
+		vector<bool> fleeArr = { false, false, false, false }; //[left, right, up, down]
 		MyPoint point = piece.getPosition();
 		int x = point.getX(), y = point.getY();
 		if (checkForAdjecentOpponent(piece, MyPiecePosition(x - 1, y)));
@@ -214,17 +214,17 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 			else 
 				fleeArr[1] = true;
 		}
-		if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y - 1)));
-		{
-			if (piece >= MyPiecePosition(x, y - 1)) //potential win
-				return make_unique<MyMove>(x, y, x, y - 1);
-			else 
-				fleeArr[2] = true;
-		}
 		if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y + 1)));
 		{
 			if (piece >= MyPiecePosition(x, y + 1)) //potential win
 				return make_unique<MyMove>(x, y, x, y + 1);
+			else 
+				fleeArr[2] = true;
+		}
+		if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y - 1)));
+		{
+			if (piece >= MyPiecePosition(x, y - 1)) //potential win
+				return make_unique<MyMove>(x, y, x, y - 1);
 			else 
 				fleeArr[3] = true;
 		}
