@@ -192,7 +192,8 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 {
 	//MyPiecePosition nextPieceToMove = getNextPieceToMove();
 	//MyPiecePosition nextPieceToAttack = getNextPieceToAttack();
-
+	
+	/*look for petential win or flee*/
 	for (auto& piece : boardSet)
 	{
 		MyPoint point = piece.getPosition();
@@ -223,6 +224,9 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 			//else flee(y, up) 
 		}
 	}
+
+	/*perform random move*/
+
 	return unique_ptr<Move>();
 }
 
