@@ -7,11 +7,10 @@
 
 class MyJokerChange : public JokerChange
 {
-	Point* jokerChangePosition;
+	std::unique_ptr<Point> jokerChangePosition;
 	char jokerNewRep;// R, P, S or B (but NOT J and NOT F)
 public:
 	MyJokerChange(UINT fromX, UINT fromY, char jokerNewRep);
-	~MyJokerChange();
 
 	const Point& getJokerChangePosition() const
 	{

@@ -48,10 +48,15 @@ private:
 
 	bool checkForAdjecentOpponent(const MyPiecePosition& pos, const MyPiecePosition other);
 
+	unique_ptr<Move> checkAllAdjecentOpponents(const MyPiecePosition& piece, vector<bool> boolVec, int x, int y);
+
+	unique_ptr<JokerChange> checkAllAdjecentOpponents(const MyPiecePosition & joker, int x, int y);
+
 	std::unique_ptr<MyMove> getLegalMove(const MyPoint& point);
 	std::unique_ptr<MyMove> getLegalMove(const MyPoint& point, std::vector<bool>& fleeArr);
 
 	bool existsOnBoardSet(const MyPoint& point);
+
 public:
 	AutoPlayerAlgorithm(UINT boardRows, UINT boardCols,
 		UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID);

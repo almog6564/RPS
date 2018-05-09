@@ -91,12 +91,11 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<FightInfo>>& fights)
 {
 	int owner;
-	//global changin MyPoint
 	for (UINT i = 1; i < boardRows; i++)
 	{
 		for (UINT j = 1; j < boardCols; j++)
 		{
-			owner = b.getPlayer(MyPoint(j, i)); //move constructor will be called
+			owner = b.getPlayer(MyPoint(j, i)); 
 			if (owner == 0 || owner == ID) //Point is empty or owned by player
 				continue;
 			else
@@ -135,25 +134,33 @@ void AutoPlayerAlgorithm::notifyOnOpponentMove(const Move & move)
 void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 {
 	MyPoint tempPoint = fightInfo.getPosition();
-	if (fightInfo.getWinner() != ID) //player lost fight, remove piece from players set, and update piece type and if moving
+	int winner = fightInfo.getWinner();
+	if (winner == (ID == 1 ? 2 : 1)) //player lost fight, remove piece from players set, and update piece type and if moving
 	{
-		char type = fightInfo.getPiece(ID == 1 ? 2 : 1);
 		auto& piece = *opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
-		boardSet.erase(boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
+		auto it = boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
+		if (it == nextPieceToMove)
+			++nextPieceToMove;
+		boardSet.erase(it);
+		char type = fightInfo.getPiece(winner);
 		piece.setPieceType(type);
 		if (type == 'P' || type == 'R' || type == 'S')
 			piece.setMovingPiece(true);
 	}
-	else //player won, remove opponent's piece
+	else if (winner == ID)//player won, remove opponent's piece
 	{
 		opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
 	}
-
-	/*TIE!!!*/
+	else //TIE - remove both pieces
+	{
+		opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
+		boardSet.erase(boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
+	}
 }
 
 const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToMove()
 {
+	++nextPieceToMove;
 	while (nextPieceToMove != boardSet.end())
 	{
 		char tempType = (nextPieceToMove)->getPiece();
@@ -169,6 +176,7 @@ const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToMove()
 
 const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToAttack()
 {
+	++nextPieceToAttack;
 	while (nextPieceToAttack != opponentsPieces.end())
 	{
 		if ((nextPieceToAttack)->isMoving()) //prefer to attack a potential flag
@@ -177,6 +185,68 @@ const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToAttack()
 			break;
 	}
 	return *nextPieceToAttack; //return the piece inside the iterator
+}
+
+unique_ptr<Move> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & piece, vector<bool> boolVec, int x, int y)
+{
+	if (checkForAdjecentOpponent(piece, MyPiecePosition(x - 1, y)))
+	{
+		if (piece >= MyPiecePosition(x - 1, y)) //potential win
+			return make_unique<MyMove>(x, y, x - 1, y);
+		else //potential lose
+			boolVec[0] = false;
+	}
+
+	if (checkForAdjecentOpponent(piece, MyPiecePosition(x + 1, y)))
+	{
+		if (piece >= MyPiecePosition(x + 1, y)) //potential win
+			return make_unique<MyMove>(x, y, x + 1, y);
+		else
+			boolVec[1] = false;
+	}
+	if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y + 1)))
+	{
+		if (piece >= MyPiecePosition(x, y + 1)) //potential win
+			return make_unique<MyMove>(x, y, x, y + 1);
+		else
+			boolVec[2] = false;
+	}
+	if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y - 1)))
+	{
+		if (piece >= MyPiecePosition(x, y - 1)) //potential win
+			return make_unique<MyMove>(x, y, x, y - 1);
+		else
+			boolVec[3] = false;
+	}
+	return nullptr;
+}
+
+unique_ptr<JokerChange> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & joker, int x, int y)
+{
+	if (checkForAdjecentOpponent(joker, MyPiecePosition(x - 1, y)))
+	{
+		if (!(joker >= MyPiecePosition(x - 1, y))) //potential lose
+			;//return make_unique<MyMove>(x, y, x - 1, y);
+	}
+
+	if (checkForAdjecentOpponent(joker, MyPiecePosition(x + 1, y)))
+	{
+		if (!(joker >= MyPiecePosition(x + 1, y))) //potential lose
+			;//return make_unique<MyMove>(x, y, x + 1, y);
+	}
+	if (checkForAdjecentOpponent(joker, MyPiecePosition(x, y + 1)))
+	{
+		if (!(joker >= MyPiecePosition(x, y + 1))) //potential lose
+			;// return make_unique<MyMove>(x, y, x, y + 1);
+
+	}
+	if (!(checkForAdjecentOpponent(joker, MyPiecePosition(x, y - 1)))) //potential lose
+	{
+		if (joker >= MyPiecePosition(x, y - 1)) //potential win
+			;// return make_unique<MyMove>(x, y, x, y - 1);
+
+	}
+	return nullptr;
 }
 
 //pos will be recieved as a lvalue reference, and other as rvalue reference
@@ -190,57 +260,30 @@ bool AutoPlayerAlgorithm::checkForAdjecentOpponent(const MyPiecePosition& pos, c
 
 unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 {
-	//MyPiecePosition nextPieceToMove = getNextPieceToMove();
-	//MyPiecePosition nextPieceToAttack = getNextPieceToAttack();
-	
 	/*look for petential win or flee*/
 	for (auto& piece : boardSet)
 	{
-		vector<bool> fleeArr = { false, false, false, false }; //[left, right, up, down]
-		MyPoint point = piece.getPosition();
+		vector<bool> fleeArr = { true, true, true, true }; //[left, right, up, down]
+		const MyPoint point = piece.getPosition();
 		int x = point.getX(), y = point.getY();
-		if (checkForAdjecentOpponent(piece, MyPiecePosition(x - 1, y)));
-		{
-			if (piece >= MyPiecePosition(x - 1, y)) //potential win
-				return make_unique<MyMove>(x, y, x-1, y);
-			else 
-				fleeArr[0] = true;
-		}
+		unique_ptr<Move> nextMove = checkAllAdjecentOpponents(piece, fleeArr, x, y);
+		if (nextMove)
+			return move(nextMove);
 		
-		if (checkForAdjecentOpponent(piece, MyPiecePosition(x + 1, y)));
-		{
-			if (piece >= MyPiecePosition(x + 1, y)) //potential win
-				return make_unique<MyMove>(x, y, x + 1, y);
-			else 
-				fleeArr[1] = true;
-		}
-		if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y + 1)));
-		{
-			if (piece >= MyPiecePosition(x, y + 1)) //potential win
-				return make_unique<MyMove>(x, y, x, y + 1);
-			else 
-				fleeArr[2] = true;
-		}
-		if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y - 1)));
-		{
-			if (piece >= MyPiecePosition(x, y - 1)) //potential win
-				return make_unique<MyMove>(x, y, x, y - 1);
-			else 
-				fleeArr[3] = true;
-		}
-		
-		unique_ptr<MyMove> fleeMove = getLegalMove(point, fleeArr);
 		//flee(fleeArr&)
 	}
 
 	/*perform random move*/
+	MyPiecePosition nextPieceToMove = getNextPieceToMove();
+	MyPoint point = nextPieceToMove.getPosition();
 
 	return unique_ptr<Move>();
 }
 
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
-	return unique_ptr<JokerChange>();
+	
+	return nullptr;
 }
 
 unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point)

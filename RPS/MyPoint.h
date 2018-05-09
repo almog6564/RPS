@@ -14,12 +14,7 @@ public:
 
 	MyPoint() {} //empty c'tor
 
-	MyPoint& operator=(const Point& other) 
-	{
-		col = other.getX();
-		row = other.getY();
-		return *this;
-	}
+	MyPoint& operator=(const MyPoint& other) = default;
 
 	MyPoint(const Point& other) //copy c'tor
 	{
