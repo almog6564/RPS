@@ -1,6 +1,7 @@
 
 
 #include "AutoPlayerAlgorithm.h"
+#include "MyMove.h"
 
 using namespace std;
 
@@ -178,7 +179,8 @@ const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToAttack()
 	return *nextPieceToAttack; //return the piece inside the iterator
 }
 
-bool AutoPlayerAlgorithm::checkForAdjecentOpponent(const MyPiecePosition & pos, const MyPiecePosition& other)
+//pos will be recieved as a lvalue reference, and other as rvalue reference
+bool AutoPlayerAlgorithm::checkForAdjecentOpponent(const MyPiecePosition& pos, const MyPiecePosition other)
 {
 	MyPoint point = pos.getPosition();
 	if (opponentsPieces.find(other) != opponentsPieces.end())
@@ -191,17 +193,35 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	//MyPiecePosition nextPieceToMove = getNextPieceToMove();
 	//MyPiecePosition nextPieceToAttack = getNextPieceToAttack();
 
-	//create temps
 	for (auto& piece : boardSet)
 	{
-		if (checkForAdjecentOpponent(piece, MyPiecePosition(piece.getPosition().getX() - 1, piece.getPosition().getY())));
-			//complete;
-		if (checkForAdjecentOpponent(piece, MyPiecePosition(piece.getPosition().getX() + 1, piece.getPosition().getY())));
-			//complete;
-		if (checkForAdjecentOpponent(piece, MyPiecePosition(piece.getPosition().getX(), piece.getPosition().getY() - 1)));
-			//complete;
-		if (checkForAdjecentOpponent(piece, MyPiecePosition(piece.getPosition().getX(), piece.getPosition().getY() + 1)));
-			//complete
+		MyPoint point = piece.getPosition();
+		int x = point.getX(), y = point.getY();
+		if (checkForAdjecentOpponent(piece, MyPiecePosition(x - 1, y)));
+		{
+			if (piece >= MyPiecePosition(x - 1, y)) //potential win
+				return make_unique<MyMove>(x, y, x-1, y);
+			//else flee(x, left) 
+		}
+		
+		if (checkForAdjecentOpponent(piece, MyPiecePosition(x + 1, y)));
+		{
+			if (piece >= MyPiecePosition(x + 1, y)) //potential win
+				return make_unique<MyMove>(x, y, x + 1, y);
+			//else flee(x, right) 
+		}
+		if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y - 1)));
+		{
+			if (piece >= MyPiecePosition(x, y - 1)) //potential win
+				return make_unique<MyMove>(x, y, x, y - 1);
+			//else flee(y, down) 
+		}
+		if (checkForAdjecentOpponent(piece, MyPiecePosition(x, y + 1)));
+		{
+			if (piece >= MyPiecePosition(x, y + 1)) //potential win
+				return make_unique<MyMove>(x, y, x, y + 1);
+			//else flee(y, up) 
+		}
 	}
 	return unique_ptr<Move>();
 }

@@ -45,7 +45,7 @@ private:
 
 	const MyPiecePosition & getNextPieceToAttack();
 
-	bool checkForAdjecentOpponent(const MyPiecePosition& pos, const MyPiecePosition& other);
+	bool checkForAdjecentOpponent(const MyPiecePosition& pos, const MyPiecePosition other);
 
 public:
 	AutoPlayerAlgorithm(UINT boardRows, UINT boardCols,
