@@ -1,40 +1,35 @@
 
-#include "piece.h"
+#include "BoardPiece.h"
 #include <iostream>
 
 using namespace std;
 
 
-Piece::Piece(ePieceType typeArg, ePieceType winAgainstArg, PlayerContext* playerOwner) :
+BoardPiece::BoardPiece(ePieceType typeArg, ePieceType winAgainstArg, PlayerContext* playerOwner) :
 	type(typeArg), winAgainst(winAgainstArg), owner(playerOwner) 
 {
 	position = new MyPoint(0, 0);
 }
 
-const Point& Piece::getPosition() const
-{
-	return (Point&)(*position);
-}
-
-void Piece::setPiecePosition(int col, int row)
+void BoardPiece::setPiecePosition(int col, int row)
 {
 	position->setNewPosition(col, row);
 }
 
 
-char Piece::getPiece() const
+char BoardPiece::getPiece() const
 {
 	return pieceToChar(getOriginalType());
 }
 
-Piece::~Piece()
+BoardPiece::~BoardPiece()
 {
 	delete position;
 }
 
 
 
-eScore Piece::match(Piece* p)
+eScore BoardPiece::match(BoardPiece* p)
 {
 	eScore s = ERROR;
 	ePieceType p1type = this->getType();
@@ -52,12 +47,12 @@ eScore Piece::match(Piece* p)
 	return s;
 }
 
- bool Piece::isJoker()
+ bool BoardPiece::isJoker()
 {
 	return false;
 }
 
-Joker::Joker(ePieceType currentTypeArg, PlayerContext* owner): Piece(JOKER, UNDEF, owner)
+Joker::Joker(ePieceType currentTypeArg, PlayerContext* owner): BoardPiece(JOKER, UNDEF, owner)
 {
 	currentType = currentTypeArg;	
 }
@@ -109,9 +104,9 @@ ePieceType Joker::getWinAgainst() const
 	return ret;
 }
 
-Piece* createNewPiece(PlayerContext* owner, ePieceType type, ePieceType jokerType)
+BoardPiece* createNewPiece(PlayerContext* owner, ePieceType type, ePieceType jokerType)
 {
-	Piece* p = nullptr;
+	BoardPiece* p = nullptr;
 
 	switch (type)
 	{

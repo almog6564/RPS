@@ -7,42 +7,33 @@
 #include "PlayerContext.h"
 
 
-class Piece : public PiecePosition
+class BoardPiece
 {
 	const ePieceType type;
 	ePieceType winAgainst;
 
-	
 public:
 	MyPoint * position = nullptr;
 
 	PlayerContext* owner;
 
-	Piece(ePieceType typeArg, ePieceType winAgainstArg, PlayerContext* owner);
+	BoardPiece(ePieceType typeArg, ePieceType winAgainstArg, PlayerContext* owner);
 
-	~Piece();
-
-	const Point& getPosition() const;
+	virtual ~BoardPiece();
 
 	//does not check boundaries
 	void setPiecePosition(int col, int row);
 	char getPiece() const; // R, P, S, B, J or F
 
-
-	char getJokerRep() const override // ONLY for Joker: R, P, S or B -- non-Joker may return ‘#’
-	{
-		return '#';
-	}
-
 	/*
 	This function does a match between the piece and a given second piece according to the rules of Rock, Paper, Scissors.
 		@returns -
-			WIN - the Piece won p.
+			WIN - the BoardPiece won p.
 			LOSE - the piece lost to p.
 			TIE - a tie result.
 			ERROR - some invalid values.
 	*/
-	eScore match(Piece* p);
+	eScore match(BoardPiece* p);
 
 
 	ePieceType getOriginalType()const
@@ -65,42 +56,41 @@ public:
 		return owner;
 	}
 
-
 	virtual bool isJoker();
 
 };
 
-class Rock : public Piece
+class Rock : public BoardPiece
 {
 public:
-	Rock(PlayerContext* owner) : Piece(ROCK, SCISSORS, owner) {};
+	Rock(PlayerContext* owner) : BoardPiece(ROCK, SCISSORS, owner) {};
 };
 
-class Scissors : public Piece
+class Scissors : public BoardPiece
 {
 public:
-	Scissors(PlayerContext* owner) : Piece(SCISSORS, PAPER, owner) {};
+	Scissors(PlayerContext* owner) : BoardPiece(SCISSORS, PAPER, owner) {};
 };
 
-class Paper : public Piece
+class Paper : public BoardPiece
 {
 public:
-	Paper(PlayerContext* owner) : Piece(PAPER, ROCK, owner) {};
+	Paper(PlayerContext* owner) : BoardPiece(PAPER, ROCK, owner) {};
 };
 
-class Flag : public Piece
+class Flag : public BoardPiece
 {
 public:
-	Flag(PlayerContext* owner) : Piece(FLAG, UNDEF, owner) {};
+	Flag(PlayerContext* owner) : BoardPiece(FLAG, UNDEF, owner) {};
 };
 
-class Bomb : public Piece
+class Bomb : public BoardPiece
 {
 public:
-	Bomb(PlayerContext* owner) : Piece(BOMB, UNDEF, owner) {};
+	Bomb(PlayerContext* owner) : BoardPiece(BOMB, UNDEF, owner) {};
 };
 
-class Joker : public Piece
+class Joker : public BoardPiece
 {
 	ePieceType currentType;
 
@@ -121,15 +111,10 @@ public:
 	{
 		return true;
 	}
-
-	char getJokerRep() const override // ONLY for Joker: R, P, S or B -- non-Joker may return ‘#’
-	{
-		return getType();
-	}
 };
 
 
-Piece* createNewPiece(PlayerContext* owner, ePieceType type, ePieceType jokerType = UNDEF);
+BoardPiece* createNewPiece(PlayerContext* owner, ePieceType type, ePieceType jokerType = UNDEF);
 
 #endif //_PIECE_
 

@@ -356,7 +356,7 @@ void Game::printBoard()
 {
 	UINT rows, cols, i, j;
 	board->getBoardDimensions(&cols, &rows);
-	Piece* piece;
+	BoardPiece* piece;
 	bool isPlayer1 = false;
 
 #if DEBUG == 1
@@ -398,7 +398,7 @@ void Game::printBoard()
 void Game::writeOutputFile()
 {
 	UINT rows, cols, i, j;
-	Piece* piece;
+	BoardPiece* piece;
 	bool isPlayer1 = false;
 	char c;
 	int winner;
@@ -448,7 +448,7 @@ void Game::positionAllPieces()
 {
 	UINT x, y;
 	ePieceType type, jokerType;
-	Piece* p = nullptr;
+	BoardPiece* p = nullptr;
 	unique_ptr<MyFightInfo> pFight;
 	vector<unique_ptr<PiecePosition>> p1PieceVec(0), p2PieceVec(0);
 	vector<unique_ptr<FightInfo>> fightVec(0);
