@@ -85,7 +85,7 @@
     <ClInclude Include="MyPiecePosition.h" />
     <ClInclude Include="MyPoint.h" />
     <ClInclude Include="parser.h" />
-    <ClInclude Include="piece.h" />
+    <ClInclude Include="BoardPiece.h" />
     <ClInclude Include="PiecePosition.h" />
     <ClInclude Include="PlayerContext.h" />
     <ClInclude Include="PlayerAlgorithm.h" />
@@ -103,7 +103,7 @@
     <ClCompile Include="MyPiecePosition.cpp" />
     <ClCompile Include="MyPoint.cpp" />
     <ClCompile Include="parser.cpp" />
-    <ClCompile Include="piece.cpp" />
+    <ClCompile Include="BoardPiece.cpp" />
     <ClCompile Include="PlayerContext.cpp" />
     <ClCompile Include="InitalPositionsUtilities.cpp" />
   </ItemGroup>

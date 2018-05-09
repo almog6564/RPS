@@ -6,11 +6,11 @@ using namespace std;
 
 MyBoard::MyBoard(UINT N, UINT M) : rows(N), cols(M)
 {
-	table = new Piece**[N];
+	table = new BoardPiece**[N];
 
 	for (UINT i = 0; i < N; i++)
 	{
-		table[i] = new Piece*[M]();
+		table[i] = new BoardPiece*[M]();
 	}
 }
 
@@ -18,7 +18,7 @@ int MyBoard::getPlayer(const Point& pos) const
 {
 	UINT col, row;
 	int ret = 0;
-	Piece* p = nullptr;
+	BoardPiece* p = nullptr;
 
 	do 
 	{
@@ -40,7 +40,7 @@ int MyBoard::getPlayer(const Point& pos) const
 	return ret;
 }
 
-Piece* MyBoard::getPieceAt(UINT col, UINT row) 
+BoardPiece* MyBoard::getPieceAt(UINT col, UINT row) 
 {
 	if (col > cols || row > rows || row < 1 || col < 1)
 		return nullptr;
@@ -48,7 +48,7 @@ Piece* MyBoard::getPieceAt(UINT col, UINT row)
 	return table[row-1][col-1];
 }
 
-void MyBoard::setPieceAt(Piece* p, UINT col, UINT row)
+void MyBoard::setPieceAt(BoardPiece* p, UINT col, UINT row)
 {
 	if (col > cols || row > rows || row < 1 || col < 1)
 		return;
@@ -66,7 +66,7 @@ void MyBoard::removePiece(UINT col, UINT row)
 	if (col > cols || row > rows || row < 1 || col < 1)
 		return;
 	
-	Piece* p = table[row - 1][col - 1];
+	BoardPiece* p = table[row - 1][col - 1];
 
 	if (p)
 	{
@@ -93,9 +93,9 @@ void MyBoard::clearBoard()
 /**
  * This function assumes legal dimensions.
 */
-int MyBoard::positionPiece(Piece* newPiece, UINT toX, UINT toY, unique_ptr<MyFightInfo>& fight, int moved, UINT fromX, UINT fromY)
+int MyBoard::positionPiece(BoardPiece* newPiece, UINT toX, UINT toY, unique_ptr<MyFightInfo>& fight, int moved, UINT fromX, UINT fromY)
 {
-	Piece* existingPiece;
+	BoardPiece* existingPiece;
 	eScore score;
 	PlayerContext* newPieceOwner, *existingPieceOwner;
 	ePieceType type, originalType, existingPieceType;
@@ -105,7 +105,7 @@ int MyBoard::positionPiece(Piece* newPiece, UINT toX, UINT toY, unique_ptr<MyFig
 	newPieceOwner = newPiece->getOwner();
 
 	existingPiece = getPieceAt(toX, toY);
-	if (!existingPiece) //Piece was not found
+	if (!existingPiece) //BoardPiece was not found
 	{
 		setPieceAt(newPiece, toX, toY);
 
@@ -236,7 +236,7 @@ int MyBoard::positionPiece(Piece* newPiece, UINT toX, UINT toY, unique_ptr<MyFig
 
 int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY, unique_ptr<MyFightInfo>& fightInfo)
 {
-	Piece* p1;
+	BoardPiece* p1;
 	UINT p1PlayerId;
 	ePieceType type;
 
@@ -259,7 +259,7 @@ int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY
 	}
 
 	p1 = getPieceAt(fromX, fromY);
-	if (!p1) //Piece was not found
+	if (!p1) //BoardPiece was not found
 	{
 		printf("[Board::movePiece] no piece at fromX <%d> fromY <%d>\n", fromX, fromY);
 		return ERROR;
@@ -311,7 +311,7 @@ int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY
 
 int MyBoard::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
 {
-	Piece* p1;
+	BoardPiece* p1;
 
 	if (fromX > cols || fromY > rows || fromX < 1 || fromY < 1)
 	{
@@ -320,7 +320,7 @@ int MyBoard::changeJokerType(UINT fromX, UINT fromY, ePieceType newType)
 	}
 
 	p1 = getPieceAt(fromX, fromY);
-	if (!p1) //Piece was not found
+	if (!p1) //BoardPiece was not found
 	{
 		printf("changeJokerType: no piece at fromX <%d> fromY <%d>\n", fromX, fromY);
 		return -1;

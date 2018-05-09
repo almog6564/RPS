@@ -32,7 +32,7 @@ public:
 
 	const Point& getPosition() const
 	{
-		return *(position);
+		return *position;
 	}
 
 	char getPiece(int player) const // R, P, S, B or F (but NOT J)
