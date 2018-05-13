@@ -71,10 +71,10 @@ int generateUniqueCorner(RandomContext &rndCtx, vector<bool>& selectedCorners)
 
 	do
 	{
-		select = rndCtx.getRandomCol();
+		select = rndCtx.getRandomCorner();
 
 		if (selectedCorners[select] == true) //already flag on this corner
-			select = rndCtx.getRandomCol();
+			select = rndCtx.getRandomCorner();
 		else
 		{
 			selectedCorners[select] = true;

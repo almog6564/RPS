@@ -102,7 +102,7 @@ int MyBoard::positionPiece(BoardPiece* newPiece, UINT toX, UINT toY, unique_ptr<
 	char typeChar, existingPieceTypeChar;
 
 	type = newPiece->getType();
-	typeChar = typeChar;
+	typeChar = pieceToChar(type);
 	originalType = newPiece->getOriginalType();
 	newPieceOwner = newPiece->getOwner();
 
@@ -126,7 +126,7 @@ int MyBoard::positionPiece(BoardPiece* newPiece, UINT toX, UINT toY, unique_ptr<
 	{
 
 		existingPieceType = existingPiece->getType();
-		existingPieceTypeChar = existingPieceTypeChar;
+		existingPieceTypeChar = pieceToChar(existingPieceType);
 		existingPieceOwner = existingPiece->getOwner();
 
 		if (newPieceOwner == existingPieceOwner)
