@@ -1,8 +1,8 @@
 
 
 #include "AutoPlayerAlgorithm.h"
-#include "MyMove.h"
-
+#include <algorithm>
+#include <list>
 using namespace std;
 
 
@@ -161,8 +161,9 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToMove()
 {
 	++nextPieceToMove;
-	while (nextPieceToMove != boardSet.end())
+	while (nextPieceToMove != boardSet.end()) 
 	{
+		//save iterator of current,iterate until reached current, when reached end return to begin
 		char tempType = (nextPieceToMove)->getPiece();
 		char tempJoker = (nextPieceToMove)->getJokerRep();
 		if (tempType == 'P' || tempType == 'S' || tempType == 'R' ||
@@ -187,7 +188,7 @@ const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToAttack()
 	return *nextPieceToAttack; //return the piece inside the iterator
 }
 
-unique_ptr<Move> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & piece, vector<bool> boolVec, int x, int y)
+unique_ptr<Move> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & piece, vector<bool>& boolVec, int x, int y)
 {
 	if (checkForAdjecentOpponent(piece, MyPiecePosition(x - 1, y)))
 	{
@@ -249,7 +250,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyP
 	return nullptr;
 }
 
-//pos will be recieved as a lvalue reference, and other as rvalue reference
+//pos will be received as a lvalue reference, and other as rvalue reference
 bool AutoPlayerAlgorithm::checkForAdjecentOpponent(const MyPiecePosition& pos, const MyPiecePosition other)
 {
 	MyPoint point = pos.getPosition();
@@ -260,28 +261,137 @@ bool AutoPlayerAlgorithm::checkForAdjecentOpponent(const MyPiecePosition& pos, c
 
 unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 {
+	unique_ptr<Move> nextMove;
+	vector<bool> fleeArr = { true, true, true, true }; //[left, right, up, down]
+
 	/*look for potential win or flee*/
 	for (auto& piece : boardSet)
 	{
-		vector<bool> fleeArr = { true, true, true, true }; //[left, right, up, down]
+		
 		const MyPoint point = piece.getPosition();
 		int x = point.getX(), y = point.getY();
-		unique_ptr<Move> nextMove = checkAllAdjecentOpponents(piece, fleeArr, x, y);
+		nextMove = move(checkAllAdjecentOpponents(piece, fleeArr, x, y));
+
 		if (nextMove)
+		{
 			return move(nextMove);
-		
-		//flee(fleeArr&)
+		}
+		else if( find(fleeArr.begin(), fleeArr.end(), false) != fleeArr.end())
+		{
+			//if not all are true, it means that there is an opponent piece stronger than me,
+			//try to flee from it
+			nextMove = move(getLegalMove(point, fleeArr));
+
+			if (nextMove)
+			{
+				return move(nextMove);
+			}
+		}
 	}
 
 	/*perform random move*/
-	MyPiecePosition nextPieceToMove = getNextPieceToMove();
-	MyPoint point = nextPieceToMove.getPosition();
+	
+	do 
+	{
+		const MyPiecePosition& nextPieceToMove = getNextPieceToMove();
+		MyPoint point = nextPieceToMove.getPosition();
 
-	return unique_ptr<Move>();
+		nextMove = move(getLegalMove(point));
+		if (nextMove)
+			break;
+
+	} while (true);
+	
+	//TODOS: 1. joker change 2. get next piece 3. end of get move
+
 }
 
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
 	
 	return nullptr;
+}
+
+unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point)
+{
+	vector<bool> legalDirections = { true, true, true, true };
+
+	return move(getLegalMove(point, legalDirections));
+
+}
+
+bool AutoPlayerAlgorithm::existsOnBoardSet(const MyPoint& point)
+{
+	return boardSet.count(MyPiecePosition(point.getX(), point.getY())) > 0;
+}
+
+const MyPoint getPointByDirection(const MyPoint& point, int direction)
+{
+	switch (direction)
+	{
+	case 0:
+		return MyPoint(point.getX() - 1, point.getY()); //left
+		
+	case 1:
+		return MyPoint(point.getX() + 1, point.getY()); //right
+		
+	case 2:
+		return MyPoint(point.getX(), point.getY() + 1); //up
+
+	case 3:
+		return MyPoint(point.getX(), point.getY() - 1); //down
+	}
+
+	//should not get here
+
+	printf("Error: Illegal Direction in getPointByDirection\n");
+
+	return point;
+}
+
+unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, vector<bool>& legalFleeDirections)
+{
+	vector<int> possibleMoves(0);
+	int chosenDirection = 0;
+
+	/* Get all directions that does not include opponent piece*/
+	for (int i = 0; i < 4; i++)
+	{
+		if (legalFleeDirections[i])
+			possibleMoves.push_back(i);
+	}
+
+	/* If there is no available direction than cannot find legal move which is not a fight */
+
+	if(possibleMoves.size() == 0)
+		return unique_ptr<MyMove>(nullptr);
+
+
+	/* Remove a direction which include a piece of ours */
+
+	for (auto move = possibleMoves.begin(); move != possibleMoves.end(); move++)
+	{
+		if (existsOnBoardSet(getPointByDirection(point,*move)))
+		{
+			possibleMoves.erase(move);
+		}
+	}
+
+	/* If there is no available direction than cannot find legal move return no move */
+
+	if (possibleMoves.size() == 0)
+		return unique_ptr<MyMove>(nullptr);
+
+	if (possibleMoves.size() > 1) 
+	{
+		random_device	seed;
+		mt19937			gen(seed());
+		uniform_int_distribution<> genDirection(0, (int) possibleMoves.size() - 1);
+		chosenDirection = genDirection(gen);
+	}
+
+	const MyPoint& chosenDirectionPoint = getPointByDirection(point, chosenDirection);
+
+	return make_unique<MyMove>(point.getX(), point.getY(),
+		chosenDirectionPoint.getX(), chosenDirectionPoint.getY());
 }

@@ -5,6 +5,7 @@
 #include "defs.h"
 #include <unordered_set>
 #include "MyPiecePosition.h"
+#include "MyMove.h"
 #include <random>
 
 class PositioningScenario;
@@ -47,11 +48,14 @@ private:
 
 	bool checkForAdjecentOpponent(const MyPiecePosition& pos, const MyPiecePosition other);
 
-	unique_ptr<Move> checkAllAdjecentOpponents(const MyPiecePosition& piece, vector<bool> boolVec, int x, int y);
+	unique_ptr<Move> checkAllAdjecentOpponents(const MyPiecePosition& piece, vector<bool>& boolVec, int x, int y);
 
 	unique_ptr<JokerChange> checkAllAdjecentOpponents(const MyPiecePosition & joker, int x, int y);
 
+	std::unique_ptr<MyMove> getLegalMove(const MyPoint& point);
+	std::unique_ptr<MyMove> getLegalMove(const MyPoint& point, std::vector<bool>& fleeArr);
 
+	bool existsOnBoardSet(const MyPoint& point);
 
 public:
 	AutoPlayerAlgorithm(UINT boardRows, UINT boardCols,

@@ -22,6 +22,12 @@ public:
 		row = other.getY();
 	}
 
+	MyPoint(const MyPoint& other) //copy c'tor
+	{
+		col = other.getX();
+		row = other.getY();
+	}
+
 	int getX() const override
 	{
 		return col;
