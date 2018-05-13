@@ -336,6 +336,22 @@ bool AutoPlayerAlgorithm::existsOnBoardSet(const MyPoint& point)
 	return boardSet.count(MyPiecePosition(point.getX(), point.getY())) > 0;
 }
 
+void AutoPlayerAlgorithm::removeOutOfBoundsDirections(const MyPoint& point, vector<bool>& legalFleeDirections)
+{
+	//[left, right, up, down]
+	if (point.getX() == 1)
+		legalFleeDirections[0] = false;
+
+	else if (point.getX() == boardCols - 1)
+		legalFleeDirections[1] = false;
+
+	if (point.getY() == 1)
+		legalFleeDirections[2] = false;
+
+	else if (point.getY() == boardRows - 1)
+		legalFleeDirections[3] = false;
+}
+
 const MyPoint getPointByDirection(const MyPoint& point, int direction)
 {
 	switch (direction)
@@ -364,6 +380,8 @@ unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, vecto
 {
 	vector<int> possibleMoves(0);
 	int chosenDirection = 0;
+
+	removeOutOfBoundsDirections(point, legalFleeDirections);
 
 	/* Get all directions that does not include opponent piece*/
 	for (int i = 0; i < 4; i++)

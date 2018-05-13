@@ -57,6 +57,7 @@ private:
 
 	bool existsOnBoardSet(const MyPoint& point);
 
+	void removeOutOfBoundsDirections(const MyPoint& point, vector<bool>& legalFleeDirections);
 public:
 	AutoPlayerAlgorithm(UINT boardRows, UINT boardCols,
 		UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID);
