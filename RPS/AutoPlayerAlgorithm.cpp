@@ -99,7 +99,7 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 			if (owner == 0 || owner == ID) //Point is empty or owned by player
 				continue;
 			else
-				opponentsPieces.emplace(i, j);
+				opponentsPieces.emplace(j, i);
 		}
 	}
 	for (auto& fight : fights)
@@ -107,9 +107,11 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 		if (fight->getWinner() != ID) //player lost fight, remove piece from players set, and update piece type
 		{
 			MyPoint tempPoint = fight->getPosition();
+			int x = tempPoint.getX(), y = tempPoint.getY();
 			char type = fight->getPiece(ID == 1 ? 2 : 1);
-			boardSet.erase(boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
-			auto& piece = *opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
+			boardSet.erase(boardSet.find(MyPiecePosition(x, y)));
+			auto& piece = *opponentsPieces.find(MyPiecePosition(x, y));
+				
 			piece.setPieceType(type);
 			if (type == 'P' || type == 'R' || type == 'S')
 				piece.setMovingPiece(true);
