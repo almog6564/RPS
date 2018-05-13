@@ -270,6 +270,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 {
 	unique_ptr<Move> nextMove;
 	vector<bool> fleeArr = { true, true, true, true }; //[left, right, up, down]
+	bool foundMove = false;
 
 	/*look for potential win or flee*/
 	for (auto& piece : boardSet)
@@ -283,7 +284,8 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 
 		if (nextMove)
 		{
-			return move(nextMove);
+			foundMove = true;
+			break;
 		}
 		else if( find(fleeArr.begin(), fleeArr.end(), false) != fleeArr.end())
 		{
@@ -293,28 +295,44 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 
 			if (nextMove)
 			{
-				return move(nextMove);
+				foundMove = true;
+				break;
 			}
+				
 		}
 	}
-
-	/*perform random move*/
-	MyPiecePosition nextPieceToMove = getNextPieceToMove();
-	MyPiecePosition firstPieceToMove = nextPieceToMove;
-	do 
+	if (!foundMove)
 	{
-		MyPoint point = nextPieceToMove.getPosition();
-		nextMove = move(getLegalMove(point));
-		if (nextMove)
-			break;
-		nextPieceToMove = getNextPieceToMove();
-		if (nextPieceToMove == firstPieceToMove)
-			return nullptr; //no moves to do
+		/*perform random move*/
+		MyPiecePosition nextPieceToMove = getNextPieceToMove();
+		MyPiecePosition firstPieceToMove = nextPieceToMove;
+		do
+		{
+			MyPoint point = nextPieceToMove.getPosition();
+			nextMove = move(getLegalMove(point));
+			if (nextMove)
+				break;
+			nextPieceToMove = getNextPieceToMove();
+			if (nextPieceToMove == firstPieceToMove)
+				return nullptr; //no moves to do
+		} while (true);
+	}
+
+	if (!nextMove)
+	{
+		dprint("/******in getMove got null******/\n");
+		return nullptr;
+	}
 		
 
-	} while (true);
+	//update player's board
+	auto& t = *boardSet.find(MyPiecePosition(nextMove->getFrom().getX(), nextMove->getFrom().getY()));
+	char type = t.getPiece();
+	boardSet.erase(t);
+	boardSet.insert(MyPiecePosition(nextMove->getTo().getX(), nextMove->getTo().getY(), type, true));
+
 	return move(nextMove);
-	
+
 	//TODOS: 1. joker change
 
 }
