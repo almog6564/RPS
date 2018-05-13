@@ -342,13 +342,13 @@ void AutoPlayerAlgorithm::removeOutOfBoundsDirections(const MyPoint& point, vect
 	if (point.getX() == 1)
 		legalFleeDirections[0] = false;
 
-	else if (point.getX() == boardCols - 1)
+	else if (point.getX() == (int) boardCols)
 		legalFleeDirections[1] = false;
 
 	if (point.getY() == 1)
 		legalFleeDirections[2] = false;
 
-	else if (point.getY() == boardRows - 1)
+	else if (point.getY() == (int) boardRows)
 		legalFleeDirections[3] = false;
 }
 
@@ -386,30 +386,16 @@ unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, vecto
 	/* Get all directions that does not include opponent piece*/
 	for (int i = 0; i < 4; i++)
 	{
-		if (legalFleeDirections[i])
+		//if move is legal already and the to Point does not contain a piece of ours
+		if (legalFleeDirections[i] && !existsOnBoardSet(getPointByDirection(point, i)))
 			possibleMoves.push_back(i);
 	}
 
 	/* If there is no available direction than cannot find legal move which is not a fight */
 
 	if(possibleMoves.size() == 0)
-		return unique_ptr<MyMove>(nullptr);
+		return nullptr;
 
-
-	/* Remove a direction which include a piece of ours */
-
-	for (auto move = possibleMoves.begin(); move != possibleMoves.end(); move++)
-	{
-		if (existsOnBoardSet(getPointByDirection(point,*move)))
-		{
-			possibleMoves.erase(move);
-		}
-	}
-
-	/* If there is no available direction than cannot find legal move return no move */
-
-	if (possibleMoves.size() == 0)
-		return unique_ptr<MyMove>(nullptr);
 
 	if (possibleMoves.size() > 1) 
 	{
@@ -418,8 +404,9 @@ unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, vecto
 		uniform_int_distribution<> genDirection(0, (int) possibleMoves.size() - 1);
 		chosenDirection = genDirection(gen);
 	}
+	//else it already is 0 and it will take the first and only element
 
-	const MyPoint& chosenDirectionPoint = getPointByDirection(point, chosenDirection);
+	const MyPoint& chosenDirectionPoint = getPointByDirection(point, possibleMoves[chosenDirection]);
 
 	return make_unique<MyMove>(point.getX(), point.getY(),
 		chosenDirectionPoint.getX(), chosenDirectionPoint.getY());
