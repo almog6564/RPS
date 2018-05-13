@@ -260,7 +260,7 @@ bool AutoPlayerAlgorithm::checkForAdjecentOpponent(const MyPiecePosition& pos, c
 
 unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 {
-	/*look for petential win or flee*/
+	/*look for potential win or flee*/
 	for (auto& piece : boardSet)
 	{
 		vector<bool> fleeArr = { true, true, true, true }; //[left, right, up, down]
