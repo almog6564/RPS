@@ -1,7 +1,7 @@
 COMP = g++-5.3.0
 #put all your object files here
 OBJS = parser.o MyPoint.o MyJokerChange.o MyMove.o MyFightInfo.o PlayerContext.o \
-	MyPiecePosition.o piece.o myBoard.o InitalPositionsUtilities.o \
+	MyPiecePosition.o BoardPiece.o myBoard.o InitalPositionsUtilities.o \
 	AutoPlayerAlgorithm.o FilePlayerAlgorithm.o game.o main.o 
 
 #The executabel filename DON'T CHANGE
@@ -44,11 +44,11 @@ MyPiecePosition.o: MyPiecePosition.cpp MyPiecePosition.h PiecePosition.h \
  defs.h MyPoint.h Point.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
-piece.o: piece.cpp piece.h defs.h MyPiecePosition.h PiecePosition.h \
+BoardPiece.o: BoardPiece.cpp BoardPiece.h defs.h MyPiecePosition.h PiecePosition.h \
  MyPoint.h Point.h PlayerContext.h parser.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
-myBoard.o: myBoard.cpp myBoard.h piece.h defs.h PiecePosition.h \
+myBoard.o: myBoard.cpp myBoard.h BoardPiece.h defs.h PiecePosition.h \
  PlayerContext.h parser.h MyPoint.h Point.h Board.h MyFightInfo.h \
  FightInfo.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
@@ -70,13 +70,13 @@ FilePlayerAlgorithm.o: FilePlayerAlgorithm.cpp FilePlayerAlgorithm.h \
  MyPiecePosition.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
-game.o: game.cpp game.h defs.h PlayerContext.h parser.h myBoard.h piece.h \
+game.o: game.cpp game.h defs.h PlayerContext.h parser.h myBoard.h BoardPiece.h \
  PiecePosition.h MyPoint.h Point.h Board.h MyFightInfo.h FightInfo.h \
  AutoPlayerAlgorithm.h PlayerAlgorithm.h Move.h JokerChange.h \
  FilePlayerAlgorithm.h MyMove.h MyJokerChange.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
-main.o: main.cpp game.h defs.h PlayerContext.h parser.h myBoard.h piece.h \
+main.o: main.cpp game.h defs.h PlayerContext.h parser.h myBoard.h BoardPiece.h \
  PiecePosition.h MyPoint.h Point.h Board.h MyFightInfo.h FightInfo.h \
  AutoPlayerAlgorithm.h PlayerAlgorithm.h Move.h JokerChange.h \
  FilePlayerAlgorithm.h

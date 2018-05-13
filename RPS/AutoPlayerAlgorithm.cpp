@@ -229,24 +229,24 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyP
 	if (checkForAdjecentOpponent(joker, MyPiecePosition(x - 1, y)))
 	{
 		if (!(joker >= MyPiecePosition(x - 1, y))) //potential lose
-			;//return make_unique<MyMove>(x, y, x - 1, y);
+		{};//return make_unique<MyMove>(x, y, x - 1, y);
 	}
 
 	if (checkForAdjecentOpponent(joker, MyPiecePosition(x + 1, y)))
 	{
 		if (!(joker >= MyPiecePosition(x + 1, y))) //potential lose
-			;//return make_unique<MyMove>(x, y, x + 1, y);
+		{};//return make_unique<MyMove>(x, y, x + 1, y);
 	}
 	if (checkForAdjecentOpponent(joker, MyPiecePosition(x, y + 1)))
 	{
 		if (!(joker >= MyPiecePosition(x, y + 1))) //potential lose
-			;// return make_unique<MyMove>(x, y, x, y + 1);
+		{};// return make_unique<MyMove>(x, y, x, y + 1);
 
 	}
 	if (!(checkForAdjecentOpponent(joker, MyPiecePosition(x, y - 1)))) //potential lose
 	{
 		if (joker >= MyPiecePosition(x, y - 1)) //potential win
-			;// return make_unique<MyMove>(x, y, x, y - 1);
+		{};// return make_unique<MyMove>(x, y, x, y - 1);
 
 	}
 	return nullptr;
