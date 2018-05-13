@@ -24,6 +24,10 @@ class Game
 	
 	void runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAlgo);
 
+	void gameNotifyFightResult(unique_ptr<MyFightInfo>& fightInfo);
+
+	void gameNotifyOnOpponnentMove(PlayerContext* playerContext, unique_ptr<Move>& move);
+
 	void checkPlayersFlagCountLessThanMax(PlayerContext* player);
 
 public:
@@ -33,16 +37,6 @@ public:
 
 
 	~Game();
-	/*
-	Before starting the actual game (i.e. positioning, matching and moving pieces), this function checks
-	whether the board files are valid (i.e. correct formats and no two pieces at the same location by the 
-	same player).
-		@returns -
-			0 - board files are valid, can start game.
-			-1 - one or both board files are not valid, the player(s) with the invalid board will be set has
-				a losing player with the corresponding result.
-	*/
-	int validatePositionFiles();
 
 	/*
 	Before starting to move pieces according to moving files, this function makes sure that for both players

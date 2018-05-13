@@ -101,21 +101,9 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 			return;
 		}
 
-		if (playerContext->getPlayerId() == 0) //player 1
-		{
-			player2Algorithm->notifyOnOpponentMove(*move);
-		}
-		else //player 2
-		{
-			player1Algorithm->notifyOnOpponentMove(*move);
-		}
+		gameNotifyOnOpponnentMove(playerContext, move);
 
-		if (fightInfo) //if there was a fight
-		{
-			player1Algorithm->notifyFightResult(*fightInfo);
-			player2Algorithm->notifyFightResult(*fightInfo);
-		}
-			
+		gameNotifyFightResult(fightInfo);
 		
 		auto jokerChange = playerAlgo->getJokerChange();
 		if (jokerChange)
@@ -134,6 +122,27 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 		checkWhetherFlagsWereCaptured();
 
 	} while (false);
+}
+
+void Game::gameNotifyFightResult(unique_ptr<MyFightInfo>& fightInfo)
+{
+	if (fightInfo) //if there was a fight
+	{
+		player1Algorithm->notifyFightResult(*fightInfo);
+		player2Algorithm->notifyFightResult(*fightInfo);
+	}
+}
+
+void Game::gameNotifyOnOpponnentMove(PlayerContext* playerContext, unique_ptr<Move>& move)
+{
+	if (playerContext->getPlayerId() == 0) //player 1
+	{
+		player2Algorithm->notifyOnOpponentMove(*move);
+	}
+	else //player 2
+	{
+		player1Algorithm->notifyOnOpponentMove(*move);
+	}
 }
 
 void Game::checkPlayersFlagCountLessThanMax(PlayerContext* player)
@@ -157,39 +166,6 @@ bool Game::endGame()
 		|| player2Context->getHasMoreMoves()))
 		return false;
 	return true;
-}
-
-int Game::validatePositionFiles()
-{
-	/* Initialize temporary boolean array to check if theres pieces from the same player*/
-	bool** tmpBoard = new bool*[N];
-
-	for (UINT i = 0; i < N; i++)
-		tmpBoard[i] = new bool[M]();	//() initializes the elements to false
-
-	//player1Context->validatePlayerPositions(tmpBoard, N, M);
-
-	dprint("validatePlayerPositions #1 %s\n",player1Context->getHasLost() ? "FAILED" : "SUCCESS");
-
-	for (UINT i = 0; i < N; i++)
-		for (UINT j = 0; j < M; j++)
-			tmpBoard[i][j] = false;
-
-	//player2Context->validatePlayerPositions(tmpBoard, N, M);
-
-	dprint("validatePlayerPositions #2 %s\n", player2Context->getHasLost() ? "FAILED" : "SUCCESS");
-
-
-	for (UINT i = 0; i < N; i++)
-		delete [] tmpBoard[i];
-
-	delete [] tmpBoard;
-
-	if (player1Context->getHasLost() || player2Context->getHasLost())
-		return -1;
-	return 0;
-
-
 }
 
 void Game::checkWhetherFlagsWereCaptured(void)

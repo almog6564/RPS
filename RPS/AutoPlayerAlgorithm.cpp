@@ -299,6 +299,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 		nextMove = move(getLegalMove(point));
 		if (nextMove)
 			break;
+		
 
 	} while (true);
 	

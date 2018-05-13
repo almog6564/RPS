@@ -23,11 +23,7 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 	UINT pieceCounter = 0;
 
 	/* Initialize temporary boolean array to check if theres pieces from the same player*/
-	bool** tmpBoard = new bool*[rows];
-
-	for (UINT i = 0; i < rows; i++)
-		tmpBoard[i] = new bool[cols]();	//() initializes the elements to false
-
+	vector<vector<bool>> tmpBoard(rows, vector<bool>(cols, 0));
 
 	while (status == FILE_SUCCESS)
 	{
@@ -82,11 +78,6 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 
 	if(status == FILE_EOF_REACHED)
 		playerFileContext.setPieceFileToStart();
-
-	for (UINT i = 0; i < rows; i++)
-		delete[] tmpBoard[i];
-
-	delete[] tmpBoard;
 
 	return pieceCounter;
 }
