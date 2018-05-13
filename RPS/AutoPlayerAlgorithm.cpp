@@ -110,15 +110,17 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 			int x = tempPoint.getX(), y = tempPoint.getY();
 			char type = fight->getPiece(ID == 1 ? 2 : 1);
 			boardSet.erase(boardSet.find(MyPiecePosition(x, y)));
-			auto& piece = *opponentsPieces.find(MyPiecePosition(x, y));
-				
-			piece.setPieceType(type);
-			if (type == 'P' || type == 'R' || type == 'S')
-				piece.setMovingPiece(true);
+			auto it = opponentsPieces.find(MyPiecePosition(x, y));
+			if (it != opponentsPieces.end())
+			{
+				it->setPieceType(type);
+				if (type == 'P' || type == 'R' || type == 'S')
+					it->setMovingPiece(true);
+			}
 		}
 	}
 	nextPieceToMove = boardSet.begin(); //start with first piece
-	nextPieceToAttack = opponentsPieces.begin();
+	//nextPieceToAttack = opponentsPieces.begin();
 }
 
 

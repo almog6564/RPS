@@ -91,7 +91,7 @@ struct PiecePositionHasher
 {
 	size_t operator()(const PiecePosition & obj) const
 	{
-		return (size_t)(obj.getPosition().getX() << 16 || obj.getPosition().getY());
+		return (size_t)(obj.getPosition().getX() << 16 | obj.getPosition().getY());
 	}
 };
 
