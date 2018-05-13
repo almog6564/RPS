@@ -99,8 +99,10 @@ int MyBoard::positionPiece(BoardPiece* newPiece, UINT toX, UINT toY, unique_ptr<
 	eScore score;
 	PlayerContext* newPieceOwner, *existingPieceOwner;
 	ePieceType type, originalType, existingPieceType;
+	char typeChar, existingPieceTypeChar;
 
 	type = newPiece->getType();
+	typeChar = typeChar;
 	originalType = newPiece->getOriginalType();
 	newPieceOwner = newPiece->getOwner();
 
@@ -114,7 +116,7 @@ int MyBoard::positionPiece(BoardPiece* newPiece, UINT toX, UINT toY, unique_ptr<
 		else
 		{
 			dprint("Player #%d moved its %c [if J: %c] from (%d,%d) to (%d,%d)\n",
-				newPieceOwner->getPlayerId()+1, pieceToChar(originalType), pieceToChar(type),
+				newPieceOwner->getPlayerId()+1, pieceToChar(originalType), typeChar,
 				fromX, fromY, toX, toY);
 			setPieceAt(nullptr, fromX, fromY);
 		}
@@ -124,6 +126,7 @@ int MyBoard::positionPiece(BoardPiece* newPiece, UINT toX, UINT toY, unique_ptr<
 	{
 
 		existingPieceType = existingPiece->getType();
+		existingPieceTypeChar = existingPieceTypeChar;
 		existingPieceOwner = existingPiece->getOwner();
 
 		if (newPieceOwner == existingPieceOwner)
@@ -139,21 +142,21 @@ int MyBoard::positionPiece(BoardPiece* newPiece, UINT toX, UINT toY, unique_ptr<
 		}
 
 		dprint("MATCH: Player#%d [%c already at (%d,%d)] VS Player #%d [%c from (%d,%d)] ... ",
-			existingPieceOwner->getPlayerId()+1, pieceToChar(existingPiece->getType()), toX, toY, 
-			newPieceOwner->getPlayerId()+1, pieceToChar(type), 
+			existingPieceOwner->getPlayerId()+1, existingPieceTypeChar, toX, toY,
+			newPieceOwner->getPlayerId()+1, typeChar, 
 			(moved) ? fromX : toX, (moved) ? fromY : toY);
 
 		if (type == BOMB || existingPieceType == BOMB)
 		{
 			if (type != existingPieceType)
 			{
-				fight.reset(new MyFightInfo(toX, toY, type, existingPieceType, type == BOMB ? newPieceOwner->getPlayerId() + 1 : existingPieceOwner->getPlayerId() + 1));
+				fight.reset(new MyFightInfo(toX, toY, typeChar, existingPieceTypeChar, type == BOMB ? newPieceOwner->getPlayerId() + 1 : existingPieceOwner->getPlayerId() + 1));
 
 				dprint("Player #%d WINS!\n", type == BOMB ? newPieceOwner->getPlayerId()+1 : existingPieceOwner->getPlayerId()+1);
 			}
 			else
 			{
-				fight.reset(new MyFightInfo(toX, toY, type, existingPieceType, 0));
+				fight.reset(new MyFightInfo(toX, toY, typeChar, existingPieceTypeChar, 0));
 				dprint("It's a TIE!\n");
 			}
 
@@ -187,13 +190,13 @@ int MyBoard::positionPiece(BoardPiece* newPiece, UINT toX, UINT toY, unique_ptr<
 				if (newPieceOwner->incTypeCount(type, originalType))
 					return -1;
 			}
-			fight.reset(new MyFightInfo(toX, toY, type, existingPieceType, newPieceOwner->getPlayerId() + 1));
+			fight.reset(new MyFightInfo(toX, toY, typeChar, existingPieceTypeChar, newPieceOwner->getPlayerId() + 1));
 			dprint("Player #%d WINS!\n", newPieceOwner->getPlayerId()+1);
 			break;
 
 		case LOSE:
 
-			fight.reset(new MyFightInfo(toX, toY, type, existingPieceType, existingPieceOwner->getPlayerId() + 1));
+			fight.reset(new MyFightInfo(toX, toY, typeChar, existingPieceTypeChar, existingPieceOwner->getPlayerId() + 1));
 
 			dprint("Player #%d LOSES!\n", newPieceOwner->getPlayerId()+1);
 			if (moved)
@@ -205,7 +208,7 @@ int MyBoard::positionPiece(BoardPiece* newPiece, UINT toX, UINT toY, unique_ptr<
 		case TIE:
 			dprint("It's a TIE!\n");
 
-			fight.reset(new MyFightInfo(toX, toY, type, existingPieceType, 0));
+			fight.reset(new MyFightInfo(toX, toY, typeChar, existingPieceTypeChar, 0));
 
 			if (moved)
 				removePiece(fromX, fromY);
