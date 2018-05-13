@@ -162,6 +162,7 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 	}
 }
 
+//assumes at least one moving piece exists
 MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove()
 {
 	++nextPieceToMove;
