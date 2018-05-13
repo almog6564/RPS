@@ -42,7 +42,7 @@ private:
 
 	void fillListWithMovingPieces(std::vector<char>& movingPieceList, int bombUsed);
 
-	const MyPiecePosition& getNextPieceToMove();
+	MyPiecePosition getNextPieceToMove();
 
 	const MyPiecePosition & getNextPieceToAttack();
 
