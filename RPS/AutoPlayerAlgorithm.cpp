@@ -273,7 +273,9 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	/*look for potential win or flee*/
 	for (auto& piece : boardSet)
 	{
-		
+		if (!piece.isMoving())
+			continue;
+
 		const MyPoint point = piece.getPosition();
 		int x = point.getX(), y = point.getY();
 		nextMove = move(checkAllAdjecentOpponents(piece, fleeArr, x, y));
