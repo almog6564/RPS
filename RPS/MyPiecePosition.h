@@ -11,7 +11,7 @@ using namespace std;
 class MyPiecePosition : public PiecePosition
 {
 	mutable char pieceType;
-	unique_ptr<Point> position;
+	shared_ptr<Point> position;
 	char jokerRep;
 	mutable bool movingPiece; //initialized to false
 
@@ -20,15 +20,32 @@ public:
 
 	MyPiecePosition(UINT x, UINT y, char pieceType = '?', char jokerRep = '#', bool movingPiece = false);
 
+	MyPiecePosition(const MyPiecePosition& other) = default;
+
 	MyPiecePosition(MyPiecePosition& other) = default;
 
-	MyPiecePosition(const MyPiecePosition& other) //copy c'tor
+
+	MyPiecePosition& operator=(MyPiecePosition& other) = default;
+
+	MyPiecePosition& operator=(const MyPiecePosition& other) = default;
+
+	MyPiecePosition(MyPiecePosition&&) = default; //default move constructor
+
+
+	bool operator==(MyPiecePosition& other)
 	{
-		pieceType = other.pieceType;
-		jokerRep = other.jokerRep;
-		movingPiece = other.movingPiece;
-		position = make_unique<MyPoint>(other.getPosition().getX(), other.getPosition().getY());
+		if ((*position).getX() == (*other.position).getX() && (*position).getY() == (*other.position).getY())
+			return true;
+		return false;
 	}
+
+	bool operator==(const MyPiecePosition& other)
+	{
+		if ((*position).getX() == (*other.position).getX() && (*position).getY() == (*other.position).getY())
+			return true;
+		return false;
+	}
+
 
 	const Point& getPosition() const
 	{
@@ -67,7 +84,6 @@ public:
 		return true;
 	}
 
-	MyPiecePosition(MyPiecePosition&&) = default; //default move constructor
 
 };
 

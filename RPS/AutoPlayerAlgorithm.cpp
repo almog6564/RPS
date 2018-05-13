@@ -158,11 +158,13 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 	}
 }
 
-const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToMove()
+MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove()
 {
 	++nextPieceToMove;
-	while (nextPieceToMove != boardSet.end()) 
+	while (true) 
 	{
+		if (nextPieceToMove == boardSet.end())
+			nextPieceToMove = boardSet.begin();
 		//save iterator of current,iterate until reached current, when reached end return to begin
 		char tempType = (nextPieceToMove)->getPiece();
 		char tempJoker = (nextPieceToMove)->getJokerRep();
@@ -290,25 +292,28 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	}
 
 	/*perform random move*/
-	
+	MyPiecePosition nextPieceToMove = getNextPieceToMove();
+	MyPiecePosition firstPieceToMove = nextPieceToMove;
 	do 
 	{
-		const MyPiecePosition& nextPieceToMove = getNextPieceToMove();
 		MyPoint point = nextPieceToMove.getPosition();
-
 		nextMove = move(getLegalMove(point));
 		if (nextMove)
 			break;
+		nextPieceToMove = getNextPieceToMove();
+		if (nextPieceToMove == firstPieceToMove)
+			return nullptr; //no moves to do
+		
 
 	} while (true);
+	return move(nextMove);
 	
-	//TODOS: 1. joker change 2. get next piece 3. end of get move
+	//TODOS: 1. joker change
 
 }
 
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
-	
 	return nullptr;
 }
 
