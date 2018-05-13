@@ -18,18 +18,54 @@ class MyPiecePosition : public PiecePosition
 
 public:
 
-	MyPiecePosition(UINT x, UINT y, char pieceType = '?', char jokerRep = '#', bool movingPiece = false);
+	MyPiecePosition(UINT x, UINT y, char pieceType = '?', char jokerRep = '#');
 
-	MyPiecePosition(const MyPiecePosition& other) = default;
+	//MyPiecePosition(const MyPiecePosition& other) = default;
 
-	MyPiecePosition(MyPiecePosition& other) = default;
+	MyPiecePosition(const MyPiecePosition& other)
+	{
+		pieceType = other.pieceType;
+		position = other.position;
+		jokerRep = other.jokerRep;
+		movingPiece = other.movingPiece;
+	}
 
+	//MyPiecePosition(MyPiecePosition& other) = default;
+	MyPiecePosition(MyPiecePosition& other)
+	{
+		pieceType = other.pieceType;
+		position = other.position;
+		jokerRep = other.jokerRep;
+		movingPiece = other.movingPiece;
+	}
 
-	MyPiecePosition& operator=(MyPiecePosition& other) = default;
+	//MyPiecePosition& operator=(MyPiecePosition& other) = default;
+	MyPiecePosition& operator=(MyPiecePosition& other)
+	{
+		pieceType = other.pieceType;
+		position = other.position;
+		jokerRep = other.jokerRep;
+		movingPiece = other.movingPiece;
+		return *this;
+	}
 
-	MyPiecePosition& operator=(const MyPiecePosition& other) = default;
-
-	MyPiecePosition(MyPiecePosition&&) = default; //default move constructor
+	//MyPiecePosition& operator=(const MyPiecePosition& other) = default;
+	MyPiecePosition& operator=(const MyPiecePosition& other)
+	{
+		pieceType = other.pieceType;
+		position = other.position;
+		jokerRep = other.jokerRep;
+		movingPiece = other.movingPiece;
+		return *this;
+	}
+	//MyPiecePosition(MyPiecePosition&& other) = default; //default move constructor
+	MyPiecePosition(MyPiecePosition&& other)
+	{
+		pieceType = other.pieceType;
+		position = other.position;
+		jokerRep = other.jokerRep;
+		movingPiece = other.movingPiece;
+	}
 
 
 	bool operator==(MyPiecePosition& other)
@@ -45,7 +81,6 @@ public:
 			return true;
 		return false;
 	}
-
 
 	const Point& getPosition() const
 	{
