@@ -91,9 +91,9 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<FightInfo>>& fights)
 {
 	int owner;
-	for (UINT i = 1; i < boardRows; i++)
+	for (UINT i = 1; i <= boardRows; i++)
 	{
-		for (UINT j = 1; j < boardCols; j++)
+		for (UINT j = 1; j <= boardCols; j++)
 		{
 			owner = b.getPlayer(MyPoint(j, i)); 
 			if (owner == 0 || owner == ID) //Point is empty or owned by player
@@ -126,6 +126,12 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 
 void AutoPlayerAlgorithm::notifyOnOpponentMove(const Move & move)
 {
+	/*dprint("notifyOnOpponentMove of player %d: opponentsPieces.size = %d\n", ID+1, (int)opponentsPieces.size());
+	for (auto& p : opponentsPieces)
+	{
+		dprint("(%d,%d)[%c],  ", p.getPosition().getX(), p.getPosition().getY(), p.getPiece());
+	}
+	dprint("\nSearching for move (%d,%d)->(%d,%d)\n", move.getFrom().getX(), move.getFrom().getY(), move.getTo().getX(), move.getTo().getY());*/
 	//update opponent's piece, because the key is imutable, remove and insert a new piece
 	auto& t = *opponentsPieces.find(MyPiecePosition(move.getFrom().getX(), move.getFrom().getY()));
 	char type = t.getPiece();
@@ -195,7 +201,7 @@ const MyPiecePosition & AutoPlayerAlgorithm::getNextPieceToAttack()
 	return *nextPieceToAttack; //return the piece inside the iterator
 }
 
-unique_ptr<Move> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & piece, vector<bool>& boolVec, int x, int y)
+unique_ptr<Move> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & piece, std::bitset<4>& boolVec, int x, int y)
 {
 	if (checkForAdjecentOpponent(piece, MyPiecePosition(x - 1, y)))
 	{
@@ -269,7 +275,7 @@ bool AutoPlayerAlgorithm::checkForAdjecentOpponent(const MyPiecePosition& pos, c
 unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 {
 	unique_ptr<Move> nextMove;
-	vector<bool> fleeArr = { true, true, true, true }; //[left, right, up, down]
+	std::bitset<4> fleeArr(0xF); //[left, right, up, down]
 	bool foundMove = false;
 
 	/*look for potential win or flee*/
@@ -287,7 +293,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 			foundMove = true;
 			break;
 		}
-		else if( find(fleeArr.begin(), fleeArr.end(), false) != fleeArr.end())
+		else if( fleeArr.count() < 4 )
 		{
 			//if not all are true, it means that there is an opponent piece stronger than me,
 			//try to flee from it
@@ -344,7 +350,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 
 unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point)
 {
-	vector<bool> legalDirections = { true, true, true, true };
+	std::bitset<4> legalDirections(0xF);
 
 	return move(getLegalMove(point, legalDirections));
 
@@ -355,7 +361,7 @@ bool AutoPlayerAlgorithm::existsOnBoardSet(const MyPoint& point)
 	return boardSet.count(MyPiecePosition(point.getX(), point.getY())) > 0;
 }
 
-void AutoPlayerAlgorithm::removeOutOfBoundsDirections(const MyPoint& point, vector<bool>& legalFleeDirections)
+void AutoPlayerAlgorithm::removeOutOfBoundsDirections(const MyPoint& point, std::bitset<4>& legalFleeDirections)
 {
 	//[left, right, up, down]
 	if (point.getX() == 1)
@@ -382,10 +388,10 @@ const MyPoint getPointByDirection(const MyPoint& point, int direction)
 		return MyPoint(point.getX() + 1, point.getY()); //right
 		
 	case 2:
-		return MyPoint(point.getX(), point.getY() + 1); //up
+		return MyPoint(point.getX(), point.getY() - 1); //up
 
 	case 3:
-		return MyPoint(point.getX(), point.getY() - 1); //down
+		return MyPoint(point.getX(), point.getY() + 1); //down
 	}
 
 	//should not get here
@@ -395,20 +401,29 @@ const MyPoint getPointByDirection(const MyPoint& point, int direction)
 	return point;
 }
 
-unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, vector<bool>& legalFleeDirections)
+unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, bitset<4>& legalFleeDirections)
 {
 	vector<int> possibleMoves(0);
 	int chosenDirection = 0;
 
+	//dprint("getLegalMove: point: (%d,%d) legalFleeDirections = %s\n",
+	//	point.getX(), point.getY(), legalFleeDirections.to_string().c_str());
+
 	removeOutOfBoundsDirections(point, legalFleeDirections);
+
+	//dprint("removeOutOfBoundsDirections: legalFleeDirections = %s\n", legalFleeDirections.to_string().c_str());
 
 	/* Get all directions that does not include opponent piece*/
 	for (int i = 0; i < 4; i++)
 	{
 		//if move is legal already and the to Point does not contain a piece of ours
 		if (legalFleeDirections[i] && !existsOnBoardSet(getPointByDirection(point, i)))
+		{
 			possibleMoves.push_back(i);
+			//dprint("\tPossible move: index %d\n", i);
+		}
 	}
+
 
 	/* If there is no available direction than cannot find legal move which is not a fight */
 
@@ -424,9 +439,9 @@ unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, vecto
 		chosenDirection = genDirection(gen);
 	}
 	//else it already is 0 and it will take the first and only element
-
+	//dprint("Had %lu directions to choose from. Chose direction possibleMoves[%d] = %d\n", possibleMoves.size(), chosenDirection, possibleMoves[chosenDirection]);
 	const MyPoint& chosenDirectionPoint = getPointByDirection(point, possibleMoves[chosenDirection]);
-
+	//dprint("ChosenDirectionPoint: (%d,%d)\n", chosenDirectionPoint.getX(), chosenDirectionPoint.getY());
 	return make_unique<MyMove>(point.getX(), point.getY(),
 		chosenDirectionPoint.getX(), chosenDirectionPoint.getY());
 }
