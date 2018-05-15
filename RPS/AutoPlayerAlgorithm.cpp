@@ -393,16 +393,19 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 	}
 
 	//get random jokerChange
-	for (auto& piece : boardSet)
+	bool firstLoop = true;
+	auto& first = nextPieceToMove;
+	for (auto& piece = first; piece == nextPieceToMove && !firstLoop; piece++)
 	{
-		if (piece.getJokerRep() == '#')
+		firstLoop = false;
+		if (piece->getJokerRep() == '#')
 			continue;
-		const MyPoint point = piece.getPosition();
+		const MyPoint point = piece->getPosition();
 		int x = point.getX(), y = point.getY();
 		random_device	seed;
 		mt19937			gen(seed());
 		uniform_int_distribution<> genDirection(0, 2);
-		return make_unique<MyJokerChange>(x, y, getRandomJokerChahge(genDirection(gen), piece.getJokerRep()));
+		return make_unique<MyJokerChange>(x, y, getRandomJokerChahge(genDirection(gen), piece->getJokerRep()));
 	}
 	*/
 	return nullptr;
