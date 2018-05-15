@@ -1,8 +1,8 @@
-
-
 #include "AutoPlayerAlgorithm.h"
 #include <algorithm>
 #include <list>
+#include "MyJokerChange.h"
+
 using namespace std;
 
 
@@ -235,31 +235,68 @@ unique_ptr<Move> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePos
 	return nullptr;
 }
 
+char AutoPlayerAlgorithm::getNewJokerRep(char oldJokerRep)
+{
+	char result;
+	switch (oldJokerRep)
+	{
+	case 'R':
+		result = 'S';
+		break;
+	case 'S':
+		result = 'P';
+		break;
+	case 'P':
+		result = 'R';
+		break;
+	default:
+		result = '#';
+	}
+	return result;
+}
+
 unique_ptr<JokerChange> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & joker, int x, int y)
 {
-	if (checkForAdjecentOpponent(joker, MyPiecePosition(x - 1, y)))
+	bool foundAdjecentOpponent = false;
+	do
 	{
-		if (!(joker >= MyPiecePosition(x - 1, y))) //potential lose
-		{};//return make_unique<MyMove>(x, y, x - 1, y);
-	}
+		if (checkForAdjecentOpponent(joker, MyPiecePosition(x - 1, y)))
+		{
+			if (joker < MyPiecePosition(x - 1, y)) //potential lose
+			{
+				foundAdjecentOpponent = true;
+				break;
+			}
+		}
+		if (checkForAdjecentOpponent(joker, MyPiecePosition(x + 1, y)))
+		{
+			if (joker < MyPiecePosition(x + 1, y)) //potential lose
+			{
+				foundAdjecentOpponent = true;
+				break;
+			}
+		}
+		if (checkForAdjecentOpponent(joker, MyPiecePosition(x, y + 1)))
+		{
+			if (joker < MyPiecePosition(x, y + 1)) //potential lose
+			{
+				foundAdjecentOpponent = true;
+				break;
+			}
 
-	if (checkForAdjecentOpponent(joker, MyPiecePosition(x + 1, y)))
-	{
-		if (!(joker >= MyPiecePosition(x + 1, y))) //potential lose
-		{};//return make_unique<MyMove>(x, y, x + 1, y);
-	}
-	if (checkForAdjecentOpponent(joker, MyPiecePosition(x, y + 1)))
-	{
-		if (!(joker >= MyPiecePosition(x, y + 1))) //potential lose
-		{};// return make_unique<MyMove>(x, y, x, y + 1);
-
-	}
-	if (!(checkForAdjecentOpponent(joker, MyPiecePosition(x, y - 1)))) //potential lose
-	{
-		if (joker >= MyPiecePosition(x, y - 1)) //potential win
-		{};// return make_unique<MyMove>(x, y, x, y - 1);
-
-	}
+		}
+		if (checkForAdjecentOpponent(joker, MyPiecePosition(x, y - 1))) //potential lose
+		{
+			if (joker < MyPiecePosition(x, y - 1)) //potential win
+			{
+				foundAdjecentOpponent = true;
+				break;
+			}
+		}
+	} while (false);
+	if (foundAdjecentOpponent)
+		return make_unique<MyJokerChange>(joker.getPosition().getX(), joker.getPosition().getY(), getNewJokerRep(joker.getJokerRep()));
+	
 	return nullptr;
 }
 
@@ -338,14 +375,94 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	boardSet.insert(MyPiecePosition(nextMove->getTo().getX(), nextMove->getTo().getY(), type, true));
 
 	return move(nextMove);
-
-	//TODOS: 1. joker change
-
 }
 
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
+	/*
+	unique_ptr<JokerChange> nextJokerChange;
+	for (auto& piece : boardSet)
+	{
+		if (piece.getJokerRep() == '#')
+			continue;
+		const MyPoint point = piece.getPosition();
+		int x = point.getX(), y = point.getY();
+		nextJokerChange = move(checkAllAdjecentOpponents(piece, x, y));
+		if (nextJokerChange)
+			return nextJokerChange;
+	}
+
+	//get random jokerChange
+	for (auto& piece : boardSet)
+	{
+		if (piece.getJokerRep() == '#')
+			continue;
+		const MyPoint point = piece.getPosition();
+		int x = point.getX(), y = point.getY();
+		random_device	seed;
+		mt19937			gen(seed());
+		uniform_int_distribution<> genDirection(0, 2);
+		return make_unique<MyJokerChange>(x, y, getRandomJokerChahge(genDirection(gen), piece.getJokerRep()));
+	}
+	*/
 	return nullptr;
+}
+
+char AutoPlayerAlgorithm::getRandomJokerChahge(int rand, char jokerRep)
+{
+	switch (jokerRep)
+	{
+	case 'R':
+		switch (rand)
+		{
+		case 0:
+			return 'S';
+		case 1:
+			return 'P';
+		case 2:
+			return 'B';
+		default:
+			return '#';
+		}
+	case 'P':
+		switch (rand)
+		{
+		case 0:
+			return 'S';
+		case 1:
+			return 'R';
+		case 2:
+			return 'B';
+		default:
+			return '#';
+		}
+	case 'S':
+		switch (rand)
+		{
+		case 0:
+			return 'P';
+		case 1:
+			return 'R';
+		case 2:
+			return 'B';
+		default:
+			return '#';
+		}
+	case 'B':
+		switch (rand)
+		{
+		case 0:
+			return 'S';
+		case 1:
+			return 'R';
+		case 2:
+			return 'P';
+		default:
+			return '#';
+		}
+	default:
+		return '#';
+	}
 }
 
 unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point)
@@ -445,3 +562,5 @@ unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, bitse
 	return make_unique<MyMove>(point.getX(), point.getY(),
 		chosenDirectionPoint.getX(), chosenDirectionPoint.getY());
 }
+
+

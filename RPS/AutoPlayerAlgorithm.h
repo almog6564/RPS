@@ -54,7 +54,12 @@ private:
 	unique_ptr<JokerChange> checkAllAdjecentOpponents(const MyPiecePosition & joker, int x, int y);
 
 	std::unique_ptr<MyMove> getLegalMove(const MyPoint& point);
+
 	std::unique_ptr<MyMove> getLegalMove(const MyPoint& point, std::bitset<4>& fleeArr);
+
+	char getNewJokerRep(char oldJokerRep);
+
+	char getRandomJokerChahge(int rand, char jokerRep);
 
 	bool existsOnBoardSet(const MyPoint& point);
 

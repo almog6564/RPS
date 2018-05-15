@@ -119,6 +119,36 @@ public:
 		return true;
 	}
 
+	bool operator<=(const MyPiecePosition& other) const
+	{
+		char otherPieceType = other.getPiece();
+		if (((pieceType == 'R' || jokerRep == 'R') && (otherPieceType == 'S')) ||
+			((pieceType == 'S' || jokerRep == 'S') && (otherPieceType == 'P')) ||
+			((pieceType == 'P' || jokerRep == 'P') && (otherPieceType == 'R')))
+			return false;
+		return true;
+	}
+
+	bool operator>(const MyPiecePosition& other) const
+	{
+		char otherPieceType = other.getPiece();
+		if (((pieceType == 'R' || jokerRep == 'R') && (otherPieceType == 'S')) ||
+			((pieceType == 'S' || jokerRep == 'S') && (otherPieceType == 'P')) ||
+			((pieceType == 'P' || jokerRep == 'P') && (otherPieceType == 'R')))
+			return false;
+		return true;
+	}
+
+	bool operator<(const MyPiecePosition& other) const
+	{
+		char otherPieceType = other.getPiece();
+		if (((pieceType == 'R' || jokerRep == 'R') && (otherPieceType == 'S')) ||
+			((pieceType == 'S' || jokerRep == 'S') && (otherPieceType == 'P')) ||
+			((pieceType == 'P' || jokerRep == 'P') && (otherPieceType == 'R')))
+			return true;
+		return false;
+	}
+
 
 };
 
