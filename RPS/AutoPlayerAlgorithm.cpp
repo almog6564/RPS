@@ -1,5 +1,6 @@
 #include "AutoPlayerAlgorithm.h"
 #include <algorithm>
+#include <iostream>
 #include <list>
 #include "MyJokerChange.h"
 
@@ -421,6 +422,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 	auto first = nextPieceToMove;
 	for (auto& piece = first; piece != nextPieceToMove || firstLoop; piece++)
 	{
+		std::cout << "loop" << std::endl;
 		if (piece == boardSet.end())
 			piece = boardSet.begin();
 		firstLoop = false;
