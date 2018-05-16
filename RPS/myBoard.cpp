@@ -241,7 +241,7 @@ int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY
 {
 	BoardPiece* p1;
 	UINT p1PlayerId;
-	ePieceType type;
+	ePieceType type, originalType;
 
 	if (toX > cols || toY > rows)
 	{
@@ -269,6 +269,8 @@ int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY
 	}
 
 	type = p1->getType();
+	originalType = p1->getOriginalType();
+
 	p1PlayerId = p1->getOwner()->getPlayerId();
 	if (p1PlayerId != playerID)
 	{
@@ -280,7 +282,7 @@ int MyBoard::movePiece(UINT playerID, UINT fromX, UINT fromY, UINT toX, UINT toY
 
 	if (type == BOMB || type == FLAG || type == UNDEF || type == JOKER)
 	{
-		printf("[Board::movePiece] illegal piece type <%c> for move at fromX <%d> fromY <%d> toX <%d> toY <%d> \n", pieceToChar(type), fromX, fromY, toX, toY);
+		printf("[Board::movePiece] illegal piece type <%c> (if J: <%c>) for move at fromX <%d> fromY <%d> toX <%d> toY <%d> \n", pieceToChar(originalType), pieceToChar(type), fromX, fromY, toX, toY);
 		return ERROR;
 	}
 
