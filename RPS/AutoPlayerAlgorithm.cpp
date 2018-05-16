@@ -198,8 +198,6 @@ MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove()
 		else
 			++nextPieceToMove; //move the pointer to the next iterator
 	}
-	char testp = nextPieceToMove->getPiece();
-	char testj = nextPieceToMove->getJokerRep();
 
 	return *nextPieceToMove; //return the piece inside the iterator
 }
