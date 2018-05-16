@@ -439,7 +439,7 @@ char pieceToChar(ePieceType p, bool isUpperCase)
 		break;
 
 	default:	//indicates invalid enum
-		c = 'U';
+		c = '#';
 		break;
 	}
 

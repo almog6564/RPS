@@ -285,17 +285,7 @@ string Game::GetReasonString(eReason reason)
 		return "A tie - all flags are eaten by both players in the position files";
 
 	case BAD_MOVES_INPUT_FILE:
-		if (player1Context->getHasLost())
-		{
-			playerNumber = 1;
-			line = player1Context->getPlayerFileContext()->moves->getCurrentLineNum();
-		}
-		else
-		{
-			playerNumber = 2;
-			line = player2Context->getPlayerFileContext()->moves->getCurrentLineNum();
-		}
-		sprintf(temp, "Bad Moves input file for player %d - line %d", playerNumber, line);
+		sprintf(temp, "Bad Moves input file for player %d", player1Context->getHasLost() ? 1 : 2);
 		return (string)temp;
 
 	case BAD_POSITIONING_INPUT_FILE_FORMAT:
@@ -312,7 +302,7 @@ string Game::GetReasonString(eReason reason)
 			playerNumber = 2;
 			line = player2Context->getPlayerFileContext()->pieces->getCurrentLineNum();
 		}
-		sprintf(temp, "Bad Positioning input file for player %d - line %d", playerNumber, line);
+		sprintf(temp, "Bad Positioning input file for player %d", playerNumber, line);
 		return (string)temp;
 
 	case BOTH_BAD_POSITIONING_INPUT_FILE_FORMAT:
