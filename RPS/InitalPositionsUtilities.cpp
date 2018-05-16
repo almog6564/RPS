@@ -32,7 +32,7 @@ void positionFlag(int i, int x, int y, PieceVector &vectorToFill, BoardSet &boar
 
 void positionMovingPiece(int x, int y, PieceVector &vectorToFill, BoardSet &boardSet, char pieceType, char jokerType)
 {
-	if (jokerType == '#')
+	if (pieceType != 'J')
 	{
 		dprint("\t - Moving Piece (%c) choosed position (%d,%d)\n", pieceType, x, y);
 	}

@@ -83,6 +83,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 
 	//add the Jokers, don't place them on the corners (its a waste!)
 	addAllToVector(J, 'J'); 
+	initialMovingCnt = (int)movingPieceVector.size();
 
 	positionRestOfMovingPiecesRandomly(pieceIndex, initialMovingCnt, rndCtx, boardSet, movingPieceVector, vectorToFill);
 	
@@ -382,7 +383,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
-	/*
+	
 	unique_ptr<JokerChange> nextJokerChange;
 	for (auto& piece : boardSet)				//there can be no jokers at all
 	{
@@ -411,7 +412,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 		uniform_int_distribution<> genDirection(0, 2);
 		return make_unique<MyJokerChange>(x, y, getRandomJokerChahge(genDirection(gen), piece->getJokerRep()));
 	}
-	*/
+	
 	return nullptr;
 }
 
