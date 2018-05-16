@@ -164,7 +164,10 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 	else //TIE - remove both pieces
 	{
 		opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
-		boardSet.erase(boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
+		auto it = boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
+		if (it == nextPieceToMove)
+			++nextPieceToMove;
+		boardSet.erase(it);
 	}
 }
 
@@ -397,6 +400,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 	auto& first = nextPieceToMove;
 	for (auto& piece = first; piece == nextPieceToMove && !firstLoop; piece++)
 	{
+		//if piece == end piece = begin
 		firstLoop = false;
 		if (piece->getJokerRep() == '#')
 			continue;
