@@ -401,7 +401,8 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 	auto& first = nextPieceToMove;
 	for (auto& piece = first; piece == nextPieceToMove && !firstLoop; piece++)
 	{
-		//if piece == end piece = begin
+		if (piece == boardSet.end())
+			piece = boardSet.begin();
 		firstLoop = false;
 		if (piece->getJokerRep() == '#')
 			continue;
