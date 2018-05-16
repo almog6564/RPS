@@ -15,7 +15,7 @@ AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, U
 	
 	scenario = new PositioningScenario(dis(gen), dis(gen));
 	scenario->areMovingOnCorners = false; 
-	scenario->areFlagsOnCorners = true;
+	scenario->areFlagsOnCorners = false;
 
 	boardCols = cols;
 	boardRows = rows;
@@ -150,31 +150,29 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 	MyPoint tempPoint = fightInfo.getPosition();
 	int winner = fightInfo.getWinner();
 	auto& piece = *opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
+	char winningType = fightInfo.getPiece(winner);
 	if (winner == (ID == 1 ? 2 : 1)) //player lost fight, remove piece from players set, and update piece type and if moving
 	{
-		auto it = boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
-		if (it->getPiece() == 'B' || it->getJokerRep() == 'B')
-		{
+		piece.setPieceType(winningType);
+		if (winningType == 'P' || winningType == 'R' || winningType == 'S')
+			piece.setMovingPiece(true);
+		else if (winningType == 'B')
 			opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
-		}
+		auto it = boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
 		if (it == nextPieceToMove)
 			++nextPieceToMove;
-		boardSet.erase(it);
-		char type = fightInfo.getPiece(winner);
-		piece.setPieceType(type);
-		if (type == 'P' || type == 'R' || type == 'S')
-			piece.setMovingPiece(true);
+		boardSet.erase(it);	
 	}
 	else if (winner == ID)//player won, remove opponent's piece
 	{
-		opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
-		if (fightInfo.getPiece(ID == 1 ? 2 : 1) == 'B')
+		if (winningType == 'B')
 		{
 			auto it = boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
 			if (it == nextPieceToMove)
 				++nextPieceToMove;
 			boardSet.erase(it);
 		}
+		opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
 	}
 	else //TIE - remove both pieces
 	{
@@ -195,14 +193,14 @@ MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove()
 		if (nextPieceToMove == boardSet.end())
 			nextPieceToMove = boardSet.begin();
 		//save iterator of current,iterate until reached current, when reached end return to begin
-		char tempType = (nextPieceToMove)->getPiece();
-		char tempJoker = (nextPieceToMove)->getJokerRep();
-		if (tempType == 'P' || tempType == 'S' || tempType == 'R' ||
-			(tempType == 'J' && (tempJoker == 'P' || tempType == 'S' || tempType == 'R'))) //A moving piece
+		if (nextPieceToMove->isMoving())
 			break;
 		else
 			++nextPieceToMove; //move the pointer to the next iterator
 	}
+	char testp = nextPieceToMove->getPiece();
+	char testj = nextPieceToMove->getJokerRep();
+
 	return *nextPieceToMove; //return the piece inside the iterator
 }
 
@@ -420,11 +418,10 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 	//get random jokerChange
 	bool firstLoop = true;
 	auto first = nextPieceToMove;
-	for (auto& piece = first; piece != nextPieceToMove || firstLoop; piece++)
+	for (auto piece = first; *piece != *nextPieceToMove || firstLoop;)
 	{
 		std::cout << "loop" << std::endl;
-		if (piece == boardSet.end())
-			piece = boardSet.begin();
+		
 		firstLoop = false;
 		if (piece->getJokerRep() == '#')
 			continue;
@@ -438,6 +435,9 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 			piece->setMovingPiece(true);
 		else if (ret->getJokerNewRep() == 'B')
 			piece->setMovingPiece(false);
+		++piece;
+		if (piece == boardSet.end())
+			piece = boardSet.begin();
 		return ret;
 	}
 	
