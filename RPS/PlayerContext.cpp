@@ -81,8 +81,6 @@ int PlayerContext::incTypeCount(ePieceType type, ePieceType originalType, bool u
 	if (!updateOnlyMovingCounter) 
 	{
 		pieceCounters[originalType]++;
-		//dprint("\t###\t incTypeCount: Player %d ||  type %c || originalType %c || CNT = %d\n", 
-		//	ID+1, pieceToChar(type), pieceToChar(originalType), pieceCounters[originalType]);
 	}
 
 	if (type != BOMB && type != FLAG && type != UNDEF)
@@ -104,12 +102,12 @@ int PlayerContext::incTypeCount(ePieceType type, ePieceType originalType, bool u
 	if (type == FLAG)
 		incOriginalFlagCount();
 
-	if (pieceCounters[originalType] > getTypeMax(type))
+	if (pieceCounters[originalType] > getTypeMax(originalType))
 	{
 		hasLost = 1;
 		reason = BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER;
 		printf("\n** ERROR: Player #%d piece %c count is <%d> bigger than MAX <%d>\n",
-			ID+1, pieceToChar(originalType), pieceCounters[originalType], getTypeMax(type));
+			ID+1, pieceToChar(originalType), pieceCounters[originalType], getTypeMax(originalType));
 		return -1;
 	}
 	return 0;
