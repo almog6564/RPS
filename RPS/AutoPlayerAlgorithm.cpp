@@ -148,10 +148,14 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 {
 	MyPoint tempPoint = fightInfo.getPosition();
 	int winner = fightInfo.getWinner();
+	auto& piece = *opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
 	if (winner == (ID == 1 ? 2 : 1)) //player lost fight, remove piece from players set, and update piece type and if moving
 	{
-		auto& piece = *opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
 		auto it = boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
+		if (it->getPiece() == 'B' || it->getJokerRep() == 'B')
+		{
+			opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
+		}
 		if (it == nextPieceToMove)
 			++nextPieceToMove;
 		boardSet.erase(it);
@@ -163,6 +167,13 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 	else if (winner == ID)//player won, remove opponent's piece
 	{
 		opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
+		if (fightInfo.getPiece(ID == 1 ? 2 : 1) == 'B')
+		{
+			auto it = boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
+			if (it == nextPieceToMove)
+				++nextPieceToMove;
+			boardSet.erase(it);
+		}
 	}
 	else //TIE - remove both pieces
 	{
