@@ -13,6 +13,8 @@ AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, U
 	uniform_int_distribution<>	dis(0,1);		//Distributed random
 	
 	scenario = new PositioningScenario(dis(gen), dis(gen));
+	scenario->areMovingOnCorners = false; 
+	scenario->areFlagsOnCorners = true;
 
 	boardCols = cols;
 	boardRows = rows;
@@ -375,8 +377,9 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	//update player's board
 	auto& t = *boardSet.find(MyPiecePosition(nextMove->getFrom().getX(), nextMove->getFrom().getY()));
 	char type = t.getPiece();
+	char jokerType = t.getJokerRep();
 	boardSet.erase(t);
-	boardSet.insert(MyPiecePosition(nextMove->getTo().getX(), nextMove->getTo().getY(), type, true));
+	boardSet.insert(MyPiecePosition(nextMove->getTo().getX(), nextMove->getTo().getY(), type, jokerType));
 
 	return move(nextMove);
 }
@@ -398,8 +401,8 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 
 	//get random jokerChange
 	bool firstLoop = true;
-	auto& first = nextPieceToMove;
-	for (auto& piece = first; piece == nextPieceToMove && !firstLoop; piece++)
+	auto first = nextPieceToMove;
+	for (auto& piece = first; piece != nextPieceToMove || firstLoop; piece++)
 	{
 		if (piece == boardSet.end())
 			piece = boardSet.begin();
