@@ -396,7 +396,13 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 		int x = point.getX(), y = point.getY();
 		nextJokerChange = move(checkAllAdjecentOpponents(piece, x, y));
 		if (nextJokerChange)
+		{
+			if (piece.getJokerRep() == 'B')
+				piece.setMovingPiece(true);
+			else if (nextJokerChange->getJokerNewRep() == 'B')
+				piece.setMovingPiece(false);
 			return nextJokerChange;
+		}
 	}
 
 	//get random jokerChange
@@ -414,7 +420,12 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 		random_device	seed;
 		mt19937			gen(seed());
 		uniform_int_distribution<> genDirection(0, 2);
-		return make_unique<MyJokerChange>(x, y, getRandomJokerChahge(genDirection(gen), piece->getJokerRep()));
+		unique_ptr<MyJokerChange> ret = make_unique<MyJokerChange>(x, y, getRandomJokerChahge(genDirection(gen), piece->getJokerRep()));
+		if (piece->getJokerRep() == 'B')
+			piece->setMovingPiece(true);
+		else if (ret->getJokerNewRep() == 'B')
+			piece->setMovingPiece(false);
+		return ret;
 	}
 	
 	return nullptr;
