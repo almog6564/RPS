@@ -302,7 +302,7 @@ string Game::GetReasonString(eReason reason)
 			playerNumber = 2;
 			line = player2Context->getPlayerFileContext()->pieces->getCurrentLineNum();
 		}
-		sprintf(temp, "Bad Positioning input file for player %d", playerNumber, line);
+		sprintf(temp, "Bad Positioning input file for player %d", playerNumber);
 		return (string)temp;
 
 	case BOTH_BAD_POSITIONING_INPUT_FILE_FORMAT:
