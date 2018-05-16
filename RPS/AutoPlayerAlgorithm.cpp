@@ -190,6 +190,7 @@ MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove()
 	++nextPieceToMove;
 	while (true) 
 	{
+		std::cout << "loop getNextPieceToMove" << std::endl;
 		if (nextPieceToMove == boardSet.end())
 			nextPieceToMove = boardSet.begin();
 		//save iterator of current,iterate until reached current, when reached end return to begin
@@ -332,6 +333,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	/*look for potential win or flee*/
 	for (auto& piece : boardSet)
 	{
+		cout << "loop getMove1" << endl;
 		if (!(piece.isMoving()))
 			continue;
 
@@ -365,6 +367,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 		MyPiecePosition firstPieceToMove = nextPieceToMove;
 		do
 		{
+			cout << "loop getMove2" << endl;
 			MyPoint point = nextPieceToMove.getPosition();
 			nextMove = move(getLegalMove(point));
 			if (nextMove)
@@ -398,6 +401,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 	unique_ptr<JokerChange> nextJokerChange;
 	for (auto& piece : boardSet)				//there can be no jokers at all
 	{
+		std::cout << "loop getJokerChange1" << std::endl;
 		if (piece.getJokerRep() == '#')
 			continue;
 		const MyPoint point = piece.getPosition();
@@ -418,7 +422,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 	auto first = nextPieceToMove;
 	for (auto piece = first; *piece != *nextPieceToMove || firstLoop;)
 	{
-		std::cout << "loop" << std::endl;
+		std::cout << "loop getJokerChange2" << std::endl;
 		
 		firstLoop = false;
 		if (piece->getJokerRep() == '#')
