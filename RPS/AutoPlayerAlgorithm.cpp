@@ -382,7 +382,6 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
-	
 	unique_ptr<JokerChange> nextJokerChange;
 	for (auto& piece : boardSet)				//there can be no jokers at all
 	{
@@ -400,7 +399,8 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 	auto& first = nextPieceToMove;
 	for (auto& piece = first; piece == nextPieceToMove && !firstLoop; piece++)
 	{
-		//if piece == end piece = begin
+		if (piece == boardSet.end())
+			piece = boardSet.begin();
 		firstLoop = false;
 		if (piece->getJokerRep() == '#')
 			continue;
@@ -411,7 +411,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 		uniform_int_distribution<> genDirection(0, 2);
 		return make_unique<MyJokerChange>(x, y, getRandomJokerChahge(genDirection(gen), piece->getJokerRep()));
 	}
-	
+
 	return nullptr;
 }
 
