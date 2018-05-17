@@ -24,7 +24,8 @@ private:
 	PositioningScenario* scenario;
 	UINT boardRows, boardCols;
 	BoardSet opponentsPieces;
-	BoardSet boardSet; //serves as playersPieces
+	BoardSet playerPieces;
+	//BoardSet boardSet; //serves as playersPieces
 	MyPoint lastMove;
 	BoardSet::iterator nextPieceToMove;
 	BoardSet::iterator nextPieceToAttack;

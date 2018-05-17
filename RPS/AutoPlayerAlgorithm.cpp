@@ -14,8 +14,6 @@ AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, U
 	uniform_int_distribution<>	dis(0,1);		//Distributed random
 	
 	scenario = new PositioningScenario(dis(gen), dis(gen));
-	scenario->areMovingOnCorners = false; 
-	scenario->areFlagsOnCorners = false;
 
 	boardCols = cols;
 	boardRows = rows;
@@ -26,9 +24,6 @@ AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, U
 	initPieceCnt.B = B;
 	initPieceCnt.J = J;
 	initPieceCnt.F = F;
-	//initialize private Board
-	//privateBoard = vector<PieceVector>(rows);
-	//for (UINT i = 0; i < rows; i++) privateBoard[i] = vector<unique_ptr<PiecePosition>>(cols);
 }
 
 
@@ -41,7 +36,6 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Parameters Initialization **/
-	//BoardSet boardSet;	
 	vector<char> movingPieceVector;
 	int initialMovingCnt, pieceIndex = 0, bombsUsed;
 
@@ -65,7 +59,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 
 	/**** Position All Flags (and maybe some Bombs around them) *****/
 
-	bombsUsed = positionFlagsAndBombs(rndCtx, boardSet, vectorToFill);
+	bombsUsed = positionFlagsAndBombs(rndCtx, playerPieces, vectorToFill);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -78,7 +72,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 
 	/** if chosen by scenario, moving pieces will be set on the corners to counter attack flags on corners **/
 
-	placeMovingPiecesOnCorners(movingPieceVector, initialMovingCnt, rndCtx, vectorToFill, boardSet, pieceIndex);
+	placeMovingPiecesOnCorners(movingPieceVector, initialMovingCnt, rndCtx, vectorToFill, playerPieces, pieceIndex);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -88,7 +82,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 	addAllToVector(J, 'J'); 
 	initialMovingCnt = (int)movingPieceVector.size();
 
-	positionRestOfMovingPiecesRandomly(pieceIndex, initialMovingCnt, rndCtx, boardSet, movingPieceVector, vectorToFill);
+	positionRestOfMovingPiecesRandomly(pieceIndex, initialMovingCnt, rndCtx, playerPieces, movingPieceVector, vectorToFill);
 	
 }
 
@@ -106,81 +100,114 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 				opponentsPieces.emplace(j, i);
 		}
 	}
-	for (auto& fight : fights)
+
+	nextPieceToMove = playerPieces.begin(); //start with first piece
+
+	for (auto& fightInfo : fights)
 	{
-		if (fight->getWinner() != ID) //player lost fight, remove piece from players set, and update piece type
+		const MyPoint fightPoint = fightInfo->getPosition();
+		const MyPiecePosition fightPos(fightPoint.getX(), fightPoint.getY());
+		int fightWinner = fightInfo->getWinner();
+		char winningType = fightInfo->getPiece(fightWinner);
+		int opponentID = (ID == 1 ? 2 : 1), playerID = ID;
+
+		auto playerPieceIter = playerPieces.find(fightPos);
+		auto opponentPieceIter = opponentsPieces.find(fightPos);
+
+		if (fightWinner == opponentID) //player lost fight, remove piece from players set, and update piece type and if moving
 		{
-			MyPoint tempPoint = fight->getPosition();
-			int x = tempPoint.getX(), y = tempPoint.getY();
-			char type = fight->getPiece(ID == 1 ? 2 : 1);
-			boardSet.erase(boardSet.find(MyPiecePosition(x, y)));
-			auto it = opponentsPieces.find(MyPiecePosition(x, y));
-			if (it != opponentsPieces.end())
+			//update new date regarding opponent's piece
+			if (winningType == 'P' || winningType == 'R' || winningType == 'S')
 			{
-				it->setPieceType(type);
-				if (type == 'P' || type == 'R' || type == 'S')
-					it->setMovingPiece(true);
+				opponentPieceIter->setPieceType(winningType);
+				opponentPieceIter->setMovingPiece(true);
+			}
+			//in any case, remove player's losing piece
+			if (*playerPieceIter == *nextPieceToMove)
+				++nextPieceToMove;
+			playerPieces.erase(playerPieceIter);
+		}
+
+		else if (fightWinner == playerID) //player won, remove opponent's piece
+		{
+			//although won, remove player's piece if it's a bomb
+			if (winningType == 'B')
+			{
+				if (*playerPieceIter == *nextPieceToMove)
+					++nextPieceToMove;
+				playerPieces.erase(playerPieceIter);
 			}
 		}
+
+		else //TIE - remove both pieces
+		{
+			if (*playerPieceIter == *nextPieceToMove)
+				++nextPieceToMove;
+			playerPieces.erase(playerPieceIter);
+		}
 	}
-	nextPieceToMove = boardSet.begin(); //start with first piece
-	//nextPieceToAttack = opponentsPieces.begin();
 }
 
 
 void AutoPlayerAlgorithm::notifyOnOpponentMove(const Move & move)
 {
-	/*dprint("notifyOnOpponentMove of player %d: opponentsPieces.size = %d\n", ID+1, (int)opponentsPieces.size());
-	for (auto& p : opponentsPieces)
-	{
-		dprint("(%d,%d)[%c],  ", p.getPosition().getX(), p.getPosition().getY(), p.getPiece());
-	}
-	dprint("\nSearching for move (%d,%d)->(%d,%d)\n", move.getFrom().getX(), move.getFrom().getY(), move.getTo().getX(), move.getTo().getY());*/
-	//update opponent's piece, because the key is imutable, remove and insert a new piece
-	auto& t = *opponentsPieces.find(MyPiecePosition(move.getFrom().getX(), move.getFrom().getY()));
-	char type = t.getPiece();
-	opponentsPieces.erase(t);
-	opponentsPieces.insert(MyPiecePosition(move.getTo().getX(), move.getTo().getY(), type, true));
-	//save last move for next_move decision
-	lastMove = move.getTo(); //call copy c'tor
+	auto& pieceToMove = *opponentsPieces.find(MyPiecePosition(move.getFrom().getX(), move.getFrom().getY()));
+	char type = pieceToMove.getPiece();
+	char jokerRep = pieceToMove.getJokerRep();
+	MyPoint getTo(move.getTo());
+	opponentsPieces.erase(pieceToMove);
+	opponentsPieces.insert(MyPiecePosition(getTo.getX(), getTo.getY(), type, jokerRep));
 }
 
 void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 {
-	MyPoint tempPoint = fightInfo.getPosition();
-	int winner = fightInfo.getWinner();
-	auto& piece = *opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
-	char winningType = fightInfo.getPiece(winner);
-	if (winner == (ID == 1 ? 2 : 1)) //player lost fight, remove piece from players set, and update piece type and if moving
+	const MyPoint fightPoint = fightInfo.getPosition();
+	const MyPiecePosition fightPos(fightPoint.getX(), fightPoint.getY());
+	int fightWinner        = fightInfo.getWinner();
+	char winningType       = fightInfo.getPiece(fightWinner);
+	int opponentID         = (ID == 1 ? 2 : 1), playerID = ID;
+
+	auto opponentPieceIter = opponentsPieces.find(fightPos);
+	auto playerPieceIter = playerPieces.find(fightPos);
+
+	if (fightWinner == opponentID) //player lost fight, remove piece from players set, and update piece type and if moving
 	{
-		piece.setPieceType(winningType);
+		//update new date regarding opponent's piece
 		if (winningType == 'P' || winningType == 'R' || winningType == 'S')
-			piece.setMovingPiece(true);
+		{
+			opponentPieceIter->setPieceType(winningType);
+			opponentPieceIter->setMovingPiece(true);
+		}
+		//remove opponent's piece if it's a bomb
 		else if (winningType == 'B')
-			opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
-		auto it = boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
-		if (it == nextPieceToMove)
+		{
+			opponentsPieces.erase(opponentPieceIter); 
+		}
+		//in any case, remove player's losing piece
+		if (*playerPieceIter == *nextPieceToMove)
 			++nextPieceToMove;
-		boardSet.erase(it);	
+		playerPieces.erase(playerPieceIter);
 	}
-	else if (winner == ID)//player won, remove opponent's piece
+
+	else if (fightWinner == playerID) //player won, remove opponent's piece
 	{
+		//although won, remove player's piece if it's a bomb
 		if (winningType == 'B')
 		{
-			auto it = boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
-			if (it == nextPieceToMove)
+			if (*playerPieceIter == *nextPieceToMove)
 				++nextPieceToMove;
-			boardSet.erase(it);
+			playerPieces.erase(playerPieceIter);
 		}
-		opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
+		//in any case, remove opponent's losing piece
+		opponentsPieces.erase(opponentPieceIter);
 	}
+
 	else //TIE - remove both pieces
 	{
-		opponentsPieces.erase(opponentsPieces.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY())));
-		auto it = boardSet.find(MyPiecePosition(tempPoint.getX(), tempPoint.getY()));
-		if (it == nextPieceToMove)
+		opponentsPieces.erase(opponentPieceIter);
+		if (*playerPieceIter == *nextPieceToMove)
 			++nextPieceToMove;
-		boardSet.erase(it);
+		playerPieces.erase(playerPieceIter);
 	}
 }
 
@@ -190,9 +217,8 @@ MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove()
 	++nextPieceToMove;
 	while (true) 
 	{
-		std::cout << "loop getNextPieceToMove" << std::endl;
-		if (nextPieceToMove == boardSet.end())
-			nextPieceToMove = boardSet.begin();
+		if (nextPieceToMove == playerPieces.end())
+			nextPieceToMove = playerPieces.begin();
 		//save iterator of current,iterate until reached current, when reached end return to begin
 		if (nextPieceToMove->isMoving())
 			break;
@@ -331,9 +357,8 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	bool foundMove = false;
 
 	/*look for potential win or flee*/
-	for (auto& piece : boardSet)
+	for (auto& piece : playerPieces)
 	{
-		cout << "loop getMove1" << endl;
 		if (!(piece.isMoving()))
 			continue;
 
@@ -367,7 +392,6 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 		MyPiecePosition firstPieceToMove = nextPieceToMove;
 		do
 		{
-			cout << "loop getMove2" << endl;
 			MyPoint point = nextPieceToMove.getPosition();
 			nextMove = move(getLegalMove(point));
 			if (nextMove)
@@ -386,11 +410,11 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 		
 
 	//update player's board
-	auto& t = *boardSet.find(MyPiecePosition(nextMove->getFrom().getX(), nextMove->getFrom().getY()));
+	auto& t = *playerPieces.find(MyPiecePosition(nextMove->getFrom().getX(), nextMove->getFrom().getY()));
 	char type = t.getPiece();
 	char jokerType = t.getJokerRep();
-	boardSet.erase(t);
-	boardSet.insert(MyPiecePosition(nextMove->getTo().getX(), nextMove->getTo().getY(), type, jokerType));
+	playerPieces.erase(t);
+	playerPieces.insert(MyPiecePosition(nextMove->getTo().getX(), nextMove->getTo().getY(), type, jokerType));
 
 	return move(nextMove);
 }
@@ -399,9 +423,8 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
 	
 	unique_ptr<JokerChange> nextJokerChange;
-	for (auto& piece : boardSet)				//there can be no jokers at all
+	for (auto& piece : playerPieces)				//there can be no jokers at all
 	{
-		std::cout << "loop getJokerChange1" << std::endl;
 		if (piece.getJokerRep() == '#')
 			continue;
 		const MyPoint point = piece.getPosition();
@@ -413,20 +436,23 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 				piece.setMovingPiece(true);
 			else if (nextJokerChange->getJokerNewRep() == 'B')
 				piece.setMovingPiece(false);
+			piece.setJokerRep(nextJokerChange->getJokerNewRep());
 			return nextJokerChange;
 		}
 	}
 
 	//get random jokerChange
 	bool firstLoop = true;
-	auto first = nextPieceToMove;
-	for (auto piece = first; *piece != *nextPieceToMove || firstLoop;)
+	for (auto piece = nextPieceToMove; *piece != *nextPieceToMove || firstLoop;)
 	{
-		std::cout << "loop getJokerChange2" << std::endl;
-		
 		firstLoop = false;
 		if (piece->getJokerRep() == '#')
+		{
+			++piece;
+			if (piece == playerPieces.end())
+				piece = playerPieces.begin();
 			continue;
+		}
 		const MyPoint point = piece->getPosition();
 		int x = point.getX(), y = point.getY();
 		random_device	seed;
@@ -437,9 +463,10 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 			piece->setMovingPiece(true);
 		else if (ret->getJokerNewRep() == 'B')
 			piece->setMovingPiece(false);
+		piece->setJokerRep(ret->getJokerNewRep());
 		++piece;
-		if (piece == boardSet.end())
-			piece = boardSet.begin();
+		if (piece == playerPieces.end())
+			piece = playerPieces.begin();
 		return ret;
 	}
 	
@@ -513,7 +540,7 @@ unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point)
 
 bool AutoPlayerAlgorithm::existsOnBoardSet(const MyPoint& point)
 {
-	return boardSet.count(MyPiecePosition(point.getX(), point.getY())) > 0;
+	return playerPieces.count(MyPiecePosition(point.getX(), point.getY())) > 0;
 }
 
 void AutoPlayerAlgorithm::removeOutOfBoundsDirections(const MyPoint& point, std::bitset<4>& legalFleeDirections)
@@ -561,12 +588,7 @@ unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, bitse
 	vector<int> possibleMoves(0);
 	int chosenDirection = 0;
 
-	//dprint("getLegalMove: point: (%d,%d) legalFleeDirections = %s\n",
-	//	point.getX(), point.getY(), legalFleeDirections.to_string().c_str());
-
 	removeOutOfBoundsDirections(point, legalFleeDirections);
-
-	//dprint("removeOutOfBoundsDirections: legalFleeDirections = %s\n", legalFleeDirections.to_string().c_str());
 
 	/* Get all directions that does not include opponent piece*/
 	for (int i = 0; i < 4; i++)
@@ -594,9 +616,7 @@ unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, bitse
 		chosenDirection = genDirection(gen);
 	}
 	//else it already is 0 and it will take the first and only element
-	//dprint("Had %lu directions to choose from. Chose direction possibleMoves[%d] = %d\n", possibleMoves.size(), chosenDirection, possibleMoves[chosenDirection]);
 	const MyPoint& chosenDirectionPoint = getPointByDirection(point, possibleMoves[chosenDirection]);
-	//dprint("ChosenDirectionPoint: (%d,%d)\n", chosenDirectionPoint.getX(), chosenDirectionPoint.getY());
 	return make_unique<MyMove>(point.getX(), point.getY(),
 		chosenDirectionPoint.getX(), chosenDirectionPoint.getY());
 }

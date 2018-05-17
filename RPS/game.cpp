@@ -124,6 +124,7 @@ void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAl
 		checkWhetherFlagsWereCaptured();
 
 	} while (false);
+	printBoard();
 }
 
 void Game::gameNotifyFightResult(unique_ptr<MyFightInfo>& fightInfo)

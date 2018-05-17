@@ -12,7 +12,7 @@ class MyPiecePosition : public PiecePosition
 {
 	mutable char pieceType;
 	shared_ptr<Point> position;
-	char jokerRep;
+	mutable char jokerRep;
 	mutable bool movingPiece; //initialized to false
 
 
@@ -128,6 +128,11 @@ public:
 	void setMovingPiece(bool b) const
 	{
 		movingPiece = b;
+	}
+
+	void setJokerRep(char newJokerRep) const
+	{
+		jokerRep = newJokerRep;
 	}
 
 	bool operator>=(const MyPiecePosition& other) const

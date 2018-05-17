@@ -56,7 +56,7 @@ int main()
 	game->writeOutputFile();
 
 	delete game;
-	delete fileParser;
+	//delete fileParser;
 
 	return 0;
 }
