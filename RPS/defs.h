@@ -10,11 +10,13 @@ typedef unsigned int UINT;
 #define UNUSED(x) (x) = (x)
 
 /***** For debug printing ******/
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG == 1
+#define consume(x)	
 #define dprint(...) printf(__VA_ARGS__)
 #else
+#define consume(x)	std::ignore = (x)
 #define dprint(...)
 #endif
 /***** For debug printing ******/

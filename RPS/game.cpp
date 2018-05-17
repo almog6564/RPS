@@ -42,6 +42,7 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 
 Game::~Game()
 {
+	printf("Finished game after %d moves\n", movesCounter);
 	delete board;
 	delete player1Context;
 	delete player2Context;
@@ -319,14 +320,13 @@ string Game::GetReasonString(eReason reason)
 
 void Game::printBoard()
 {
+	return;
+
 	UINT rows, cols, i, j;
 	board->getBoardDimensions(&cols, &rows);
 	BoardPiece* piece;
 	bool isPlayer1 = false;
-
-#if DEBUG == 1
 	char debug_c;
-#endif
 
 	dprint("\n\n ##### BOARD #####\n\n");
 
@@ -343,6 +343,7 @@ void Game::printBoard()
 			else
 			{
 				isPlayer1 = (piece->getOwner() == player1Context);
+				consume(isPlayer1);
 #if DEBUG == 1
 				debug_c = pieceToChar(piece->getOriginalType(), isPlayer1);	//need to get original type to print joker as joker
 #endif

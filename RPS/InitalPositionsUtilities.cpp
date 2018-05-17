@@ -17,6 +17,7 @@ void positionBomb(UINT& bombsUsed, int bombX, int bombY, PieceVector& vectorToFi
 	BoardSet& boardSet)
 {
 	dprint("\t - Bomb #%d choosed position (%d,%d)\n", bombsUsed + 1, bombX, bombY);
+	consume(bombsUsed);
 
 	addPieceToVectorAndBoard(boardSet, vectorToFill, bombX, bombY, 'B');
 
@@ -26,6 +27,7 @@ void positionBomb(UINT& bombsUsed, int bombX, int bombY, PieceVector& vectorToFi
 void positionFlag(int i, int x, int y, PieceVector &vectorToFill, BoardSet &boardSet)
 {
 	dprint("\t - Flag #%d choosed position (%d,%d)\n", i + 1, x, y);
+	consume(i);
 
 	addPieceToVectorAndBoard(boardSet, vectorToFill, x, y, 'F');
 }

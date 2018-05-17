@@ -50,6 +50,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	consume(player);
 	dprint("\n#### Initial Positions || Player %d\n", player);
 	dprint("\t - Scnario: areFlagsOnCoreners = %d, areMovingOnCorners = %d\n", scenario->areFlagsOnCorners, scenario->areMovingOnCorners);
 

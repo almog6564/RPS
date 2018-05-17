@@ -70,35 +70,35 @@ public:
 
 	bool operator==(MyPiecePosition& other)
 	{
-		if ((*position).getX() == (*other.position).getX() && (*position).getY() == (*other.position).getY())
+		if (position->getX() == other.position->getX() && position->getY() == other.position->getY())
 			return true;
 		return false;
 	}
 
 	bool operator!=(MyPiecePosition& other)
 	{
-		if ((*position).getX() == (*other.position).getX() && (*position).getY() == (*other.position).getY())
+		if (position->getX() == other.position->getX() && position->getY() == other.position->getY())
 			return false;
 		return true;
 	}
 
 	bool operator!=(const MyPiecePosition& other) const
 	{
-		if ((*position).getX() == (*other.position).getX() && (*position).getY() == (*other.position).getY())
+		if (position->getX() == other.position->getX() && position->getY() == other.position->getY())
 			return false;
 		return true;
 	}
 
 	bool operator==(const MyPiecePosition& other) const
 	{
-		if ((*position).getX() == (*other.position).getX() && (*position).getY() == (*other.position).getY())
+		if (position->getX() == other.position->getX() && position->getY() == other.position->getY())
 			return true;
 		return false;
 	}
 
 	bool operator==(const MyPiecePosition& other)
 	{
-		if ((*position).getX() == (*other.position).getX() && (*position).getY() == (*other.position).getY())
+		if (position->getX() == other.position->getX() && position->getY() == other.position->getY())
 			return true;
 		return false;
 	}
