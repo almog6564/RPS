@@ -7,13 +7,13 @@ using namespace std;
 
 Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 						   UINT R2, UINT P2, UINT S2, UINT B2, UINT J2, UINT F2, FileParser* fileParser,
-						   bool autoPlayer1, bool autoPlayer2)
+							eGameMode gameMode)
 	:M(M), N(N), R1(R1), P1(P1), S1(S1), B1(B1), J1(J1), F1(F1),
 				 R2(R2), P2(P2), S2(S2), B2(B2), J2(J2), F2(F2), fileParser(fileParser), movesCounter(0)
 {
 	board = new MyBoard(N, M);
 
-	if (autoPlayer1)
+	if (gameMode == AUTO_VS_FILE || gameMode == AUTO_VS_AUTO)
 	{
 		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1);
 		player1Algorithm = new AutoPlayerAlgorithm(N, M, R1, P1, S1, B1, J1, F1, 1);
@@ -21,19 +21,19 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 
 	else
 	{
-		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1, fileParser->getPlayerFileContext(0), false);
+		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1);
 		player1Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(0), N, M);
 	}
 
 
-	if (autoPlayer2)
+	if (gameMode == FILE_VS_AUTO || gameMode == AUTO_VS_AUTO)
 	{
 		player2Context = new PlayerContext(1, R2, P2, S2, B2, J2, F2);
 		player2Algorithm = new AutoPlayerAlgorithm(N, M, R1, P1, S1, B1, J1, F1, 2);
 	}
 	else
 	{
-		player2Context = new PlayerContext(1, R1, P1, S1, B1, J1, F2, fileParser->getPlayerFileContext(1), false);
+		player2Context = new PlayerContext(1, R1, P1, S1, B1, J1, F2);
 		player2Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(1), N, M);
 	}
 
@@ -261,7 +261,8 @@ int Game::getWinner(eReason* pReason)
 		reason = BOTH_LOST_DIFFERENT_REASONS;
 	}
 
-	*pReason = reason;
+	if(pReason)
+		*pReason = reason;
 
 	return winner;
 }
@@ -269,7 +270,7 @@ int Game::getWinner(eReason* pReason)
 string Game::GetReasonString(eReason reason)
 {
 	char temp[100];
-	int playerNumber, line, line2;
+	int playerNumber;
 
 	switch (reason)
 	{
@@ -296,12 +297,10 @@ string Game::GetReasonString(eReason reason)
 		if (player1Context->getHasLost())
 		{
 			playerNumber = 1;
-			line = player1Context->getPlayerFileContext()->pieces->getCurrentLineNum();
 		}
 		else
 		{
 			playerNumber = 2;
-			line = player2Context->getPlayerFileContext()->pieces->getCurrentLineNum();
 		}
 		sprintf(temp, "Bad Positioning input file for player %d", playerNumber);
 		return (string)temp;
@@ -310,10 +309,7 @@ string Game::GetReasonString(eReason reason)
 	case BOTH_BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
-		line = player1Context->getPlayerFileContext()->pieces->getCurrentLineNum();
-		line2 = player2Context->getPlayerFileContext()->pieces->getCurrentLineNum();
-
-		sprintf(temp, "Bad Positioning input file for both players - player 1: line %d, player 2: line %d", line, line2);
+		sprintf(temp, "Bad Positioning input file for both players");
 		return (string)temp;
 
 	default:

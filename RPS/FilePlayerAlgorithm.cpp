@@ -47,9 +47,6 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 
 		case FILE_ERROR:
 		case FILE_BAD_FORMAT:
-		//	setHasLost();
-		//	setReason(BAD_POSITIONING_INPUT_FILE_FORMAT);
-
 			pieceCounter = 0;
 
 			break;
@@ -62,8 +59,6 @@ UINT FilePlayerAlgorithm::validatePlayerPositions(int player)
 
 				pieceCounter = 0;
 				status = FILE_BAD_FORMAT;
-			//	setHasLost();
-			//	setReason(BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION);
 			}
 			else
 			{
@@ -144,22 +139,9 @@ unique_ptr<Move> FilePlayerAlgorithm::getMove()
 	return make_unique<MyMove>(fromX, fromY, toX, toY);
 }
 
-void FilePlayerAlgorithm::notifyOnInitialBoard(const Board & b, const std::vector<unique_ptr<FightInfo>>& fights) 
-{
-	//just zevel for it to compile
-	auto a = new MyPoint(1, 1);
-	b.getPlayer(*a);
-	fights.size();
-	delete a;
-}
+void FilePlayerAlgorithm::notifyOnInitialBoard(const Board&, const std::vector<unique_ptr<FightInfo>>&) { }
 
-void FilePlayerAlgorithm::notifyOnOpponentMove(const Move & move) 
-{
-	move.getFrom();
-}
+void FilePlayerAlgorithm::notifyOnOpponentMove(const Move &) { }
 
-void FilePlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo) 
-{
-	fightInfo.getWinner();
-}
+void FilePlayerAlgorithm::notifyFightResult(const FightInfo &) { }
 

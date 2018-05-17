@@ -2,38 +2,53 @@
 
 #include "game.h"
 #include "parser.h"
+#include <algorithm>
 
 using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
+	FileParser* fileParser = nullptr;
 	Game* game = nullptr;
 	int M, N, R, P, S, B, J, F;
 	M = N = 10;
 	R = 2; P = 5; S = 1; B = 2; J = 2; F = 1;
-	bool bIsPlayer1Auto = true ,  bIsPlayer2Auto = true;
-	string p1p = "player1.rps_board";
-	string p1m = "player1.rps_moves";
-	string p2p = "player2.rps_board";
-	string p2m = "player2.rps_moves";
-	string output = "rps.output";
+	bool printUsageAndExit = false;
+	vector<string> usages = { "file-vs-file", "file-vs-auto", "auto-vs-file", "auto-vs-auto" };
+	eGameMode gameMode;
 
 #if DEBUG == 1
-	eReason reason;
-	int	winner;
+
 #endif
 
-	FileParser* fileParser = new FileParser(p1p, p2p, p1m, p2m, output);
-	if (fileParser->initializeFiles()) //initialization failed
+	do
 	{
-		cout << "Initialization of game failed because of file error" << endl;
-		return -1;
-	}
+		if (argc != 2)
+		{
+			printUsageAndExit = true;
+			break;
+		}
 
-	do 
-	{
+		const auto usage = find(usages.begin(), usages.end(), argv[1]);
+
+		if(usage == usages.end())
+		{
+			printUsageAndExit = true;
+			break;
+		}
+
+		gameMode = (eGameMode) distance(usages.begin(), usage);
+
+		fileParser = new FileParser(gameMode);
+
+		if (fileParser->initializeFiles()) //initialization failed
+		{
+			cout << "Initialization of game failed because of file error" << endl;
+			break;
+		}
+
 		 game = new Game(M, N, R, P, S, B, J, F,
-			R, P, S, B, J, F, fileParser, bIsPlayer1Auto, bIsPlayer2Auto);
+			R, P, S, B, J, F, fileParser, gameMode);
 
 		 game->positionAllPieces();
 
@@ -45,18 +60,21 @@ int main()
 		/* Start Game */
 		while (!game->endGame())
 			game->runMove();
+		
+		dprint("\n\n ########## FINISHED GAME - RESULTS ##########\n\nWINNER is : %d\n", game->getWinner());
+
+		game->writeOutputFile();
 
 	} while (false);
 
-#if DEBUG == 1
-	winner = game->getWinner(&reason);
-	dprint("\n\n ########## FINISHED GAME - RESULTS ##########\n\nWINNER is : %d\n", winner);
-#endif
-
-	game->writeOutputFile();
+	if (printUsageAndExit)
+	{
+		cout << "\nUsage: ex2 mode\nOptions for \"mode\":"
+			"\n - auto-vs-file\n - file-vs-auto\n - auto-vs-auto\n - file-vs-file\n" << endl;
+	}
 
 	delete game;
-	//delete fileParser;
+	delete fileParser;
 
 	return 0;
 }

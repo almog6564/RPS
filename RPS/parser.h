@@ -7,6 +7,13 @@
 #include "defs.h"
 
 
+#define PLAYER1_POSITION_FILENAME	"player1.rps_board"
+#define PLAYER1_MOVES_FILENAME		"player1.rps_moves"
+#define PLAYER2_POSITION_FILENAME	"player2.rps_board"
+#define PLAYER2_MOVES_FILENAME		"player2.rps_moves"
+#define OUTPUT_FILENAME				"rps.output"
+
+
 /**
 	Class FileContext
 	Encloses all the file specific operations.
@@ -31,7 +38,7 @@ public:
 	Initializes a FileContext object.
 	After initialization the function @openFile must be run in order to use the file.
 	*/
-	FileContext(std::string& fname, bool isInputFile) :
+	FileContext(const char* fname, bool isInputFile) :
 		fileName(new std::string(fname)), isInputFile(isInputFile) {};
 
 	~FileContext();
@@ -86,7 +93,7 @@ public:
 	/*
 		Initializes a PlayerFileContext object accordingly by getting only the filenames.
 	*/
-	PlayerFileContext(std::string& pieceFileName, std::string& movesFileName);
+	PlayerFileContext(const char* pieceFileName, const char* movesFileName);
 
 	~PlayerFileContext();
 	/*
@@ -164,9 +171,7 @@ public:
 	PlayerFileContext* p2;
 	FileContext* output;
 
-	FileParser(std::string& p1PiecesFileName, std::string& p2PiecesFilename,
-		std::string& p1MovesFileName, std::string& p2MovesFilename, 
-		std::string& outputFilename);
+	FileParser(eGameMode gameMode);
 
 	/*
 		Open all files of both players and the output file.

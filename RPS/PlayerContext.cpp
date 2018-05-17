@@ -2,8 +2,8 @@
 
 using namespace std;
 
-PlayerContext::PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext /*=NULL*/, bool autoPlayer /*=true*/) 
-	: ID(ID), R(R), P(P), S(S), B(B), J(J), F(F), fileContext(fileContext)
+PlayerContext::PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F) 
+	: ID(ID), R(R), P(P), S(S), B(B), J(J), F(F)
 {
 
 	pieceCounters[ROCK] = 0; pieceCounters[SCISSORS] = 0; pieceCounters[PAPER] = 0;
@@ -13,7 +13,6 @@ PlayerContext::PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UI
 	score = 0;
 	hasLost = false;
 	hasMoreMoves = true;
-	autoPlayer = autoPlayer;
 }
 
 bool PlayerContext::isAlive()
@@ -111,11 +110,6 @@ int PlayerContext::incTypeCount(ePieceType type, ePieceType originalType, bool u
 		return -1;
 	}
 	return 0;
-}
-
-PlayerFileContext* PlayerContext::getPlayerFileContext()
-{
-	return fileContext;
 }
 
 

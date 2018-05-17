@@ -16,11 +16,10 @@ class PlayerContext
 	bool hasLost;
 	UINT R, P, S, B, J, F;
 	eReason reason;
-	PlayerFileContext* fileContext;	
 	bool hasMoreMoves;
 
 public:
-	PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, PlayerFileContext* fileContext = nullptr, bool autoPlayer = true);
+	PlayerContext(UINT ID, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F);
 
 	/*
 	This function checks if the Player is still "Alive", i.e. still have at least one flag and one moving piece left. 
@@ -46,8 +45,6 @@ public:
 	bool getHasMoreMoves();
 
 	void setHasMoreMoves(bool val);
-
-	PlayerFileContext* getPlayerFileContext();
 
 	UINT getPlayerId()const
 	{

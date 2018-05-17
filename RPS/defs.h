@@ -81,6 +81,14 @@ typedef enum _eFileStatus
 
 } eFileStatus;
 
+typedef enum _eGameMode
+{
+	FILE_VS_FILE,
+	FILE_VS_AUTO,
+	AUTO_VS_FILE,
+	AUTO_VS_AUTO
+
+} eGameMode;
 
 #endif //_DEFS_
 

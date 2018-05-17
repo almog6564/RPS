@@ -8,7 +8,7 @@
 using namespace std;
 
 
-PlayerFileContext::PlayerFileContext(string& pieceFileName, string& movesFileName)
+PlayerFileContext::PlayerFileContext(const char* pieceFileName, const char* movesFileName)
 {
 	pieces = new FileContext(pieceFileName, true);	//input file
 	moves = new FileContext(movesFileName, true);	//input file
@@ -20,12 +20,17 @@ PlayerFileContext::~PlayerFileContext()
 	delete moves;
 }
 
-FileParser::FileParser(string& p1PiecesFileName, string& p2PiecesFilename,
-	string& p1MovesFileName, string& p2MovesFilename, string& outputFilename)
+FileParser::FileParser(eGameMode gameMode)
 {
-	p1 = new PlayerFileContext(p1PiecesFileName, p1MovesFileName);
-	p2 = new PlayerFileContext(p2PiecesFilename, p2MovesFilename);
-	output = new FileContext(outputFilename, false);	//output file
+	output = new FileContext(OUTPUT_FILENAME, false);	//output file
+	p1 = nullptr;
+	p2 = nullptr;
+
+	if(gameMode == FILE_VS_AUTO || gameMode == FILE_VS_FILE)
+		p1 = new PlayerFileContext(PLAYER1_POSITION_FILENAME, PLAYER1_MOVES_FILENAME);
+
+	if (gameMode == AUTO_VS_FILE || gameMode == FILE_VS_FILE)
+		p2 = new PlayerFileContext(PLAYER2_POSITION_FILENAME, PLAYER2_MOVES_FILENAME);
 }
 
 FileParser::~FileParser()
@@ -77,20 +82,26 @@ int FileParser::initializeFiles()
 
 	do 
 	{
-		if (p1->pieces->openFile())
-			break;
-
-		if (p1->moves->openFile())
-			break;
-
-		if (p2->pieces->openFile())
-			break;
-
-		if (p2->moves->openFile())
-			break;
-
 		if (output->openFile())
 			break;
+
+		if (p1)
+		{
+			if (p1->pieces->openFile())
+				break;
+
+			if (p1->moves->openFile())
+				break;
+		}
+
+		if (p2)
+		{
+			if (p2->pieces->openFile())
+				break;
+
+			if (p2->moves->openFile())
+				break;
+		}
 
 	} while (false);
 

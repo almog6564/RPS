@@ -34,8 +34,8 @@ class Game
 
 public:
 	Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
-						 UINT R2, UINT P2, UINT S2, UINT B2, UINT J2, UINT F2, FileParser* fileParser,
-						 bool autoPlayer1, bool autoPlayer2);
+						 UINT R2, UINT P2, UINT S2, UINT B2, UINT J2, UINT F2, 
+							FileParser* fileParser,	eGameMode gameMode);
 
 
 	~Game();
@@ -75,7 +75,7 @@ public:
 			2 - if it's a tie.
 			The function will also update the reason given as a pointer with the right reason.
 	*/
-	int getWinner(eReason* reason);
+	int getWinner(eReason* reason = nullptr);
 
 	string GetReasonString(eReason reason);
 
