@@ -166,9 +166,13 @@ void Game::checkPlayersFlagCountLessThanMax(PlayerContext* player)
 
 bool Game::endGame()
 {
+	if (movesCounter >= 100)
+		return true;
+
 	if (player1Context->isAlive() && player2Context->isAlive() && (player1Context->getHasMoreMoves() 
 		|| player2Context->getHasMoreMoves()))
 		return false;
+
 	return true;
 }
 
@@ -224,7 +228,12 @@ int Game::getWinner(eReason* pReason)
 	int winner = 0;
 	eReason reason = INVALID_REASON;
 
-	if (player1Context->getHasLost() && !player2Context->getHasLost())
+	if (movesCounter >= 100)
+	{
+		reason = MORE_THAN_100_MOVES;
+	}
+
+	else if (player1Context->getHasLost() && !player2Context->getHasLost())
 	{
 		reason = player1Context->getReason();
 		winner = 2; //player2 wins
@@ -255,6 +264,11 @@ int Game::getWinner(eReason* pReason)
 	
 	else if (player1Context->getReason() != player2Context->getReason())						//TODO
 	{
+		if (player1Context->getTypeCount(FLAG) > 0 && player2Context->getTypeCount(FLAG) == 0)
+			winner = 1;
+		else if (player1Context->getTypeCount(FLAG) == 0 && player2Context->getTypeCount(FLAG) > 0)
+			winner = 2;
+
 		printf("BOTH player Got TIE scenario with two different reasons:\n"
 			"\tPlayer #1 reason: %s\n"
 			"\tPlayer #2 reason: %s\n",
@@ -270,7 +284,7 @@ int Game::getWinner(eReason* pReason)
 
 string Game::GetReasonString(eReason reason)
 {
-	char temp[100];
+	char temp[200];
 	int playerNumber;
 
 	switch (reason)
@@ -311,6 +325,19 @@ string Game::GetReasonString(eReason reason)
 	case BOTH_BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
 		sprintf(temp, "Bad Positioning input file for both players");
+		return (string)temp;
+
+	case BOTH_PIECES_EATEN:
+		sprintf(temp, "Both players ate each other's last moving piece");
+		return (string)temp;
+
+	case BOTH_LOST_DIFFERENT_REASONS:
+		sprintf(temp, "Player 1 reason: [%s] Player 2 reason: [%s]", 
+			GetReasonString(player1Context->getReason()).c_str(), GetReasonString(player2Context->getReason()).c_str());
+		return (string)temp;
+
+	case MORE_THAN_100_MOVES:
+		sprintf(temp, "100 Moves played without a winner");
 		return (string)temp;
 
 	default:

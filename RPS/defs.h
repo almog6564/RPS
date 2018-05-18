@@ -7,10 +7,8 @@
 
 typedef unsigned int UINT;
 
-#define UNUSED(x) (x) = (x)
-
 /***** For debug printing ******/
-#define DEBUG 0
+#define DEBUG 1
 
 #if DEBUG == 1
 #define consume(x)	
@@ -19,7 +17,8 @@ typedef unsigned int UINT;
 #define consume(x)	std::ignore = (x)
 #define dprint(...)
 #endif
-/***** For debug printing ******/
+/******************************/
+
 #define BOARD_SIZE		10
 #define R_COUNT			2
 #define P_COUNT			5
@@ -75,6 +74,8 @@ typedef enum  _reason
 	BOTH_BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER	= MAKE_REASON_DOUBLE(BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER),
 	BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER		= MAKE_REASON_DOUBLE(BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER),
 	
+	MORE_THAN_100_MOVES,
+
 	BOTH_LOST_DIFFERENT_REASONS
 
 } eReason;
