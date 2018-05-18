@@ -129,7 +129,9 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 			//in any case, remove player's losing piece
 			if (*playerPieceIter == *nextPieceToMove)
 				++nextPieceToMove;
-			playerPieces.erase(playerPieceIter);
+
+			if (playerPieces.count(fightPos) > 0)	//could be that the piece is no longer there if it lost another fight
+				playerPieces.erase(playerPieceIter);
 
 		}
 
@@ -140,7 +142,9 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 			{
 				if (*playerPieceIter == *nextPieceToMove)
 					++nextPieceToMove;
-				playerPieces.erase(playerPieceIter);
+
+				if (playerPieces.count(fightPos) > 0)	//could be that the piece is no longer there if it lost another fight
+					playerPieces.erase(playerPieceIter);
 			}
 		}
 
@@ -148,7 +152,9 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 		{
 			if (*playerPieceIter == *nextPieceToMove)
 				++nextPieceToMove;
-			playerPieces.erase(playerPieceIter);
+
+			if (playerPieces.count(fightPos) > 0)		//could be that the piece is no longer there if it lost another fight
+				playerPieces.erase(playerPieceIter);
 		}
 	}
 }
