@@ -65,6 +65,7 @@ private:
 	bool existsOnBoardSet(const MyPoint& point);
 
 	void removeOutOfBoundsDirections(const MyPoint& point, std::bitset<4>& legalFleeDirections);
+	int fillCornersWithAlreadyOccupiedCorners(vector<bool>& selectedCorners, BoardSet& boardSet);
 public:
 	AutoPlayerAlgorithm(UINT boardRows, UINT boardCols,
 		UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID);

@@ -88,6 +88,38 @@ int generateUniqueCorner(RandomContext &rndCtx, vector<bool>& selectedCorners)
 	return select;
 }
 
+int AutoPlayerAlgorithm::fillCornersWithAlreadyOccupiedCorners(vector<bool>& selectedCorners, BoardSet& boardSet)
+{
+	int count = 4;
+
+	if (selectedCorners[0] || boardSet.count(MyPiecePosition(1, 1)) > 0)
+	{
+		selectedCorners[0] = true;
+		count--;
+	}
+
+	if (selectedCorners[1] || boardSet.count(MyPiecePosition(1, boardRows)) > 0)
+	{
+		selectedCorners[1] = true;
+		count--;
+	}
+
+	if (selectedCorners[2] || boardSet.count(MyPiecePosition(boardCols, 1)) > 0)
+	{
+		selectedCorners[2] = true;
+		count--;
+	}
+
+
+	if (selectedCorners[3] || boardSet.count(MyPiecePosition(boardCols, boardRows)) > 0)
+	{
+		selectedCorners[3] = true;
+		count--;
+	}
+
+	return count;
+}
+
 void AutoPlayerAlgorithm::placeMovingPiecesOnCorners(vector<char> &movingPieceVector,
 	int initialMovingCnt, RandomContext &rndCtx, PieceVector& vectorToFill, BoardSet& boardSet,
 	int &pieceIndex)
@@ -96,11 +128,13 @@ void AutoPlayerAlgorithm::placeMovingPiecesOnCorners(vector<char> &movingPieceVe
 	int select, cornerX, cornerY, corners;
 	vector<bool> selectedCorners = { false, false, false, false };
 
+	corners = fillCornersWithAlreadyOccupiedCorners(selectedCorners, boardSet);
+
 	if (scenario->areMovingOnCorners && !scenario->areFlagsOnCorners)
 	{
 		shuffle(movingPieceVector.begin(), movingPieceVector.end(), rndCtx.getRandomGenerator());
 
-		corners = (initialMovingCnt < 4) ? (initialMovingCnt) : 4;
+		corners = (initialMovingCnt < corners) ? (initialMovingCnt) : corners;
 
 		for (int i = 0; i < corners; i++)
 		{
