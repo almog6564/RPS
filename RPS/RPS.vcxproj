@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="AutoPlayerAlgorithm.cpp" />
     <ClCompile Include="FilePlayerAlgorithm.cpp" />
+    <ClCompile Include="GetMoveUtilites.cpp" />
     <ClCompile Include="myBoard.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />

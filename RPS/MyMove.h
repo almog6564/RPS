@@ -7,19 +7,18 @@
 
 class MyMove :public Move
 {
-	Point* from;
-	Point* to;
+	const MyPoint from;
+	const MyPoint to;
 public:
-	MyMove(UINT fromX, UINT fromY, UINT toX, UINT toY);
-	~MyMove();
+	MyMove(const UINT fromX, const UINT fromY, const UINT toX, const UINT toY);
 
 	const Point& getFrom() const
 	{
-		return *from;
+		return from;
 	}
 	const Point& getTo() const
 	{
-		return *to;
+		return to;
 	}
 };
 

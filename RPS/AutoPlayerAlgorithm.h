@@ -2,10 +2,12 @@
 #define __AUTO_PLAYER_ALGORITHM_H_
 
 #include "PlayerAlgorithm.h"
-#include "defs.h"
-#include <unordered_set>
+#include "MyJokerChange.h"
 #include "MyPiecePosition.h"
 #include "MyMove.h"
+#include "defs.h"
+
+#include <unordered_set>
 #include <random>
 #include <bitset>
 
@@ -46,9 +48,7 @@ private:
 
 	MyPiecePosition getNextPieceToMove();
 
-	const MyPiecePosition & getNextPieceToAttack();
-
-	bool checkForAdjecentOpponent(const MyPiecePosition& pos, const MyPiecePosition other);
+	bool checkForAdjecentOpponent(const MyPiecePosition other);
 
 	unique_ptr<Move> checkAllAdjecentOpponents(const MyPiecePosition& piece, std::bitset<4>& boolVec, int x, int y);
 
@@ -58,7 +58,7 @@ private:
 
 	std::unique_ptr<MyMove> getLegalMove(const MyPoint& point, std::bitset<4>& fleeArr);
 
-	char getNewJokerRep(char oldJokerRep);
+	char getNewJokerRep(const char oldJokerRep);
 
 	char getRandomJokerChahge(int rand, char jokerRep);
 

@@ -1,18 +1,12 @@
 COMP = g++-5.3.0
 #put all your object files here
 OBJS = parser.o MyPoint.o MyJokerChange.o MyMove.o MyFightInfo.o PlayerContext.o \
-	MyPiecePosition.o BoardPiece.o myBoard.o InitalPositionsUtilities.o \
+	MyPiecePosition.o BoardPiece.o myBoard.o InitalPositionsUtilities.o GetMoveUtilites.o \
 	AutoPlayerAlgorithm.o FilePlayerAlgorithm.o game.o main.o 
 
 #The executabel filename DON'T CHANGE
 EXEC = ex2
 CPP_COMP_FLAG = -std=c++14 -DNDEBUG -g -Wall -Wextra -pedantic-errors -Werror
-
-
-##### ADD 
-#####  
-##### back
-
 
 
 $(EXEC): $(OBJS)
@@ -51,6 +45,12 @@ BoardPiece.o: BoardPiece.cpp BoardPiece.h defs.h MyPiecePosition.h PiecePosition
 myBoard.o: myBoard.cpp myBoard.h BoardPiece.h defs.h PiecePosition.h \
  PlayerContext.h parser.h MyPoint.h Point.h Board.h MyFightInfo.h \
  FightInfo.h
+	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
+
+GetMoveUtilites.o: GetMoveUtilites.cpp AutoPlayerAlgorithm.h \
+ PlayerAlgorithm.h Point.h PiecePosition.h Board.h FightInfo.h Move.h \
+ JokerChange.h MyJokerChange.h defs.h MyPoint.h MyPiecePosition.h \
+ MyMove.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
 InitalPositionsUtilities.o: InitalPositionsUtilities.cpp \

@@ -7,13 +7,13 @@ using namespace std;
 
 
 void addPieceToVectorAndBoard(BoardSet &boardSet, PieceVector &vectorToFill, 
-	int x, int y, char pieceType, char jokerType = '#')
+	const int x, const int y, const char pieceType, const char jokerType = '#') 
 {
 	vectorToFill.push_back(make_unique<MyPiecePosition>(x, y, pieceType, jokerType));
 	boardSet.emplace(x, y, pieceType, jokerType);
 }
 
-void positionBomb(UINT& bombsUsed, int bombX, int bombY, PieceVector& vectorToFill,
+void positionBomb(UINT& bombsUsed, const int bombX, const int bombY, PieceVector& vectorToFill,
 	BoardSet& boardSet)
 {
 	dprint("\t - Bomb #%d choosed position (%d,%d)\n", bombsUsed + 1, bombX, bombY);
@@ -24,7 +24,7 @@ void positionBomb(UINT& bombsUsed, int bombX, int bombY, PieceVector& vectorToFi
 	bombsUsed++;
 }
 
-void positionFlag(int i, int x, int y, PieceVector &vectorToFill, BoardSet &boardSet)
+void positionFlag(const int i, const int x, const int y, PieceVector &vectorToFill, BoardSet &boardSet)
 {
 	dprint("\t - Flag #%d choosed position (%d,%d)\n", i + 1, x, y);
 	consume(i);
@@ -32,7 +32,8 @@ void positionFlag(int i, int x, int y, PieceVector &vectorToFill, BoardSet &boar
 	addPieceToVectorAndBoard(boardSet, vectorToFill, x, y, 'F');
 }
 
-void positionMovingPiece(int x, int y, PieceVector &vectorToFill, BoardSet &boardSet, char pieceType, char jokerType)
+void positionMovingPiece(const int x, const int y, PieceVector &vectorToFill, BoardSet &boardSet, 
+	const char pieceType, const char jokerType)
 {
 	if (pieceType != 'J')
 	{
@@ -47,7 +48,7 @@ void positionMovingPiece(int x, int y, PieceVector &vectorToFill, BoardSet &boar
 }
 
 
-void positionFlagRandomly(RandomContext& rndCtx, BoardSet &boardSet, int flagIndex, PieceVector& vectorToFill)
+void positionFlagRandomly(RandomContext& rndCtx, BoardSet &boardSet, const int flagIndex, PieceVector& vectorToFill)
 {
 	int x, y;
 
@@ -121,11 +122,11 @@ int AutoPlayerAlgorithm::fillCornersWithAlreadyOccupiedCorners(vector<bool>& sel
 }
 
 void AutoPlayerAlgorithm::placeMovingPiecesOnCorners(vector<char> &movingPieceVector,
-	int initialMovingCnt, RandomContext &rndCtx, PieceVector& vectorToFill, BoardSet& boardSet,
+	const int initialMovingCnt, RandomContext &rndCtx, PieceVector& vectorToFill, BoardSet& boardSet,
 	int &pieceIndex)
 {
 
-	int select, cornerX, cornerY, corners;
+	int cornerX, cornerY, corners;
 	vector<bool> selectedCorners = { false, false, false, false };
 
 	corners = fillCornersWithAlreadyOccupiedCorners(selectedCorners, boardSet);
@@ -138,7 +139,7 @@ void AutoPlayerAlgorithm::placeMovingPiecesOnCorners(vector<char> &movingPieceVe
 
 		for (int i = 0; i < corners; i++)
 		{
-			select = generateUniqueCorner(rndCtx, selectedCorners);
+			const int select = generateUniqueCorner(rndCtx, selectedCorners);
 
 			chooseCorner(select, rndCtx, cornerX, cornerY);
 
@@ -195,7 +196,7 @@ void AutoPlayerAlgorithm::chooseCorner(int select, RandomContext& rndCtx,
 	}
 }
 
-void AutoPlayerAlgorithm::fillListWithMovingPieces(vector<char>& movingPieceVector, int bombsUsed)
+void AutoPlayerAlgorithm::fillListWithMovingPieces(vector<char>& movingPieceVector, const int bombsUsed)
 {
 	addAllToVector(R, 'R');
 	addAllToVector(P, 'P');
@@ -209,7 +210,7 @@ int AutoPlayerAlgorithm::positionFlagsAndBombs(RandomContext& rndCtx,
 	BoardSet& boardSet, PieceVector& vectorToFill)
 {
 	/* Other static variables */
-	int cornerX, cornerY, select, corners, bomb1X, bomb1Y, bomb2X, bomb2Y;
+	int select, cornerX, cornerY, corners, bomb1X = 0, bomb1Y = 0, bomb2X = 0, bomb2Y = 0;
 
 	vector<bool> selectedCorners = { false, false, false, false };
 
@@ -271,8 +272,8 @@ int AutoPlayerAlgorithm::positionFlagsAndBombs(RandomContext& rndCtx,
 }
 
 
-void positionRestOfMovingPiecesRandomly(int pieceIndex, int initialMovingCnt,
-	RandomContext &rndCtx, BoardSet &boardSet, vector<char> movingPieceVector, PieceVector& vectorToFill)
+void positionRestOfMovingPiecesRandomly(const int pieceIndex, const int initialMovingCnt,
+	RandomContext &rndCtx, BoardSet &boardSet, const vector<char> movingPieceVector, PieceVector& vectorToFill)
 {
 	int x, y;
 	char random_RPSB_jokerType;
