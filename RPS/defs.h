@@ -20,7 +20,13 @@ typedef unsigned int UINT;
 #define dprint(...)
 #endif
 /***** For debug printing ******/
-
+#define BOARD_SIZE		10
+#define R_COUNT			2
+#define P_COUNT			5
+#define S_COUNT			1
+#define B_COUNT			2
+#define J_COUNT			2
+#define F_COUNT			1
 
 typedef enum _ePieceType
 {

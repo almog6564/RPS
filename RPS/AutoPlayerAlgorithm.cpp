@@ -101,7 +101,6 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 				opponentsPieces.emplace(j, i);
 		}
 	}
-
 	nextPieceToMove = playerPieces.begin(); //start with first piece
 
 	for (auto& fightInfo : fights)
@@ -113,20 +112,25 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 		int opponentID = (ID == 1 ? 2 : 1), playerID = ID;
 
 		auto playerPieceIter = playerPieces.find(fightPos);
-		auto opponentPieceIter = opponentsPieces.find(fightPos);
 
 		if (fightWinner == opponentID) //player lost fight, remove piece from players set, and update piece type and if moving
 		{
 			//update new date regarding opponent's piece
 			if (winningType == 'P' || winningType == 'R' || winningType == 'S')
 			{
-				opponentPieceIter->setPieceType(winningType);
-				opponentPieceIter->setMovingPiece(true);
+				if (opponentsPieces.count(fightPos) > 0)	//could be that the piece is no longer there if it lost another fight
+				{
+					auto opponentPieceIter = opponentsPieces.find(fightPos);
+					opponentPieceIter->setPieceType(winningType);
+					opponentPieceIter->setMovingPiece(true);
+				}
 			}
+
 			//in any case, remove player's losing piece
 			if (*playerPieceIter == *nextPieceToMove)
 				++nextPieceToMove;
 			playerPieces.erase(playerPieceIter);
+
 		}
 
 		else if (fightWinner == playerID) //player won, remove opponent's piece

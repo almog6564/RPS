@@ -42,7 +42,7 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 
 Game::~Game()
 {
-	printf("Finished game after %d moves\n", movesCounter);
+	printf("%d\n", movesCounter);
 	delete board;
 	delete player1Context;
 	delete player2Context;

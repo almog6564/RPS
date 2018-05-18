@@ -10,9 +10,6 @@ int main(int argc, char* argv[])
 {
 	FileParser* fileParser = nullptr;
 	Game* game = nullptr;
-	int M, N, R, P, S, B, J, F;
-	M = N = 30;
-	R = 2; P = 5; S = 1; B = 2; J = 2; F = 1;
 	bool printUsageAndExit = false;
 	vector<string> usages = { "file-vs-file", "file-vs-auto", "auto-vs-file", "auto-vs-auto" };
 	eGameMode gameMode;
@@ -47,12 +44,14 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		 game = new Game(M, N, R, P, S, B, J, F,
-			R, P, S, B, J, F, fileParser, gameMode);
+		 game = new Game(BOARD_SIZE, BOARD_SIZE*2, 
+			 R_COUNT, P_COUNT, S_COUNT, B_COUNT, J_COUNT, F_COUNT,
+			 R_COUNT, P_COUNT, S_COUNT, B_COUNT, J_COUNT, F_COUNT,
+			 fileParser, gameMode);
 
 		 game->positionAllPieces();
 
-		dprint("Positioning of pieces on board ENDED!\n");
+		 dprint("Positioning of pieces on board ENDED!\n");
 
 		/* Check Flags counters*/
 		game->flagsCheck();
