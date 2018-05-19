@@ -9,7 +9,7 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 						   UINT R2, UINT P2, UINT S2, UINT B2, UINT J2, UINT F2, FileParser* fileParser,
 							eGameMode gameMode)
 	:M(M), N(N), R1(R1), P1(P1), S1(S1), B1(B1), J1(J1), F1(F1),
-				 R2(R2), P2(P2), S2(S2), B2(B2), J2(J2), F2(F2), fileParser(fileParser), movesCounter(0)
+				 R2(R2), P2(P2), S2(S2), B2(B2), J2(J2), F2(F2), fileParser(fileParser), movesCounter(0), gameMode(gameMode)
 {
 	board = new MyBoard(N, M);
 
@@ -164,6 +164,19 @@ void Game::checkPlayersFlagCountLessThanMax(PlayerContext* player)
 	}
 }
 
+bool Game::isPlayerAuto(int ID)
+{
+	bool ret = false;
+
+	if (ID == 0 && (gameMode == AUTO_VS_FILE || gameMode == AUTO_VS_AUTO))
+		ret = true;
+
+	if (ID == 1 && (gameMode == FILE_VS_AUTO || gameMode == AUTO_VS_AUTO))
+		ret = true;
+
+	return ret;
+}
+
 bool Game::endGame()
 {
 	if (movesCounter >= 100)
@@ -285,7 +298,7 @@ int Game::getWinner(eReason* pReason)
 string Game::GetReasonString(eReason reason)
 {
 	char temp[200];
-	int playerNumber;
+	int playerNumber, line = 0;
 
 	switch (reason)
 	{
@@ -312,10 +325,26 @@ string Game::GetReasonString(eReason reason)
 		if (player1Context->getHasLost())
 		{
 			playerNumber = 1;
+
+			if (isPlayerAuto(0) == false)
+			{
+				line = fileParser->getPlayerFileContext(0)->pieces->getCurrentLineNum();
+
+				sprintf(temp, "Bad Positioning input file for player %d - line %d", playerNumber, line);
+				return (string)temp;
+			}
 		}
 		else
 		{
 			playerNumber = 2;
+
+			if (isPlayerAuto(1) == false)
+			{
+				line = fileParser->getPlayerFileContext(1)->pieces->getCurrentLineNum();
+
+				sprintf(temp, "Bad Positioning input file for player %d - line %d", playerNumber, line);
+				return (string)temp;
+			}
 		}
 		sprintf(temp, "Bad Positioning input file for player %d", playerNumber);
 		return (string)temp;
@@ -324,6 +353,17 @@ string Game::GetReasonString(eReason reason)
 	case BOTH_BAD_POSITIONING_INPUT_FILE_DOUBLE_POSITION:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_PIECE_NUMBER:
 	case BOTH_BAD_POSITIONING_INPUT_FILE_FLAG_NUMBER:
+		
+		//sanity check
+		if (isPlayerAuto(0) == false && isPlayerAuto(1) == false)
+		{
+			int line1 = fileParser->getPlayerFileContext(0)->pieces->getCurrentLineNum();
+			int line2 = fileParser->getPlayerFileContext(1)->pieces->getCurrentLineNum();
+
+			sprintf(temp, "Bad Positioning input file for both players - player 1: line %d, player 2: line %d", line1, line2);
+			return (string)temp;
+		}
+
 		sprintf(temp, "Bad Positioning input file for both players");
 		return (string)temp;
 
@@ -347,8 +387,6 @@ string Game::GetReasonString(eReason reason)
 
 void Game::printBoard()
 {
-	return;
-
 	UINT rows, cols, i, j;
 	board->getBoardDimensions(&cols, &rows);
 	BoardPiece* piece;

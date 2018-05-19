@@ -23,6 +23,13 @@ typedef std::vector<unique_ptr<PiecePosition>> PieceVector;
 class AutoPlayerAlgorithm : public PlayerAlgorithm
 {
 private:
+
+	int ID;
+
+	struct {
+		UINT R, P, S, B, J, F;
+	} initPieceCnt;
+
 	PositioningScenario* scenario;
 	UINT boardRows, boardCols;
 	BoardSet opponentsPieces;
@@ -30,14 +37,7 @@ private:
 	//BoardSet boardSet; //serves as playersPieces
 	MyPoint lastMove;
 	BoardSet::iterator nextPieceToMove;
-	BoardSet::iterator nextPieceToAttack;
 
-
-	int ID;
-
-	struct { 
-		UINT R, P, S, B, J, F;
-	} initPieceCnt;
 
 	int positionFlagsAndBombs(RandomContext& rndCtx, BoardSet& boardSet, PieceVector& vectorToFill);
 
@@ -46,13 +46,13 @@ private:
 
 	void fillListWithMovingPieces(std::vector<char>& movingPieceList, int bombUsed);
 
-	MyPiecePosition getNextPieceToMove();
+	MyPiecePosition getNextPieceToMove(void);
 
 	bool checkForAdjecentOpponent(const MyPiecePosition other);
 
-	unique_ptr<Move> checkAllAdjecentOpponents(const MyPiecePosition& piece, std::bitset<4>& boolVec, int x, int y);
+	unique_ptr<Move> checkAllAdjecentOpponents(const MyPiecePosition& piece, std::bitset<4>& boolVec, const int x, const int y);
 
-	unique_ptr<JokerChange> checkAllAdjecentOpponents(const MyPiecePosition & joker, int x, int y);
+	unique_ptr<JokerChange> checkAllAdjecentOpponents(const MyPiecePosition & joker, const int x, const int y);
 
 	std::unique_ptr<MyMove> getLegalMove(const MyPoint& point);
 

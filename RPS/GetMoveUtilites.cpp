@@ -3,7 +3,7 @@
 
 
 //assumes at least one moving piece exists
-MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove()
+MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove(void)
 {
 	++nextPieceToMove;
 	while (true)
@@ -74,7 +74,7 @@ char AutoPlayerAlgorithm::getNewJokerRep(const char oldJokerRep)
 	return result;
 }
 
-unique_ptr<JokerChange> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & joker, int x, int y)
+unique_ptr<JokerChange> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & joker, const int x, const int y)
 {
 	bool foundAdjecentOpponent = false;
 	do

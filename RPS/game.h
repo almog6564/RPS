@@ -21,7 +21,8 @@ class Game
 	UINT R2, P2, S2, B2, J2, F2;
 	FileParser* fileParser;
 	int turn; //0=player1, 1=player2
-	
+	eGameMode gameMode;
+
 	void runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAlgo);
 
 	void gameNotifyFightResult(unique_ptr<MyFightInfo>& fightInfo);
@@ -31,6 +32,8 @@ class Game
 	void checkPlayersFlagCountLessThanMax(PlayerContext* player);
 
 	int movesCounter;
+
+	bool isPlayerAuto(int ID);
 
 public:
 	Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,

@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		 game = new Game(BOARD_SIZE, BOARD_SIZE*2, 
+		 game = new Game(BOARD_SIZE, BOARD_SIZE, 
 			 R_COUNT, P_COUNT, S_COUNT, B_COUNT, J_COUNT, F_COUNT,
 			 R_COUNT, P_COUNT, S_COUNT, B_COUNT, J_COUNT, F_COUNT,
 			 fileParser, gameMode);
