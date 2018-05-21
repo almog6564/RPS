@@ -65,7 +65,9 @@ private:
 	bool existsOnBoardSet(const MyPoint& point);
 
 	void removeOutOfBoundsDirections(const MyPoint& point, std::bitset<4>& legalFleeDirections);
+
 	int fillCornersWithAlreadyOccupiedCorners(vector<bool>& selectedCorners, BoardSet& boardSet);
+
 public:
 	AutoPlayerAlgorithm(UINT boardRows, UINT boardCols,
 		UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID);
@@ -87,8 +89,8 @@ public:
 
 void positionMovingPiece(int x, int y, PieceVector &vectorToFill, BoardSet &boardSet, char pieceType, char jokerType = '#');
 
-void positionRestOfMovingPiecesRandomly(int pieceIndex, int initialMovingCnt,
-	RandomContext &rndCtx, BoardSet &boardSet, vector<char> movingPieceVector, PieceVector& vectorToFill);
+void positionRestOfMovingPiecesRandomly(int pieceIndex, 
+	RandomContext &rndCtx, BoardSet &boardSet, vector<char>& movingPieceVector, PieceVector& vectorToFill);
 
 class PositioningScenario
 {

@@ -3,9 +3,20 @@
 #include "parser.h"
 #include <algorithm>
 
+/*	This module contains all the sub-functions implementations of the auto player's initialPositions 
+	mechanism. Some of the functions are class functions of AutoPlayerAlgorithm, some are used only
+	by this module.
+*/
+
+
 using namespace std;
 
-
+/*
+	Generic function that adds a new piece to the auto player's context: BoardSet and PieceVector.
+	@var boardSet					- ref to the player pieces set
+	@var vectorToFill				- ref to the pieces unique_ptr vector returned by getInitialPositions
+	@vars x,y,pieceType,jokerType	- properties of the piece
+*/
 void addPieceToVectorAndBoard(BoardSet &boardSet, PieceVector &vectorToFill, 
 	const int x, const int y, const char pieceType, const char jokerType = '#') 
 {
@@ -13,6 +24,13 @@ void addPieceToVectorAndBoard(BoardSet &boardSet, PieceVector &vectorToFill,
 	boardSet.emplace(x, y, pieceType, jokerType);
 }
 
+/*
+	Adds a new bomb to the auto player's context using #addPieceToVectorAndBoard, incrementing the bombUsed counter.
+	@var boardSet					- ref to the player pieces set
+	@var vectorToFill				- ref to the pieces unique_ptr vector returned by getInitialPositions
+	@var bombsUsed		- bombs counter up until this point
+	@var bombX, bombY	- bomb position
+*/
 void positionBomb(UINT& bombsUsed, const int bombX, const int bombY, PieceVector& vectorToFill,
 	BoardSet& boardSet)
 {
@@ -24,6 +42,13 @@ void positionBomb(UINT& bombsUsed, const int bombX, const int bombY, PieceVector
 	bombsUsed++;
 }
 
+/*
+	Adds a new flag to the auto player's context using #addPieceToVectorAndBoard.
+	@var boardSet					- ref to the player pieces set
+	@var vectorToFill				- ref to the pieces unique_ptr vector returned by getInitialPositions
+	@var i							- flag counter for debug purposes
+	@var x,y						- flag position
+*/
 void positionFlag(const int i, const int x, const int y, PieceVector &vectorToFill, BoardSet &boardSet)
 {
 	dprint("\t - Flag #%d choosed position (%d,%d)\n", i + 1, x, y);
@@ -32,6 +57,12 @@ void positionFlag(const int i, const int x, const int y, PieceVector &vectorToFi
 	addPieceToVectorAndBoard(boardSet, vectorToFill, x, y, 'F');
 }
 
+/*
+	Wrapper function to position a moving piece that contains debug printing.
+	@var boardSet					- ref to the player pieces set
+	@var vectorToFill				- ref to the pieces unique_ptr vector returned by getInitialPositions
+	@vars x,y,pieceType,jokerType	- properties of the piece
+*/
 void positionMovingPiece(const int x, const int y, PieceVector &vectorToFill, BoardSet &boardSet, 
 	const char pieceType, const char jokerType)
 {
@@ -47,7 +78,17 @@ void positionMovingPiece(const int x, const int y, PieceVector &vectorToFill, Bo
 	addPieceToVectorAndBoard(boardSet, vectorToFill, x, y, pieceType, jokerType);
 }
 
+/*
+	Generates a random position on the board, one which is unused by this player.
+	Afterwards it places a flag in this position, adding it to the auto player's context: BoardSet and PieceVector
 
+	@pre - an empty position exists on the board.
+
+	@var rndCtx						- ref to a randomization context to be used to generate a random position
+	@var boardSet					- ref to the player pieces set
+	@var vectorToFill				- ref to the pieces unique_ptr vector returned by getInitialPositions
+	@var flagIndex					- index of the flag for debug purposes
+*/
 void positionFlagRandomly(RandomContext& rndCtx, BoardSet &boardSet, const int flagIndex, PieceVector& vectorToFill)
 {
 	int x, y;
@@ -67,7 +108,18 @@ void positionFlagRandomly(RandomContext& rndCtx, BoardSet &boardSet, const int f
 	positionFlag(flagIndex, x, y, vectorToFill, boardSet);
 }
 
+/*
+	Generates a random unused corner (0-3) on the board using a boolean vector of the current selected corners.
 
+	@pre - selectedCorners is not all "true". 
+	@pre - selectedCorners is of size 4
+
+	@var rndCtx						- ref to a randomization context to be used to generate a random corner
+	@var selectedCorners			- ref to the boolean vectors containing information of already occupied board corners
+									  Indices start from the upper left corner, continues clockwise
+
+	@ret	The generated corner index.
+*/
 int generateUniqueCorner(RandomContext &rndCtx, vector<bool>& selectedCorners)
 {
 	int select;
@@ -88,6 +140,62 @@ int generateUniqueCorner(RandomContext &rndCtx, vector<bool>& selectedCorners)
 
 	return select;
 }
+
+
+/*
+	Places all the remaining unpositioned pieces on the board. 
+	Those contain all the pieces not positioned on the corners and all the player's jokers.
+	In this point there should be no flags to position.
+	Each position will be unique and random, using the random context.
+	This function will not return until all pieces are positioned.
+
+	@pre - there is enough room for all pieces in the board
+
+	@var rndCtx							- ref to a randomization context to be used to generate a random corner
+	@var piecesAlreadyPositioned		- count of pieces already positioned before this function
+	@var movingPieceVector				- ref to the pieces vector, from which rest of the pieces will be added
+	@var boardSet						- ref to the player pieces set
+	@var vectorToFill					- ref to the pieces unique_ptr vector returned by getInitialPositions
+
+	*/
+void positionRestOfMovingPiecesRandomly(const int piecesAlreadyPositioned, RandomContext &rndCtx, 
+	BoardSet &boardSet, const vector<char>& movingPieceVector, PieceVector& vectorToFill)
+{
+	int x, y, piecesCounter = movingPieceVector.size();
+	char random_RPSB_jokerType;
+
+	for (int i = piecesAlreadyPositioned; i < piecesCounter;)
+	{
+		do
+		{
+			//choose place randomly
+			x = rndCtx.getRandomCol();
+			y = rndCtx.getRandomRow();
+
+			//if chose already 
+			if (boardSet.count(MyPiecePosition(x, y, movingPieceVector[i])) == 0)
+				break;
+
+		} while (true);
+
+		if (movingPieceVector[i] != 'J')
+		{
+			positionMovingPiece(x, y, vectorToFill, boardSet, movingPieceVector[i]);
+		}
+		else
+		{
+			//getRandomCorner+1 will generate number between 1-4 (ROCK,PAPER,SCISSORS,BOMB in ePieceType enum)
+
+			random_RPSB_jokerType = pieceToChar((ePieceType)(rndCtx.getRandomCorner() + 1));
+
+			positionMovingPiece(x, y, vectorToFill, boardSet, 'J', random_RPSB_jokerType);
+		}
+
+		i++;
+	}
+}
+
+
 
 int AutoPlayerAlgorithm::fillCornersWithAlreadyOccupiedCorners(vector<bool>& selectedCorners, BoardSet& boardSet)
 {
@@ -271,40 +379,3 @@ int AutoPlayerAlgorithm::positionFlagsAndBombs(RandomContext& rndCtx,
 	return bombsUsed;
 }
 
-
-void positionRestOfMovingPiecesRandomly(const int pieceIndex, const int initialMovingCnt,
-	RandomContext &rndCtx, BoardSet &boardSet, const vector<char> movingPieceVector, PieceVector& vectorToFill)
-{
-	int x, y;
-	char random_RPSB_jokerType;
-
-	for (int i = pieceIndex; i < initialMovingCnt;)
-	{
-		do
-		{
-			//choose place randomly
-			x = rndCtx.getRandomCol();
-			y = rndCtx.getRandomRow();
-
-			//if chose already 
-			if (boardSet.count(MyPiecePosition(x, y, movingPieceVector[i])) == 0)
-				break;
-
-		} while (true);
-
-		if (movingPieceVector[i] != 'J')
-		{
-			positionMovingPiece(x, y, vectorToFill, boardSet, movingPieceVector[i]);
-		}
-		else
-		{
-			//getRandomCorner+1 will generate number between 1-4 (ROCK,PAPER,SCISSORS,BOMB in ePieceType enum)
-
-			random_RPSB_jokerType = pieceToChar((ePieceType)(rndCtx.getRandomCorner() + 1));
-
-			positionMovingPiece(x, y, vectorToFill, boardSet, 'J', random_RPSB_jokerType);
-		}
-
-		i++;
-	}
-}

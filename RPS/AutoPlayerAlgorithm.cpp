@@ -81,9 +81,8 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 
 	//add the Jokers, don't place them on the corners (its a waste!)
 	addAllToVector(J, 'J'); 
-	initialMovingCnt = (int)movingPieceVector.size();
 
-	positionRestOfMovingPiecesRandomly(pieceIndex, initialMovingCnt, rndCtx, playerPieces, movingPieceVector, vectorToFill);
+	positionRestOfMovingPiecesRandomly(pieceIndex, rndCtx, playerPieces, movingPieceVector, vectorToFill);
 	
 }
 
