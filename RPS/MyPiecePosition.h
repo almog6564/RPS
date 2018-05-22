@@ -10,6 +10,7 @@ using namespace std;
 
 class MyPiecePosition : public PiecePosition
 {
+	/*Some members are defined as mutable to enable to hold a Set of MyPiecePositions and change some data members that are not part of the "key"*/
 	mutable char pieceType;
 	shared_ptr<Point> position;
 	mutable char jokerRep;

@@ -224,7 +224,7 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
 	unique_ptr<JokerChange> nextJokerChange;
-	for (auto& piece : playerPieces)				//there can be no jokers at all
+	for (auto& piece : playerPieces)				
 	{
 		if (piece.getJokerRep() == '#')
 			continue;
