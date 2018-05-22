@@ -37,12 +37,11 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 		player2Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(1), N, M);
 	}
 
-	turn = 0;
+	turn = 0; //player 1 begins
 }
 
 Game::~Game()
 {
-	printf("%d\n", movesCounter);
 	delete board;
 	delete player1Context;
 	delete player2Context;

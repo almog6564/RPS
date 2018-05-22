@@ -20,12 +20,14 @@ int main(int argc, char* argv[])
 
 	do
 	{
+		//must have arg and exactly one
 		if (argc != 2)
 		{
 			printUsageAndExit = true;
 			break;
 		}
 
+		//find arg in possible args and if not found print usage
 		const auto usage = find(usages.begin(), usages.end(), argv[1]);
 
 		if(usage == usages.end())
@@ -34,6 +36,7 @@ int main(int argc, char* argv[])
 			break;
 		}
 
+		//index of the arg in array usage is exactly the the eGameMode value according
 		gameMode = (eGameMode) distance(usages.begin(), usage);
 
 		fileParser = new FileParser(gameMode);

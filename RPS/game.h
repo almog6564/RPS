@@ -82,10 +82,12 @@ public:
 
 	string GetReasonString(eReason reason);
 
+	/* Function for debug */
 	void printBoard();
 
 	void writeOutputFile();
 
+	/* Positions all the pieces on the game board using the player's algorithms. */
 	void positionAllPieces();
 
 private:

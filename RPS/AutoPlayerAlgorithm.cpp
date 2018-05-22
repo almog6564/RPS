@@ -36,7 +36,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Parameters Initialization **/
-	vector<char> movingPieceVector;
+	vector<char> rpsbVector;
 	int initialMovingCnt, pieceIndex = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,14 +66,14 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 
 	/********* Moving Pieces Section **********/
 
-	fillListWithMovingPieces(movingPieceVector, bombsUsed);
-	initialMovingCnt = (int) movingPieceVector.size();
+	fillListWithRPSBpieces(rpsbVector, bombsUsed);
+	initialMovingCnt = (int) rpsbVector.size();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/** if chosen by scenario, moving pieces will be set on the corners to counter attack flags on corners **/
 
-	placeMovingPiecesOnCorners(movingPieceVector, initialMovingCnt, rndCtx, vectorToFill, playerPieces, pieceIndex);
+	placeMovingPiecesOnCorners(rpsbVector, initialMovingCnt, rndCtx, vectorToFill, playerPieces, pieceIndex);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -82,7 +82,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 	//add the Jokers, don't place them on the corners (its a waste!)
 	addAllToVector(J, 'J'); 
 
-	positionRestOfMovingPiecesRandomly(pieceIndex, rndCtx, playerPieces, movingPieceVector, vectorToFill);
+	positionRestOfMovingPiecesRandomly(pieceIndex, rndCtx, playerPieces, rpsbVector, vectorToFill);
 	
 }
 

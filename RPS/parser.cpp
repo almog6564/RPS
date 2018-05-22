@@ -85,6 +85,7 @@ int FileParser::initializeFiles()
 		if (output->openFile())
 			break;
 
+		//if player 1 is filePlayer
 		if (p1)
 		{
 			if (p1->pieces->openFile())
@@ -94,6 +95,7 @@ int FileParser::initializeFiles()
 				break;
 		}
 
+		//if player 2 is filePlayer
 		if (p2)
 		{
 			if (p2->pieces->openFile())

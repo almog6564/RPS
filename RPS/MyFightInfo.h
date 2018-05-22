@@ -9,19 +9,15 @@ using namespace std;
 
 class MyFightInfo : public FightInfo
 {
-	unique_ptr<Point> position;
-	char p1piece, p2piece;
-	int winner;
+	unique_ptr<Point> position;		//position of the fight
+	char p1piece, p2piece;			//piece of each player
+	int winner;						//0,1,2 - winner of the fight or tie (0)
 
 public:
 
-	MyFightInfo(UINT x, UINT y, char p1piece, char p2piece, int winner) :
-		position(make_unique<MyPoint>(x, y)), p1piece(p1piece), p2piece(p2piece), winner(winner) {}
+	MyFightInfo(UINT x, UINT y, char p1piece, char p2piece, int winner);
 
-	MyFightInfo()
-	{
-		position.reset(nullptr);
-	}
+	MyFightInfo();
 
 	operator bool() const { return position != nullptr; }
 
