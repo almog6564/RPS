@@ -70,6 +70,7 @@
     <RemoteLdToolExe>g++-5.3.0</RemoteLdToolExe>
   </PropertyGroup>
   <ItemGroup>
+    <ClInclude Include="AlgorithmRegistration.h" />
     <ClInclude Include="AutoPlayerAlgorithm.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="FightInfo.h" />
@@ -92,6 +93,7 @@
     <ClInclude Include="Point.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AlgorithmRegistration.cpp" />
     <ClCompile Include="AutoPlayerAlgorithm.cpp" />
     <ClCompile Include="FilePlayerAlgorithm.cpp" />
     <ClCompile Include="GetMoveUtilites.cpp" />
