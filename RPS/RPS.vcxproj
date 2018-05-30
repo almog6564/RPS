@@ -77,6 +77,7 @@
     <ClInclude Include="FilePlayerAlgorithm.h" />
     <ClInclude Include="JokerChange.h" />
     <ClInclude Include="Move.h" />
+    <ClInclude Include="MultiGameManager.h" />
     <ClInclude Include="myBoard.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="game.h" />
@@ -97,9 +98,11 @@
     <ClCompile Include="AutoPlayerAlgorithm.cpp" />
     <ClCompile Include="FilePlayerAlgorithm.cpp" />
     <ClCompile Include="GetMoveUtilites.cpp" />
+    <ClCompile Include="main_ex3.cpp" />
+    <ClCompile Include="MultiGameManager.cpp" />
     <ClCompile Include="myBoard.cpp" />
     <ClCompile Include="game.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main_ex2.cpp" />
     <ClCompile Include="MyFightInfo.cpp" />
     <ClCompile Include="MyJokerChange.cpp" />
     <ClCompile Include="MyMove.cpp" />
@@ -109,6 +112,7 @@
     <ClCompile Include="BoardPiece.cpp" />
     <ClCompile Include="PlayerContext.cpp" />
     <ClCompile Include="InitalPositionsUtilities.cpp" />
+    <ClCompile Include="RSPPlayer_204312763.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

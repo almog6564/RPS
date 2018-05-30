@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int main(int argc, char* argv[])
+int main_ex2(int argc, char* argv[])
 {
 	FileParser* fileParser = nullptr;
 	Game* game = nullptr;

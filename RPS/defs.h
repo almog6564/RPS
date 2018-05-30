@@ -21,6 +21,16 @@ typedef unsigned int UINT;
 #endif
 /******************************/
 
+/***** For debug printing ******/
+#define NEW_DEBUG 1
+
+#if NEW_DEBUG == 1					
+#define dprintreg(...) printf(__VA_ARGS__)
+#else
+#define dprintreg(...)
+#endif
+/******************************/
+
 #define BOARD_SIZE		10
 #define R_COUNT			2
 #define P_COUNT			5
