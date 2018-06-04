@@ -7,13 +7,16 @@
 #include "parser.h"
 #include "AutoPlayerAlgorithm.h"
 #include "FilePlayerAlgorithm.h"
+#include <utility>      // std::pair
+
+
 
 using namespace std;
 
 class Game
 {
 	PlayerContext*		player1Context,		*player2Context;
-	PlayerAlgorithm*	player1Algorithm,	*player2Algorithm;
+	unique_ptr<PlayerAlgorithm>	player1Algorithm,	player2Algorithm;
 
 	MyBoard* board;
 	UINT M, N;
@@ -24,7 +27,11 @@ class Game
 	int movesCounter;
 	eGameMode gameMode;
 
-	void runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAlgo);
+	int player1GlobalID; //for scoreBoard
+	int player2GlobalID; //for scoreBoard
+
+	void runSingleMove(PlayerContext* playerContext, unique_ptr<PlayerAlgorithm>& playerAlgo);
+	//void runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAlgo);
 
 	void gameNotifyFightResult(unique_ptr<MyFightInfo>& fightInfo);
 
@@ -34,14 +41,26 @@ class Game
 
 
 	bool isPlayerAuto(int ID);
+	int gameID;
 
 public:
 	Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 						 UINT R2, UINT P2, UINT S2, UINT B2, UINT J2, UINT F2, 
 							FileParser* fileParser,	eGameMode gameMode);
 
+	Game(unique_ptr<PlayerAlgorithm>& algo1, unique_ptr<PlayerAlgorithm>& algo2, int player1GlobalID, int player2GlobalID, int gameID);
 
 	~Game();
+
+	pair<int, int> getPlayersGlobalIDs()
+	{
+		return pair<int, int>(player1GlobalID, player2GlobalID);
+	}
+
+	int getGameID()
+	{
+		return gameID;
+	}
 
 	/*
 	Before starting to move pieces according to moving files, this function makes sure that for both players
@@ -89,6 +108,8 @@ public:
 
 	/* Positions all the pieces on the game board using the player's algorithms. */
 	void positionAllPieces();
+
+	void run(int *winnerToFill);
 
 private:
 	void checkWhetherFlagsWereCaptured(void);

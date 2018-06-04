@@ -8,7 +8,7 @@
 typedef unsigned int UINT;
 
 /***** For debug printing ******/
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG == 0
 #define consume(x)						
@@ -17,7 +17,7 @@ typedef unsigned int UINT;
 /* Some of the arguments exist only for debug printing, this trick "uses" the argument without actually using it,
 	whilst disabling the warning of unused variable. */
 #define consume(x)	std::ignore = (x)		
-#define dprint(...)
+#define dprint(...) 
 #endif
 /******************************/
 

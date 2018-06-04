@@ -27,13 +27,16 @@ AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, U
 }
 
 
-AutoPlayerAlgorithm::~AutoPlayerAlgorithm()
+AutoPlayerAlgorithm::~AutoPlayerAlgorithm() 
 {
 	delete scenario;
 }
 
 void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToFill)
 {
+	//update player's ID
+	ID = player;
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Parameters Initialization **/
 	vector<char> rpsbVector;

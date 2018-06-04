@@ -16,28 +16,41 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	if (gameMode == AUTO_VS_FILE || gameMode == AUTO_VS_AUTO)
 	{
 		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1);
-		player1Algorithm = new AutoPlayerAlgorithm(N, M, R1, P1, S1, B1, J1, F1, 1);
+		//player1Algorithm = new AutoPlayerAlgorithm(N, M, R1, P1, S1, B1, J1, F1, 1);
+		player1Algorithm = make_unique<AutoPlayerAlgorithm>(N, M, R1, P1, S1, B1, J1, F1, 1);
 	}
 
 	else
 	{
 		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1);
-		player1Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(0), N, M);
+		//player1Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(0), N, M);
+		player1Algorithm = make_unique<FilePlayerAlgorithm>(*fileParser->getPlayerFileContext(0), N, M);
 	}
 
 
 	if (gameMode == FILE_VS_AUTO || gameMode == AUTO_VS_AUTO)
 	{
 		player2Context = new PlayerContext(1, R2, P2, S2, B2, J2, F2);
-		player2Algorithm = new AutoPlayerAlgorithm(N, M, R1, P1, S1, B1, J1, F1, 2);
+		//player2Algorithm = new AutoPlayerAlgorithm(N, M, R1, P1, S1, B1, J1, F1, 2);
+		player2Algorithm = make_unique<AutoPlayerAlgorithm>(N, M, R1, P1, S1, B1, J1, F1, 2);
 	}
 	else
 	{
-		player2Context = new PlayerContext(1, R1, P1, S1, B1, J1, F2);
-		player2Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(1), N, M);
+		//player2Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(1), N, M);
+		player2Algorithm = make_unique<FilePlayerAlgorithm>(*fileParser->getPlayerFileContext(1), N, M);
 	}
 
 	turn = 0; //player 1 begins
+}
+
+Game::Game(unique_ptr<PlayerAlgorithm>& algo1, unique_ptr<PlayerAlgorithm>& algo2, int player1GlobalID, int player2GlobalID, int gameID) :
+	player1Algorithm(move(algo1)), player2Algorithm(move(algo2)), M(BOARD_SIZE), N(BOARD_SIZE), R1(R_COUNT), P1(P_COUNT), S1(S_COUNT), B1(B_COUNT), J1(J_COUNT), F1(F_COUNT),
+	R2(R_COUNT), P2(P_COUNT), S2(S_COUNT), B2(B_COUNT), J2(J_COUNT), F2(F_COUNT), movesCounter(0), player1GlobalID(player1GlobalID), player2GlobalID(player2GlobalID), gameID(gameID)
+{
+	board = new MyBoard(BOARD_SIZE, BOARD_SIZE);
+	turn = 0;
+	player1Context = new PlayerContext(0, R_COUNT, P_COUNT, S_COUNT, B_COUNT, J_COUNT, F_COUNT);
+	player2Context = new PlayerContext(1, R_COUNT, P_COUNT, S_COUNT, B_COUNT, J_COUNT, F_COUNT);
 }
 
 Game::~Game()
@@ -45,8 +58,8 @@ Game::~Game()
 	delete board;
 	delete player1Context;
 	delete player2Context;
-	delete player1Algorithm;
-	delete player2Algorithm;
+	//delete player1Algorithm;
+	//delete player2Algorithm;
 }
 
 void Game::runMove()
@@ -59,7 +72,8 @@ void Game::runMove()
 	turn %= 2;
 }
 
-void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAlgo)
+//void Game::runSingleMove(PlayerContext* playerContext, PlayerAlgorithm* playerAlgo)
+void Game::runSingleMove(PlayerContext* playerContext, unique_ptr<PlayerAlgorithm>& playerAlgo)
 {
 	ePieceType newRep;
 	MyFightInfo fightInfo;
@@ -432,9 +446,9 @@ void Game::printBoard()
 			{
 				isPlayer1 = (piece->getOwner() == player1Context);
 				consume(isPlayer1);
-#if DEBUG == 1
+//#if DEBUG == 1
 				debug_c = pieceToChar(piece->getOriginalType(), isPlayer1);	//need to get original type to print joker as joker
-#endif
+//#endif
 				if (debug_c < 0)
 				{
 					cout << "Bad piece returned from function" << endl;
@@ -589,4 +603,21 @@ void Game::positionAllPieces()
 
 	player1Algorithm->notifyOnInitialBoard(*board, fightVec);
 	player2Algorithm->notifyOnInitialBoard(*board, fightVec);
+}
+
+void Game::run(int * winnerToFill)
+{
+	positionAllPieces();
+
+	dprint("Positioning of pieces on board ENDED!\n");
+
+	/* Check Flags counters*/
+	flagsCheck();
+
+	/* Start Game */
+	while (!endGame())
+		runMove();
+	*winnerToFill = getWinner();
+	dprint("\n\n ########## FINISHED GAME - RESULTS ##########\n\nWINNER is : %d\n", *winnerToFill);
+
 }

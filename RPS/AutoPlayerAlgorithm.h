@@ -279,6 +279,7 @@ public:
 	int getRandomBinary() { return binaryGen(gen); }
 
 	std::mt19937& getRandomGenerator() { return gen; }
+
 };
 
 
