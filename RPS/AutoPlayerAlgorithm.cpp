@@ -103,7 +103,6 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 				opponentsPieces.emplace(j, i);
 		}
 	}
-	nextPieceToMove = playerPieces.begin(); //start with first piece
 
 	for (auto& fightInfo : fights)
 	{
@@ -129,9 +128,6 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 			}
 
 			//in any case, remove player's losing piece
-			if (*playerPieceIter == *nextPieceToMove)
-				++nextPieceToMove;
-
 			if (playerPieces.count(fightPos) > 0)	//could be that the piece is no longer there if it lost another fight
 				playerPieces.erase(playerPieceIter);
 
@@ -142,9 +138,6 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 			//although won, remove player's piece if it's a bomb
 			if (winningType == 'B')
 			{
-				if (*playerPieceIter == *nextPieceToMove)
-					++nextPieceToMove;
-
 				if (playerPieces.count(fightPos) > 0)	//could be that the piece is no longer there if it lost another fight
 					playerPieces.erase(playerPieceIter);
 			}
@@ -152,9 +145,6 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board & b, const vector<uni
 
 		else //TIE - remove both pieces
 		{
-			if (*playerPieceIter == *nextPieceToMove)
-				++nextPieceToMove;
-
 			if (playerPieces.count(fightPos) > 0)		//could be that the piece is no longer there if it lost another fight
 				playerPieces.erase(playerPieceIter);
 		}
@@ -197,8 +187,6 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 			opponentsPieces.erase(opponentPieceIter); 
 		}
 		//in any case, remove player's losing piece
-		if (*playerPieceIter == *nextPieceToMove)
-			++nextPieceToMove;
 		playerPieces.erase(playerPieceIter);
 	}
 
@@ -207,8 +195,6 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 		//although won, remove player's piece if it's a bomb
 		if (winningType == 'B')
 		{
-			if (*playerPieceIter == *nextPieceToMove)
-				++nextPieceToMove;
 			playerPieces.erase(playerPieceIter);
 		}
 		//in any case, remove opponent's losing piece
@@ -218,8 +204,6 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 	else //TIE - remove both pieces
 	{
 		opponentsPieces.erase(opponentPieceIter);
-		if (*playerPieceIter == *nextPieceToMove)
-			++nextPieceToMove;
 		playerPieces.erase(playerPieceIter);
 	}
 }
@@ -227,6 +211,7 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo & fightInfo)
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
 	unique_ptr<JokerChange> nextJokerChange;
+
 	for (auto& piece : playerPieces)				
 	{
 		if (piece.getJokerRep() == '#')
@@ -241,38 +226,9 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 			else if (nextJokerChange->getJokerNewRep() == 'B')
 				piece.setMovingPiece(false);
 			piece.setJokerRep(nextJokerChange->getJokerNewRep());
+
 			return nextJokerChange;
 		}
 	}
-
-	//get random jokerChange
-	bool firstLoop = true;
-	for (auto piece = nextPieceToMove; *piece != *nextPieceToMove || firstLoop;)
-	{
-		firstLoop = false;
-		if (piece->getJokerRep() == '#')
-		{
-			++piece;
-			if (piece == playerPieces.end())
-				piece = playerPieces.begin();
-			continue;
-		}
-		const MyPoint point = piece->getPosition();
-		int x = point.getX(), y = point.getY();
-		random_device	seed;
-		mt19937			gen(seed());
-		uniform_int_distribution<> genDirection(0, 2);
-		unique_ptr<MyJokerChange> ret = make_unique<MyJokerChange>(x, y, getRandomJokerChahge(genDirection(gen), piece->getJokerRep()));
-		if (piece->getJokerRep() == 'B')
-			piece->setMovingPiece(true);
-		else if (ret->getJokerNewRep() == 'B')
-			piece->setMovingPiece(false);
-		piece->setJokerRep(ret->getJokerNewRep());
-		++piece;
-		if (piece == playerPieces.end())
-			piece = playerPieces.begin();
-		return ret;
-	}
-	
 	return nullptr;
 }

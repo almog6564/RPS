@@ -39,7 +39,6 @@ private:
 	UINT boardRows, boardCols;			//Size of board
 	BoardSet opponentsPieces;			//This set will hold all the known data regarding his opponent's pieces
 	BoardSet playerPieces;				//This set will hold the data regarding player's own pieces
-	BoardSet::iterator nextPieceToMove; //An iterator keeping the next piece to move 
 
 	/* The function positions all the flags on the board and possibly some of the bombs,
 		according to the positioning scenario randomly chosen.

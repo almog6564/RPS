@@ -1,4 +1,3 @@
-
 #include "MultiGameManager.h"
 #include "game.h"
 #include <iostream>
@@ -13,7 +12,7 @@ using namespace std;
 
 int done;
 
-class TaskPool 
+class TaskPool
 {
 	deque<unique_ptr<Game>> taskQueue;
 	mutex mx;
@@ -32,9 +31,9 @@ public:
 		if (taskQueue.empty())
 			return nullptr;
 		unique_ptr<Game> ret = move(taskQueue.front()); //take ownership
-		taskQueue.pop_front();							
-		cout << this_thread::get_id() << endl;  //debug
-		cout << ret->getGameID() << endl;		//debug
+		taskQueue.pop_front();
+		//cout << this_thread::get_id() << endl;  //debug
+		//cout << ret->getGameID() << endl;		//debug
 		return ret;
 	}
 
@@ -45,7 +44,7 @@ public:
 
 	int size()
 	{
-		return taskQueue.size();
+		return (int)taskQueue.size();
 	}
 
 	deque<unique_ptr<Game>>& getQueue()
@@ -78,21 +77,21 @@ void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 		else
 			(*scoreBoard)[playersGlobalIDs.second] += 3;
 	}
-	
-	
+
+
 }
 
 int main(void)
 {
-	int threads_count = 1;
-	int rounds = 5;
+	int threads_count = 5;
+	int rounds = 30;
 	done = 0;
 
 	MultiGameManager gameManager = MultiGameManager::getGameManager();
-	int players_count = gameManager.algos.size();
+	int players_count = (int)gameManager.algos.size();
 	vector<thread> threadsPool;
 	vector<atomic<int>> scoreBoard(players_count);
-	
+
 	TaskPool taskPool;
 
 	//run threads
@@ -135,7 +134,7 @@ int main(void)
 		while (!taskPool.isEmpty()); //spin while tasks are not done
 		done = 1;
 	}
-	
+
 
 	//join threads
 	for (auto& th : threadsPool)

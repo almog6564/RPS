@@ -87,7 +87,6 @@ void Game::runSingleMove(PlayerContext* playerContext, unique_ptr<PlayerAlgorith
 		/* STEP 1 */
 		if (!playerContext->getHasMoreMoves())
 			break;
-
 		auto move = playerAlgo->getMove();
 		if (!move)
 		{
@@ -120,7 +119,6 @@ void Game::runSingleMove(PlayerContext* playerContext, unique_ptr<PlayerAlgorith
 		gameNotifyOnOpponnentMove(playerContext, move);
 
 		gameNotifyFightResult(fightInfo);
-		
 		auto jokerChange = playerAlgo->getJokerChange();
 		if (jokerChange)
 		{
@@ -134,7 +132,6 @@ void Game::runSingleMove(PlayerContext* playerContext, unique_ptr<PlayerAlgorith
 				return;
 			}
 		}
-
 		checkWhetherFlagsWereCaptured();
 
 	} while (false);
@@ -619,5 +616,4 @@ void Game::run(int * winnerToFill)
 		runMove();
 	*winnerToFill = getWinner();
 	dprint("\n\n ########## FINISHED GAME - RESULTS ##########\n\nWINNER is : %d\n", *winnerToFill);
-
 }

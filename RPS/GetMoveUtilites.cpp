@@ -1,23 +1,31 @@
 
 #include "AutoPlayerAlgorithm.h"
+#include <random>
 
 
 //assumes at least one moving piece exists
 MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove(void)
 {
-	++nextPieceToMove;
-	while (true)
+	random_device				seed;
+	mt19937						gen(seed());
+	uniform_int_distribution<>	rand_gen(0, playerPieces.size());
+	int rand;
+	do
 	{
-		if (nextPieceToMove == playerPieces.end())
-			nextPieceToMove = playerPieces.begin();
-		//save iterator of current,iterate until reached current, when reached end return to begin
-		if (nextPieceToMove->isMoving())
-			break;
-		else
-			++nextPieceToMove; //move the pointer to the next iterator
-	}
-
-	return *nextPieceToMove; //return the piece inside the iterator
+		rand = rand_gen(gen);
+		int i = 0;
+		for (auto it = playerPieces.begin(); i < rand; i++, it++)
+		{
+			if (i == rand-1)
+			{
+				if (it->isMoving())
+				{
+					return *it;
+				}
+				break;
+			}
+		}
+	} while (true);
 }
 
 unique_ptr<Move> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & piece, std::bitset<4>& boolVec, const int x, const int y)
@@ -166,7 +174,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	if (!foundMove)
 	{
 		/*perform random move*/
-		MyPiecePosition nextPieceToMove = getNextPieceToMove();
+		MyPiecePosition nextPieceToMove = getNextPieceToMove(); //TODO: changes were made here
 		MyPiecePosition firstPieceToMove = nextPieceToMove;
 		do
 		{
@@ -176,7 +184,10 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 				break;
 			nextPieceToMove = getNextPieceToMove();
 			if (nextPieceToMove == firstPieceToMove)
+			{
+				cout << "error: no moves to do" << endl;
 				return nullptr; //no moves to do
+			}
 		} while (true);
 	}
 
