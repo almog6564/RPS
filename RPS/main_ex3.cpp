@@ -85,7 +85,7 @@ void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 int main(void)
 {
 	int threads_count = 8;
-	int rounds = 10000;
+	int rounds = 30;
 	done = 0;
 
 	MultiGameManager gameManager = MultiGameManager::getGameManager();
