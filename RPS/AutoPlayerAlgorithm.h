@@ -76,7 +76,7 @@ private:
 	void fillListWithRPSBpieces(std::vector<char>& rpsbVector, int bombUsed);
 
 	/* The function will iterate on playersPieces Set and return the first moving piece it encounters */
-	MyPiecePosition getNextPieceToMove(void);
+	unique_ptr<Move> getNextRandomMove(void);
 
 	/* The function checks if an opponent's piece is present at specific position.
 		@return - True if opponent's piece if found, False otherwise.*/

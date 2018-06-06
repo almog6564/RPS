@@ -1,3 +1,4 @@
+
 #include "MultiGameManager.h"
 #include "game.h"
 #include <iostream>
@@ -10,7 +11,7 @@
 
 using namespace std;
 
-int done;
+volatile int done;
 
 class TaskPool
 {
@@ -37,12 +38,12 @@ public:
 		return ret;
 	}
 
-	bool isEmpty()
+	bool isEmpty() const
 	{
 		return taskQueue.empty();
 	}
 
-	int size()
+	int size() const
 	{
 		return (int)taskQueue.size();
 	}
@@ -83,8 +84,8 @@ void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 
 int main(void)
 {
-	int threads_count = 5;
-	int rounds = 30;
+	int threads_count = 8;
+	int rounds = 10000;
 	done = 0;
 
 	MultiGameManager gameManager = MultiGameManager::getGameManager();

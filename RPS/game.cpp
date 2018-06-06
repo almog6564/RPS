@@ -16,14 +16,12 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	if (gameMode == AUTO_VS_FILE || gameMode == AUTO_VS_AUTO)
 	{
 		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1);
-		//player1Algorithm = new AutoPlayerAlgorithm(N, M, R1, P1, S1, B1, J1, F1, 1);
 		player1Algorithm = make_unique<AutoPlayerAlgorithm>(N, M, R1, P1, S1, B1, J1, F1, 1);
 	}
 
 	else
 	{
 		player1Context = new PlayerContext(0, R1, P1, S1, B1, J1, F1);
-		//player1Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(0), N, M);
 		player1Algorithm = make_unique<FilePlayerAlgorithm>(*fileParser->getPlayerFileContext(0), N, M);
 	}
 
@@ -31,12 +29,10 @@ Game::Game(UINT M, UINT N, UINT R1, UINT P1, UINT S1, UINT B1, UINT J1, UINT F1,
 	if (gameMode == FILE_VS_AUTO || gameMode == AUTO_VS_AUTO)
 	{
 		player2Context = new PlayerContext(1, R2, P2, S2, B2, J2, F2);
-		//player2Algorithm = new AutoPlayerAlgorithm(N, M, R1, P1, S1, B1, J1, F1, 2);
 		player2Algorithm = make_unique<AutoPlayerAlgorithm>(N, M, R1, P1, S1, B1, J1, F1, 2);
 	}
 	else
 	{
-		//player2Algorithm = new FilePlayerAlgorithm(*fileParser->getPlayerFileContext(1), N, M);
 		player2Algorithm = make_unique<FilePlayerAlgorithm>(*fileParser->getPlayerFileContext(1), N, M);
 	}
 
@@ -58,8 +54,6 @@ Game::~Game()
 	delete board;
 	delete player1Context;
 	delete player2Context;
-	//delete player1Algorithm;
-	//delete player2Algorithm;
 }
 
 void Game::runMove()

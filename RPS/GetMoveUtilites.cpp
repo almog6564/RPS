@@ -1,29 +1,41 @@
 
 #include "AutoPlayerAlgorithm.h"
 #include <random>
+#include <algorithm>
 
 
 //assumes at least one moving piece exists
-MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove(void)
+unique_ptr<Move> AutoPlayerAlgorithm::getNextRandomMove(void)
 {
 	random_device				seed;
 	mt19937						gen(seed());
-	uniform_int_distribution<>	rand_gen(0, playerPieces.size());
+	uniform_int_distribution<>	rand_gen(0, playerPieces.size() - 1);
 	int rand;
+	vector<bool> checkList(playerPieces.size(), false);
+
 	do
 	{
 		rand = rand_gen(gen);
 		int i = 0;
-		for (auto it = playerPieces.begin(); i < rand; i++, it++)
+		for (auto it = playerPieces.begin(); i <= rand; i++, it++)
 		{
-			if (i == rand-1)
+			if (i == rand)
 			{
-				if (it->isMoving())
+				if (!checkList[i] && it->isMoving())
 				{
-					return *it;
+					MyPoint point = (*it).getPosition();
+					unique_ptr<MyMove> nextMove = move(getLegalMove(point));
+					if (nextMove)
+						return nextMove;
 				}
+				checkList[i] = true;
 				break;
 			}
+		}
+		if (all_of(checkList.begin(), checkList.end(), [](bool i) {return i;})) //check if all pieces were checked yet
+		{
+			cout << "Error, did not find a moving piece" << endl;
+			return nullptr; //invalid Move
 		}
 	} while (true);
 }
@@ -174,38 +186,16 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	if (!foundMove)
 	{
 		/*perform random move*/
-		MyPiecePosition nextPieceToMove = getNextPieceToMove(); //TODO: changes were made here
-		MyPiecePosition firstPieceToMove = nextPieceToMove;
-		do
-		{
-			MyPoint point = nextPieceToMove.getPosition();
-			nextMove = move(getLegalMove(point));
-			if (nextMove)
-				break;
-			nextPieceToMove = getNextPieceToMove();
-			if (nextPieceToMove == firstPieceToMove)
-			{
-				cout << "error: no moves to do" << endl;
-				return nullptr; //no moves to do
-			}
-		} while (true);
+		nextMove = getNextRandomMove();
 	}
-
-	if (!nextMove)
-	{
-		dprint("/******in getMove got null******/\n");
-		return nullptr;
-	}
-
-
-	//update player's board
+		//update player's board
 	auto& t = *playerPieces.find(MyPiecePosition(nextMove->getFrom().getX(), nextMove->getFrom().getY()));
 	char type = t.getPiece();
 	char jokerType = t.getJokerRep();
 	playerPieces.erase(t);
 	playerPieces.insert(MyPiecePosition(nextMove->getTo().getX(), nextMove->getTo().getY(), type, jokerType));
 
-	return move(nextMove);
+	return nextMove;
 }
 
 
