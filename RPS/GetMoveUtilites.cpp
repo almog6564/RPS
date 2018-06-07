@@ -9,15 +9,16 @@ unique_ptr<Move> AutoPlayerAlgorithm::getNextRandomMove(void)
 {
 	random_device				seed;
 	mt19937						gen(seed());
-	uniform_int_distribution<>	rand_gen(0, playerPieces.size() - 1);
+	uniform_int_distribution<>	rand_gen(0, (int)playerPieces.size() - 1);
 	int rand;
 	vector<bool> checkList(playerPieces.size(), false);
 
 	do
 	{
 		rand = rand_gen(gen);
+		//cout << rand << endl;
 		int i = 0;
-		for (auto it = playerPieces.begin(); i <= rand; i++, it++)
+		for (auto it = playerPieces.begin();; i++, it++)
 		{
 			if (i == rand)
 			{
@@ -187,6 +188,8 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	{
 		/*perform random move*/
 		nextMove = getNextRandomMove();
+		if (!nextMove)
+			return nullptr;
 	}
 		//update player's board
 	auto& t = *playerPieces.find(MyPiecePosition(nextMove->getFrom().getX(), nextMove->getFrom().getY()));

@@ -85,7 +85,7 @@ void Game::runSingleMove(PlayerContext* playerContext, unique_ptr<PlayerAlgorith
 		if (!move)
 		{
 			playerContext->setHasMoreMoves(false);
-			dprint("No more moves for player %d !", playerContext->getPlayerId()+1);
+			dprint("No more legal moves for player %d !", playerContext->getPlayerId()+1);
 			break;
 		}
 	

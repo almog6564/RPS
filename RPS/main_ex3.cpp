@@ -7,16 +7,16 @@
 #include <condition_variable>	
 #include <thread>
 #include <atomic>
-#include <chrono>
 
 using namespace std;
 
-volatile int done;
+volatile bool done;
+mutex mx;
+condition_variable tasksAvailable, tasksCompleted;
 
 class TaskPool
 {
 	deque<unique_ptr<Game>> taskQueue;
-	mutex mx;
 
 public:
 	void producer(unique_ptr<Game>& task)
@@ -27,12 +27,21 @@ public:
 
 	unique_ptr<Game> consumer()
 	{
-		lock_guard<mutex> lock(mx);
+		unique_lock<mutex> lock(mx);
+
 		//critical section
-		if (taskQueue.empty())
+		while (taskQueue.empty() && !done)
+		{
+			tasksAvailable.wait(lock);
+		}
+		if (done)
 			return nullptr;
 		unique_ptr<Game> ret = move(taskQueue.front()); //take ownership
 		taskQueue.pop_front();
+
+		if (taskQueue.empty())
+			tasksCompleted.notify_one();
+
 		//cout << this_thread::get_id() << endl;  //debug
 		//cout << ret->getGameID() << endl;		//debug
 		return ret;
@@ -59,10 +68,9 @@ void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 {
 	while (!done)
 	{
-		while (taskPool->isEmpty() && !done); //spin while empty
 		unique_ptr<Game> game = taskPool->consumer();
 		if (!game) //queue is empty
-			continue;
+			break;
 		int winner;
 		game->run(&winner);
 
@@ -84,16 +92,16 @@ void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 
 int main(void)
 {
-	int threads_count = 8;
+	int threads_count = 4;
 	int rounds = 30;
-	done = 0;
+	done = false;
 
 	MultiGameManager gameManager = MultiGameManager::getGameManager();
 	int players_count = (int)gameManager.algos.size();
 	vector<thread> threadsPool;
 	vector<atomic<int>> scoreBoard(players_count);
-
 	TaskPool taskPool;
+
 
 	//run threads
 	for (int i = 0; i < threads_count - 1; i++)
@@ -108,6 +116,7 @@ int main(void)
 			unique_ptr<PlayerAlgorithm> p2 = move(gameManager.algos[i + 1]());
 			unique_ptr<Game> game = make_unique<Game>(p1, p2, i, i + 1, (i / 2) + (players_count / 2)*j);
 			taskPool.producer(game);
+			tasksAvailable.notify_one();
 		}
 	}
 
@@ -132,8 +141,15 @@ int main(void)
 	}
 	else //threads_count > 1
 	{
-		while (!taskPool.isEmpty()); //spin while tasks are not done
-		done = 1;
+		{
+			unique_lock<mutex> lock(mx);
+			while (!taskPool.isEmpty())
+			{
+				tasksCompleted.wait(lock); //wait for tasks to be completed
+			}
+		}
+		done = true;
+		tasksAvailable.notify_all();
 	}
 
 
