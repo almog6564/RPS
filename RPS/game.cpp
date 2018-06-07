@@ -245,7 +245,7 @@ int Game::getWinner(eReason* pReason)
 	int winner = 0;
 	eReason reason = INVALID_REASON;
 
-	if (movesCounter >= 100)
+	if (movesCounter >= 10000)
 	{
 		reason = MORE_THAN_100_MOVES;
 	}

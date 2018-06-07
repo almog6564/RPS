@@ -71,7 +71,7 @@ void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 		unique_ptr<Game> game = taskPool->consumer();
 		if (!game) //queue is empty
 			break;
-		int winner;
+		int winner = -1;
 		game->run(&winner);
 
 		pair<int, int> playersGlobalIDs = game->getPlayersGlobalIDs();
@@ -83,8 +83,13 @@ void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 		}
 		else if (winner == 1)
 			(*scoreBoard)[playersGlobalIDs.first] += 3;
-		else
+		else if (winner == 2)
 			(*scoreBoard)[playersGlobalIDs.second] += 3;
+		else
+		{
+			cout << "error: wrong winner value" << endl;
+			return;
+		}
 	}
 
 
