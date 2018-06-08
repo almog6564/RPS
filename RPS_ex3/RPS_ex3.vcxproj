@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{adbd1fbe-21f2-4fa7-a13f-443d8b5e0edd}</ProjectGuid>
+    <Keyword>Linux</Keyword>
+    <RootNamespace>RPS_ex3</RootNamespace>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <ApplicationType>Linux</ApplicationType>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
+    <LinuxProjectType>{FC1A4D80-50E9-41DA-9192-61C0DBAA00D2}</LinuxProjectType>
+    <ProjectName>RPS</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <RemoteBuildCommandLine>make rps_tournament; make rps_lib</RemoteBuildCommandLine>
+    <RemoteReBuildCommandLine>make rps_tournament; make rps_lib</RemoteReBuildCommandLine>
+    <RemoteCleanCommandLine>make clean</RemoteCleanCommandLine>
+    <BuildCommandLine>
+    </BuildCommandLine>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <RemoteBuildCommandLine>make rps_tournament; make rps_lib</RemoteBuildCommandLine>
+    <RemoteReBuildCommandLine>make rps_tournament; make rps_lib</RemoteReBuildCommandLine>
+    <RemoteCleanCommandLine>make clean</RemoteCleanCommandLine>
+    <BuildCommandLine>
+    </BuildCommandLine>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="..\RPS\AlgorithmRegistration.cpp" />
+    <ClCompile Include="..\RPS\AutoPlayerAlgorithm.cpp" />
+    <ClCompile Include="..\RPS\BoardPiece.cpp" />
+    <ClCompile Include="..\RPS\FilePlayerAlgorithm.cpp" />
+    <ClCompile Include="..\RPS\game.cpp" />
+    <ClCompile Include="..\RPS\GetMoveUtilites.cpp" />
+    <ClCompile Include="..\RPS\InitalPositionsUtilities.cpp" />
+    <ClCompile Include="..\RPS\main_ex2.cpp" />
+    <ClCompile Include="..\RPS\main_ex3.cpp" />
+    <ClCompile Include="..\RPS\main_so.cpp" />
+    <ClCompile Include="..\RPS\MultiGameManager.cpp" />
+    <ClCompile Include="..\RPS\myBoard.cpp" />
+    <ClCompile Include="..\RPS\MyFightInfo.cpp" />
+    <ClCompile Include="..\RPS\MyJokerChange.cpp" />
+    <ClCompile Include="..\RPS\MyMove.cpp" />
+    <ClCompile Include="..\RPS\MyPiecePosition.cpp" />
+    <ClCompile Include="..\RPS\MyPoint.cpp" />
+    <ClCompile Include="..\RPS\parser.cpp" />
+    <ClCompile Include="..\RPS\PlayerContext.cpp" />
+    <ClCompile Include="..\RPS\RSPPlayer_0.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\RPS\AlgorithmRegistration.h" />
+    <ClInclude Include="..\RPS\AutoPlayerAlgorithm.h" />
+    <ClInclude Include="..\RPS\Board.h" />
+    <ClInclude Include="..\RPS\BoardPiece.h" />
+    <ClInclude Include="..\RPS\defs.h" />
+    <ClInclude Include="..\RPS\FightInfo.h" />
+    <ClInclude Include="..\RPS\FilePlayerAlgorithm.h" />
+    <ClInclude Include="..\RPS\game.h" />
+    <ClInclude Include="..\RPS\JokerChange.h" />
+    <ClInclude Include="..\RPS\Move.h" />
+    <ClInclude Include="..\RPS\MultiGameManager.h" />
+    <ClInclude Include="..\RPS\myBoard.h" />
+    <ClInclude Include="..\RPS\MyFightInfo.h" />
+    <ClInclude Include="..\RPS\MyJokerChange.h" />
+    <ClInclude Include="..\RPS\MyMove.h" />
+    <ClInclude Include="..\RPS\MyPiecePosition.h" />
+    <ClInclude Include="..\RPS\MyPoint.h" />
+    <ClInclude Include="..\RPS\parser.h" />
+    <ClInclude Include="..\RPS\PiecePosition.h" />
+    <ClInclude Include="..\RPS\PlayerAlgorithm.h" />
+    <ClInclude Include="..\RPS\PlayerContext.h" />
+    <ClInclude Include="..\RPS\Point.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\RPS\makefile" />
+  </ItemGroup>
+  <ItemDefinitionGroup />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

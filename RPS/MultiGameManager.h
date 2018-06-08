@@ -10,16 +10,21 @@
 
 class MultiGameManager 
 {
-	MultiGameManager() {}
+	MultiGameManager() { printf("creating static MultiGameManager %p\n", (void*)this); }
+	
+	~MultiGameManager() { printf("DELETING static MultiGameManager %p\n", (void*)this); }
+
 
 	static MultiGameManager gameManager;
 
+
 public:
 
-	std::vector <std::function<std::unique_ptr<PlayerAlgorithm>()>> algos;
+	std::vector <std::function<std::unique_ptr<PlayerAlgorithm>()>> factories;
 
 	static MultiGameManager& getGameManager()
 	{
+		printf("getting static MultiGameManager %p\n",(void*)&gameManager);
 		return gameManager;
 	}
 
