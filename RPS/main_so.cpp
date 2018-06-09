@@ -27,12 +27,10 @@ int main(void)
 
 	printf("finished dlopen v = %p\n", handle);
 
-
-	printf("before algos\n");
-
 	printf("game manager size = %d\n", (int) MultiGameManager::getGameManager().factories.size());
 	
-	
+	printf("before algos\n");
+
 	std::vector <unique_ptr<PlayerAlgorithm>> algos;
 
 	std::vector<unique_ptr<PiecePosition>> vectorToFill;
@@ -43,10 +41,15 @@ int main(void)
 
 
 	algos.clear();
+
 	printf("after algos CLEAR\n");
 
 
+	MultiGameManager::getGameManager().factories.clear();
+	printf("after factories CLEAR\n");
+
 	dlclose(handle);
+
 	printf("finished dlclose\n");
 
 	std::cout << "finishing main" << std::endl;
