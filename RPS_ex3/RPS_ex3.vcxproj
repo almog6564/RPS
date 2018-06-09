@@ -68,18 +68,20 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <RemoteBuildCommandLine>make rps_tournament; make rps_lib</RemoteBuildCommandLine>
-    <RemoteReBuildCommandLine>make rps_tournament; make rps_lib</RemoteReBuildCommandLine>
+    <RemoteBuildCommandLine>make all</RemoteBuildCommandLine>
+    <RemoteReBuildCommandLine>make all</RemoteReBuildCommandLine>
     <RemoteCleanCommandLine>make clean</RemoteCleanCommandLine>
     <BuildCommandLine>
     </BuildCommandLine>
+    <NMakeIncludeSearchPath>C:\boost\boost_1_50_0;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <RemoteBuildCommandLine>make rps_tournament; make rps_lib</RemoteBuildCommandLine>
-    <RemoteReBuildCommandLine>make rps_tournament; make rps_lib</RemoteReBuildCommandLine>
+    <RemoteBuildCommandLine>make all</RemoteBuildCommandLine>
+    <RemoteReBuildCommandLine>make all</RemoteReBuildCommandLine>
     <RemoteCleanCommandLine>make clean</RemoteCleanCommandLine>
     <BuildCommandLine>
     </BuildCommandLine>
+    <NMakeIncludeSearchPath>C:\boost\boost_1_50_0;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="..\RPS\AlgorithmRegistration.cpp" />

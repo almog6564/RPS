@@ -127,4 +127,5 @@ $(SP_FILE): $(LIB_OBJS)
 	$(COMP) $(SO_COMP_FLAG) -Wl,-soname,lib$(SP_FILE) -o $(SP_FILE) RSPPlayer_0.o
 
 rps_lib: $(LIB_OBJS) $(SP_FILE)
-	
+
+all: rps_tournament rps_lib
