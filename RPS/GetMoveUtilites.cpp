@@ -1,23 +1,44 @@
 
 #include "AutoPlayerAlgorithm.h"
+#include <random>
+#include <algorithm>
 
 
 //assumes at least one moving piece exists
-MyPiecePosition AutoPlayerAlgorithm::getNextPieceToMove(void)
+unique_ptr<Move> AutoPlayerAlgorithm::getNextRandomMove(void)
 {
-	++nextPieceToMove;
-	while (true)
-	{
-		if (nextPieceToMove == playerPieces.end())
-			nextPieceToMove = playerPieces.begin();
-		//save iterator of current,iterate until reached current, when reached end return to begin
-		if (nextPieceToMove->isMoving())
-			break;
-		else
-			++nextPieceToMove; //move the pointer to the next iterator
-	}
+	random_device				seed;
+	mt19937						gen(seed());
+	uniform_int_distribution<>	rand_gen(0, (int)playerPieces.size() - 1);
+	int rand;
+	vector<bool> checkList(playerPieces.size(), false);
 
-	return *nextPieceToMove; //return the piece inside the iterator
+	do
+	{
+		rand = rand_gen(gen);
+		//cout << rand << endl;
+		int i = 0;
+		for (auto it = playerPieces.begin();; i++, it++)
+		{
+			if (i == rand)
+			{
+				if (!checkList[i] && it->isMoving())
+				{
+					MyPoint point = (*it).getPosition();
+					unique_ptr<MyMove> nextMove = move(getLegalMove(point));
+					if (nextMove)
+						return nextMove;
+				}
+				checkList[i] = true;
+				break;
+			}
+		}
+		if (all_of(checkList.begin(), checkList.end(), [](bool i) {return i;})) //check if all pieces were checked yet
+		{
+			cout << "Error, did not find a moving piece" << endl;
+			return nullptr; //invalid Move
+		}
+	} while (true);
 }
 
 unique_ptr<Move> AutoPlayerAlgorithm::checkAllAdjecentOpponents(const MyPiecePosition & piece, std::bitset<4>& boolVec, const int x, const int y)
@@ -166,35 +187,18 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 	if (!foundMove)
 	{
 		/*perform random move*/
-		MyPiecePosition nextPieceToMove = getNextPieceToMove();
-		MyPiecePosition firstPieceToMove = nextPieceToMove;
-		do
-		{
-			MyPoint point = nextPieceToMove.getPosition();
-			nextMove = move(getLegalMove(point));
-			if (nextMove)
-				break;
-			nextPieceToMove = getNextPieceToMove();
-			if (nextPieceToMove == firstPieceToMove)
-				return nullptr; //no moves to do
-		} while (true);
+		nextMove = getNextRandomMove();
+		if (!nextMove)
+			return nullptr;
 	}
-
-	if (!nextMove)
-	{
-		dprint("/******in getMove got null******/\n");
-		return nullptr;
-	}
-
-
-	//update player's board
+		//update player's board
 	auto& t = *playerPieces.find(MyPiecePosition(nextMove->getFrom().getX(), nextMove->getFrom().getY()));
 	char type = t.getPiece();
 	char jokerType = t.getJokerRep();
 	playerPieces.erase(t);
 	playerPieces.insert(MyPiecePosition(nextMove->getTo().getX(), nextMove->getTo().getY(), type, jokerType));
 
-	return move(nextMove);
+	return nextMove;
 }
 
 

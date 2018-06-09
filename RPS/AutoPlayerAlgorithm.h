@@ -39,7 +39,6 @@ private:
 	UINT boardRows, boardCols;			//Size of board
 	BoardSet opponentsPieces;			//This set will hold all the known data regarding his opponent's pieces
 	BoardSet playerPieces;				//This set will hold the data regarding player's own pieces
-	BoardSet::iterator nextPieceToMove; //An iterator keeping the next piece to move 
 
 	/* The function positions all the flags on the board and possibly some of the bombs,
 		according to the positioning scenario randomly chosen.
@@ -77,7 +76,7 @@ private:
 	void fillListWithRPSBpieces(std::vector<char>& rpsbVector, int bombUsed);
 
 	/* The function will iterate on playersPieces Set and return the first moving piece it encounters */
-	MyPiecePosition getNextPieceToMove(void);
+	unique_ptr<Move> getNextRandomMove(void);
 
 	/* The function checks if an opponent's piece is present at specific position.
 		@return - True if opponent's piece if found, False otherwise.*/
@@ -279,6 +278,7 @@ public:
 	int getRandomBinary() { return binaryGen(gen); }
 
 	std::mt19937& getRandomGenerator() { return gen; }
+
 };
 
 

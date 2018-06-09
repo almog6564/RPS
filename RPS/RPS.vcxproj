@@ -113,7 +113,12 @@
     <ClCompile Include="BoardPiece.cpp" />
     <ClCompile Include="PlayerContext.cpp" />
     <ClCompile Include="InitalPositionsUtilities.cpp" />
+    <ClCompile Include="RSPPlayer_032700767.cpp" />
+    <ClCompile Include="RSPPlayer_1.cpp" />
+    <ClCompile Include="RSPPlayer_2.cpp" />
     <ClCompile Include="RSPPlayer_204312763.cpp" />
+    <ClCompile Include="RSPPlayer_3.cpp" />
+    <ClCompile Include="RSPPlayer_4.cpp" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -125,6 +130,9 @@
       <CppLanguageStandard>c++1y</CppLanguageStandard>
       <AdditionalOptions>-Wextra -pedantic-errors -DNDEBUG -g %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <AdditionalOptions>-pthread %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

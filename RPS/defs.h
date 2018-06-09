@@ -4,6 +4,7 @@
 
 #include "cstdio"
 #include <memory>
+#include <iostream>
 
 typedef unsigned int UINT;
 
@@ -17,7 +18,7 @@ typedef unsigned int UINT;
 /* Some of the arguments exist only for debug printing, this trick "uses" the argument without actually using it,
 	whilst disabling the warning of unused variable. */
 #define consume(x)	std::ignore = (x)		
-#define dprint(...)
+#define dprint(...) 
 #endif
 /******************************/
 
