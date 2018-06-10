@@ -155,7 +155,7 @@ void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 
 int main(void)
 {
-	int threads_count = 4;
+	int threads_count = 10;
 	int rounds = 30;
 	done = false;
 
