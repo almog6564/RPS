@@ -46,7 +46,7 @@ int getdir(string dir, vector<string>& soFileNames)
 }
 
 
-int main(void)
+int main_so(void)
 {
 	string path = ".";
 

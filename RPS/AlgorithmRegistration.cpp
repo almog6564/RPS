@@ -6,6 +6,7 @@
 
 AlgorithmRegistration::AlgorithmRegistration(std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod) 
 {
+	//printf("Creating AlgorithmRegistration\n");
 	MultiGameManager::getGameManager().registerAlgorithm(factoryMethod);
 }
 

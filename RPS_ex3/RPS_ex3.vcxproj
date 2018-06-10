@@ -104,6 +104,9 @@
     <ClCompile Include="..\RPS\parser.cpp" />
     <ClCompile Include="..\RPS\PlayerContext.cpp" />
     <ClCompile Include="..\RPS\RSPPlayer_0.cpp" />
+    <ClCompile Include="..\RPS\RSPPlayer_1.cpp" />
+    <ClCompile Include="..\RPS\RSPPlayer_2.cpp" />
+    <ClCompile Include="..\RPS\RSPPlayer_3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\RPS\AlgorithmRegistration.h" />

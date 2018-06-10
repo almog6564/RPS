@@ -6,7 +6,7 @@ MultiGameManager MultiGameManager::gameManager;
 
 void MultiGameManager::registerAlgorithm(std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod)
 {
-	auto& facs = MultiGameManager::getGameManager().factories;
+	/*auto& facs = MultiGameManager::getGameManager().factories;
 
 	for (auto& factory : facs)
 	{
@@ -15,6 +15,8 @@ void MultiGameManager::registerAlgorithm(std::function<std::unique_ptr<PlayerAlg
 			printf("Factory \"%s\" already found, not inserting..", typeid(factoryMethod).name());
 			return;
 		}
-	}
+	}*/
+
 	MultiGameManager::getGameManager().factories.push_back(factoryMethod);
+	//printf("Added %s to factories\n", typeid(factoryMethod).name());
 }

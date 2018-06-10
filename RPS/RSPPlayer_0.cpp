@@ -1,19 +1,19 @@
-
-#include "PlayerAlgorithm.h"
 #include "AlgorithmRegistration.h"
+#include "PlayerAlgorithm.h"
 #include "MyJokerChange.h"
 #include "MyPiecePosition.h"
 #include "MyMove.h"
+#include "defs.h"
 #include "parser.h"
 
 #include <algorithm>
-#include <iostream>
-#include <list>
-#include <memory>
 #include <unordered_set>
 #include <random>
 #include <bitset>
+#include <iostream>
+#include <list>
 
+using namespace std;
 
 class PositioningScenario;
 class RandomContext;
@@ -43,7 +43,6 @@ private:
 	UINT boardRows, boardCols;			//Size of board
 	BoardSet opponentsPieces;			//This set will hold all the known data regarding his opponent's pieces
 	BoardSet playerPieces;				//This set will hold the data regarding player's own pieces
-	BoardSet::iterator nextPieceToMove; //An iterator keeping the next piece to move 
 
 										/* The function positions all the flags on the board and possibly some of the bombs,
 										according to the positioning scenario randomly chosen.
@@ -81,7 +80,7 @@ private:
 	void fillListWithRPSBpieces(std::vector<char>& rpsbVector, int bombUsed);
 
 	/* The function will iterate on playersPieces Set and return the first moving piece it encounters */
-	MyPiecePosition getNextPieceToMove(void);
+	unique_ptr<Move> getNextRandomMove(void);
 
 	/* The function checks if an opponent's piece is present at specific position.
 	@return - True if opponent's piece if found, False otherwise.*/
@@ -288,10 +287,15 @@ public:
 	int getRandomBinary() { return binaryGen(gen); }
 
 	std::mt19937& getRandomGenerator() { return gen; }
+
 };
 
 
-using namespace std;
+
+/*	This module contains all the sub-functions implementations of the auto player's initialPositions
+mechanism. Some of the functions are class functions of AutoPlayerAlgorithm, some are used only
+by this module.
+*/
 
 
 
@@ -650,21 +654,40 @@ int RSPPlayer_0::positionFlagsAndBombs(RandomContext& rndCtx,
 
 
 //assumes at least one moving piece exists
-MyPiecePosition RSPPlayer_0::getNextPieceToMove(void)
+unique_ptr<Move> RSPPlayer_0::getNextRandomMove(void)
 {
-	++nextPieceToMove;
-	while (true)
-	{
-		if (nextPieceToMove == playerPieces.end())
-			nextPieceToMove = playerPieces.begin();
-		//save iterator of current,iterate until reached current, when reached end return to begin
-		if (nextPieceToMove->isMoving())
-			break;
-		else
-			++nextPieceToMove; //move the pointer to the next iterator
-	}
+	random_device				seed;
+	mt19937						gen(seed());
+	uniform_int_distribution<>	rand_gen(0, (int)playerPieces.size() - 1);
+	int rand;
+	vector<bool> checkList(playerPieces.size(), false);
 
-	return *nextPieceToMove; //return the piece inside the iterator
+	do
+	{
+		rand = rand_gen(gen);
+		//cout << rand << endl;
+		int i = 0;
+		for (auto it = playerPieces.begin();; i++, it++)
+		{
+			if (i == rand)
+			{
+				if (!checkList[i] && it->isMoving())
+				{
+					MyPoint point = (*it).getPosition();
+					unique_ptr<MyMove> nextMove = move(getLegalMove(point));
+					if (nextMove)
+						return nextMove;
+				}
+				checkList[i] = true;
+				break;
+			}
+		}
+		if (all_of(checkList.begin(), checkList.end(), [](bool i) {return i; })) //check if all pieces were checked yet
+		{
+			cout << "Error, did not find a moving piece" << endl;
+			return nullptr; //invalid Move
+		}
+	} while (true);
 }
 
 unique_ptr<Move> RSPPlayer_0::checkAllAdjecentOpponents(const MyPiecePosition & piece, std::bitset<4>& boolVec, const int x, const int y)
@@ -813,27 +836,10 @@ unique_ptr<Move> RSPPlayer_0::getMove()
 	if (!foundMove)
 	{
 		/*perform random move*/
-		MyPiecePosition nextPieceToMove = getNextPieceToMove();
-		MyPiecePosition firstPieceToMove = nextPieceToMove;
-		do
-		{
-			MyPoint point = nextPieceToMove.getPosition();
-			nextMove = move(getLegalMove(point));
-			if (nextMove)
-				break;
-			nextPieceToMove = getNextPieceToMove();
-			if (nextPieceToMove == firstPieceToMove)
-				return nullptr; //no moves to do
-		} while (true);
+		nextMove = getNextRandomMove();
+		if (!nextMove)
+			return nullptr;
 	}
-
-	if (!nextMove)
-	{
-		dprint("/******in getMove got null******/\n");
-		return nullptr;
-	}
-
-
 	//update player's board
 	auto& t = *playerPieces.find(MyPiecePosition(nextMove->getFrom().getX(), nextMove->getFrom().getY()));
 	char type = t.getPiece();
@@ -841,7 +847,7 @@ unique_ptr<Move> RSPPlayer_0::getMove()
 	playerPieces.erase(t);
 	playerPieces.insert(MyPiecePosition(nextMove->getTo().getX(), nextMove->getTo().getY(), type, jokerType));
 
-	return move(nextMove);
+	return nextMove;
 }
 
 
@@ -1017,12 +1023,14 @@ RSPPlayer_0::RSPPlayer_0(UINT rows, UINT cols, UINT R, UINT P, UINT S, UINT B, U
 
 RSPPlayer_0::~RSPPlayer_0()
 {
-	dprintreg("DELETED RSPPlayer_0\n");
 	delete scenario;
 }
 
 void RSPPlayer_0::getInitialPositions(int player, PieceVector& vectorToFill)
 {
+	//update player's ID
+	ID = player;
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/** Parameters Initialization **/
 	vector<char> rpsbVector;
@@ -1089,7 +1097,6 @@ void RSPPlayer_0::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<
 				opponentsPieces.emplace(j, i);
 		}
 	}
-	nextPieceToMove = playerPieces.begin(); //start with first piece
 
 	for (auto& fightInfo : fights)
 	{
@@ -1115,9 +1122,6 @@ void RSPPlayer_0::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<
 			}
 
 			//in any case, remove player's losing piece
-			if (*playerPieceIter == *nextPieceToMove)
-				++nextPieceToMove;
-
 			if (playerPieces.count(fightPos) > 0)	//could be that the piece is no longer there if it lost another fight
 				playerPieces.erase(playerPieceIter);
 
@@ -1128,9 +1132,6 @@ void RSPPlayer_0::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<
 			//although won, remove player's piece if it's a bomb
 			if (winningType == 'B')
 			{
-				if (*playerPieceIter == *nextPieceToMove)
-					++nextPieceToMove;
-
 				if (playerPieces.count(fightPos) > 0)	//could be that the piece is no longer there if it lost another fight
 					playerPieces.erase(playerPieceIter);
 			}
@@ -1138,9 +1139,6 @@ void RSPPlayer_0::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<
 
 		else //TIE - remove both pieces
 		{
-			if (*playerPieceIter == *nextPieceToMove)
-				++nextPieceToMove;
-
 			if (playerPieces.count(fightPos) > 0)		//could be that the piece is no longer there if it lost another fight
 				playerPieces.erase(playerPieceIter);
 		}
@@ -1183,8 +1181,6 @@ void RSPPlayer_0::notifyFightResult(const FightInfo & fightInfo)
 			opponentsPieces.erase(opponentPieceIter);
 		}
 		//in any case, remove player's losing piece
-		if (*playerPieceIter == *nextPieceToMove)
-			++nextPieceToMove;
 		playerPieces.erase(playerPieceIter);
 	}
 
@@ -1193,8 +1189,6 @@ void RSPPlayer_0::notifyFightResult(const FightInfo & fightInfo)
 		//although won, remove player's piece if it's a bomb
 		if (winningType == 'B')
 		{
-			if (*playerPieceIter == *nextPieceToMove)
-				++nextPieceToMove;
 			playerPieces.erase(playerPieceIter);
 		}
 		//in any case, remove opponent's losing piece
@@ -1204,8 +1198,6 @@ void RSPPlayer_0::notifyFightResult(const FightInfo & fightInfo)
 	else //TIE - remove both pieces
 	{
 		opponentsPieces.erase(opponentPieceIter);
-		if (*playerPieceIter == *nextPieceToMove)
-			++nextPieceToMove;
 		playerPieces.erase(playerPieceIter);
 	}
 }
@@ -1213,6 +1205,7 @@ void RSPPlayer_0::notifyFightResult(const FightInfo & fightInfo)
 unique_ptr<JokerChange> RSPPlayer_0::getJokerChange()
 {
 	unique_ptr<JokerChange> nextJokerChange;
+
 	for (auto& piece : playerPieces)
 	{
 		if (piece.getJokerRep() == '#')
@@ -1227,69 +1220,11 @@ unique_ptr<JokerChange> RSPPlayer_0::getJokerChange()
 			else if (nextJokerChange->getJokerNewRep() == 'B')
 				piece.setMovingPiece(false);
 			piece.setJokerRep(nextJokerChange->getJokerNewRep());
+
 			return nextJokerChange;
 		}
 	}
-
-	/*
-	//get random jokerChange
-	bool firstLoop = true;
-	for (auto piece = nextPieceToMove; *piece != *nextPieceToMove || firstLoop;)
-	{
-	firstLoop = false;
-	if (piece->getJokerRep() == '#')
-	{
-	++piece;
-	if (piece == playerPieces.end())
-	piece = playerPieces.begin();
-	continue;
-	}
-	const MyPoint point = piece->getPosition();
-	int x = point.getX(), y = point.getY();
-	random_device	seed;
-	mt19937			gen(seed());
-	uniform_int_distribution<> genDirection(0, 2);
-	unique_ptr<MyJokerChange> ret = make_unique<MyJokerChange>(x, y, getRandomJokerChahge(genDirection(gen), piece->getJokerRep()));
-	if (piece->getJokerRep() == 'B')
-	piece->setMovingPiece(true);
-	else if (ret->getJokerNewRep() == 'B')
-	piece->setMovingPiece(false);
-	piece->setJokerRep(ret->getJokerNewRep());
-	++piece;
-	if (piece == playerPieces.end())
-	piece = playerPieces.begin();
-	return ret;
-	}
-	*/
 	return nullptr;
 }
 
 REGISTER_ALGORITHM(0)
-
-
-
-/*
-#include "AutoPlayerAlgorithm.h"
-#include "AlgorithmRegistration.h"
-
-
-class RSPPlayer_0 : public AutoPlayerAlgorithm
-{
-public:
-	RSPPlayer_0();
-};
-
-
-RSPPlayer_0::RSPPlayer_0() :
-	AutoPlayerAlgorithm(BOARD_SIZE, BOARD_SIZE, R_COUNT, P_COUNT, S_COUNT, B_COUNT, J_COUNT, F_COUNT, 0)
-{
-	dprintreg("Created a new RSPPlayer_0\n");
-}
-
-extern "C" void myprint(void)
-{
-	printf("In Myprint!!\n");
-}
-
-REGISTER_ALGORITHM(0)
-*/
