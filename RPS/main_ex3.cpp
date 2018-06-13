@@ -11,7 +11,8 @@
 #include <sys/types.h>
 #include <cerrno>
 #include <cstring>
-
+#include <algorithm>
+#include <list>
 
 
 #ifndef _WIN64
@@ -34,9 +35,11 @@ void closedir(void* a) { (void*)a; }
 #endif
 
 
-
 using namespace std;
 
+volatile bool done;
+mutex mx;
+condition_variable tasksAvailable, tasksCompleted;
 
 
 bool ends_with(std::string const & value, std::string const & ending)
@@ -68,9 +71,7 @@ int getdir(string dir, vector<string>& soFileNames)
 	return 0;
 }
 
-volatile bool done;
-mutex mx;
-condition_variable tasksAvailable, tasksCompleted;
+
 
 class TaskPool
 {
@@ -149,9 +150,25 @@ void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 			return;
 		}
 	}
-
-
 }
+
+class AlgorithmFactoryContext
+{
+	PlayerAlgorithmFactory*	pFactory;
+	int						id;
+	int						gamesPlayedCount;
+
+public:
+	AlgorithmFactoryContext(PlayerAlgorithmFactory*	factoryArg, int idArg) :
+		pFactory(factoryArg), id(idArg), gamesPlayedCount(0) {};
+
+	AlgorithmFactoryContext() : pFactory(nullptr), id(-1), gamesPlayedCount(0) {};
+
+	unique_ptr<PlayerAlgorithm> createAlgorithm()		{ return (*pFactory)(); }
+	int getId()											{ return id; }
+	void incrementCounter()								{ gamesPlayedCount++; }
+	int getGamesPlayCount()								{ return gamesPlayedCount; }
+};
 
 int main(void)
 {
@@ -199,19 +216,182 @@ int main(void)
 	/* Start logic														*/
 	/************************************************************************/
 
-	MultiGameManager& gameManager = MultiGameManager::getGameManager();
-	int players_count = (int)gameManager.factories.size();
-	printf("Got %d factories\n", players_count);
+	auto& factories		= MultiGameManager::getGameManager().factories;
+	int	players_count	= (int)factories.size();
+	int randPlayer1, randPlayer2;
+	int ID1, ID2, gameId = 0;
 	vector<thread> threadsPool;
 	vector<atomic<int>> scoreBoard(players_count);
 	TaskPool taskPool;
+	random_device				seed;			//Will be used to obtain a seed for the random number engine
+	mt19937						gen(seed());	//Standard mersenne_twister_engine seeded with seed()
+
+	printf("Got %d factories\n", players_count);
 
 
 	//run threads
 	for (int i = 0; i < threads_count - 1; i++)
 		threadsPool.push_back(thread(run_thread, &taskPool, &scoreBoard));
 
-	//produce tasks for consumers
+	/************************************************************************/
+	/*    Produce Tasks for Consumers										*/
+	/************************************************************************/
+
+
+	list<AlgorithmFactoryContext> algosCtx(0); //this vector needs to be initialized with algos and ID's (0-number of players) (algos will not be needed anymore)
+
+	int genID = 0;
+	for (int factoryIndex = 0; factoryIndex < players_count; factoryIndex++)
+	{
+		algosCtx.emplace_back(&factories[factoryIndex], genID++);
+	}
+
+	vector<AlgorithmFactoryContext> donePlaying(0); //This vector will hold algorithms that reached 30 games to use them for extra needed games
+	donePlaying.reserve(players_count);
+
+	printf("Created algosCtx, donePlaying\n");
+
+	while (!algosCtx.empty()) //loop until no remaining algorithms with less than 30 games played
+	{
+		printf("\n\n\n------------------------------------------\nRound: counters (");
+		for (auto& algo : algosCtx)
+		{
+			printf("%d,", algo.getGamesPlayCount());
+		}
+		printf(")\n");
+
+		//each iteration is kind of Round
+
+		vector<bool> selectionVector(algosCtx.size(), false); //in this round who played
+
+		while (count(selectionVector.cbegin(), selectionVector.cend(), false) > 0 && algosCtx.size() > 0)	// iterate while not all games were played
+		{
+			//create a game and put in produce in each while iteration
+			bitset<5> b(*(selectionVector.begin()._M_p));
+
+			cout << "\n##### Vector = " << b << " #####" << endl;
+			printf("Round: algosCtx.size = %d\n", (int)algosCtx.size());
+
+			if (algosCtx.size() == 1)
+			{
+				randPlayer1 = 0;
+			}
+			else
+			{
+				//randomize first player
+
+				uniform_int_distribution<>	getRandomAlgo(0, algosCtx.size() - 1);		//Distributed random
+				printf("Randomizing p1...\n");
+
+				do
+				{
+					randPlayer1 = getRandomAlgo(gen);
+					printf("%d, ", randPlayer1);
+				} while (selectionVector[randPlayer1]); //while this player already played this round
+			}
+
+			printf("\nrandPlayer1 = %d\n", randPlayer1);
+
+			selectionVector[randPlayer1] = true;
+
+			auto it = algosCtx.begin();
+			advance(it, randPlayer1);
+
+			auto& p1context = *it;
+
+			p1context.incrementCounter();
+
+			unique_ptr<PlayerAlgorithm> p1 = move(p1context.createAlgorithm()); //create player1
+
+			printf("Created p1\n");
+
+
+			if (p1context.getGamesPlayCount() == rounds)
+			{
+				//in this case, remove the algorithm from algorithms, and transfer it to donePlaying vector
+				printf("Removing %d from algosCtx, adding to donePlaying\n", it->getId());
+
+				selectionVector.erase(selectionVector.begin() + randPlayer1);
+				donePlaying.push_back(*it);
+				algosCtx.erase(it);
+
+			}
+
+			ID1 = p1context.getId();
+
+			bitset<5> b2(*(selectionVector.begin()._M_p));
+
+			cout << "##### Vector = " << b2 << " #####" << endl;
+			printf("Round: algosCtx.size = %d\n", (int)algosCtx.size());
+
+			unique_ptr<PlayerAlgorithm> p2;
+
+			if (count(selectionVector.cbegin(), selectionVector.cend(), false) == 0) //only one player remaining - odd number of players
+			{
+				printf("*** ODD NUMBER ***\n");
+
+				//in this case, get a random algorithm from donePlaying vector
+				//make sure not to count their result - can be done using
+				uniform_int_distribution<>	getRandomDonePlayingAlgo(0, donePlaying.size() - 1);		//Distributed random
+
+				randPlayer2 = getRandomDonePlayingAlgo(gen);
+
+
+				p2 = move(donePlaying[randPlayer2].createAlgorithm()); //create player2
+
+				ID2 = -1; //some constant that is defined as: "DO NOT COUNT THIS PLAYERS RESULT IN SCOREBOARD"
+			}
+
+			else
+			{
+				if (algosCtx.size() == 1)
+				{
+					randPlayer2 = 0;
+				}
+				else
+				{
+					//randomize second player
+					uniform_int_distribution<>	getRandomAlgo(0, algosCtx.size() - 1);		//Distributed random
+					printf("Randomizing p2...\n");
+
+					do
+					{
+						randPlayer2 = getRandomAlgo(gen);
+						printf("%d, ", randPlayer2);
+					} while (selectionVector[randPlayer2]); //verify that it is not the same player
+				}
+			}
+			printf("randPlayer2 = %d\n", randPlayer2);
+
+			selectionVector[randPlayer2] = true;
+
+			auto it2 = algosCtx.begin();
+			advance(it2, randPlayer2);
+
+			auto& p2context = *it2;
+
+			p2context.incrementCounter();
+
+			p2 = move(p2context.createAlgorithm()); //create player2
+			ID2 = p2context.getId();
+			printf("Created p2\n");
+
+			if (p2context.getGamesPlayCount() == rounds)
+			{
+				//in this case, remove the algorithm from algorithms, and transfer it to donePlaying vector
+				donePlaying.push_back(*it2);
+				algosCtx.erase(it2);
+			}
+
+			//create game
+			unique_ptr<Game> game = make_unique<Game>(p1, p2, ID1, ID2, gameId++);
+			printf("Game (%d) created: %d - %d\n\n", gameId - 1, ID1, ID2);
+			taskPool.producer(game);
+			tasksAvailable.notify_one();
+		}
+	}
+
+#if 0
 	for (int j = 0; j < rounds; j++)
 	{
 		for (int i = 0; i < players_count; i += 2)
@@ -223,6 +403,9 @@ int main(void)
 			tasksAvailable.notify_one();
 		}
 	}
+#endif
+
+#define addToScore(pid,score)	if(pid>=0) scoreBoard[pid]+=score;
 
 	if (threads_count == 1) //single main thread execution
 	{
@@ -234,13 +417,17 @@ int main(void)
 
 			if (winner == 0) //Tie
 			{
-				scoreBoard[playersGlobalIDs.first]++;
-				scoreBoard[playersGlobalIDs.second]++;
+				addToScore(playersGlobalIDs.first, 1);
+				addToScore(playersGlobalIDs.second, 1);
 			}
 			else if (winner == 1)
-				scoreBoard[playersGlobalIDs.first] += 3;
+			{
+				addToScore(playersGlobalIDs.first, 3);
+			}
 			else
-				scoreBoard[playersGlobalIDs.second] += 3;
+			{
+				addToScore(playersGlobalIDs.second, 3);
+			}
 		}
 	}
 	else //threads_count > 1
@@ -270,6 +457,17 @@ int main(void)
 	{
 		dlclose(so);
 	}
+
+
+	/************************************************************************/
+	/*                                                                      */
+	/************************************************************************/
+
+
+
+
+
+
 
 	return 0;
 }

@@ -8,6 +8,8 @@
 #include <functional>
 #include <memory>
 
+typedef std::function<std::unique_ptr<PlayerAlgorithm>()> PlayerAlgorithmFactory;
+
 class MultiGameManager 
 {
 	MultiGameManager() {}
@@ -20,14 +22,14 @@ class MultiGameManager
 
 public:
 
-	std::vector <std::function<std::unique_ptr<PlayerAlgorithm>()>> factories;
+	std::vector <PlayerAlgorithmFactory> factories;
 
 	static MultiGameManager& getGameManager(void)
 	{
 		return gameManager;
 	}
 
-	void registerAlgorithm(std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod);
+	void registerAlgorithm(PlayerAlgorithmFactory factoryMethod);
 
 	static void clearFactories(void)
 	{
