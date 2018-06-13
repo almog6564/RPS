@@ -267,7 +267,7 @@ int main(void)
 		while (count(selectionVector.cbegin(), selectionVector.cend(), false) > 0 && algosCtx.size() > 0)	// iterate while not all games were played
 		{
 			//create a game and put in produce in each while iteration
-			bitset<5> b(*(selectionVector.begin()._M_p));
+			bitset<5> b(*(selectionVector.begin()._M_p)); //for debug only
 
 			cout << "\n##### Vector = " << b << " #####" << endl;
 			printf("Round: algosCtx.size = %d\n", (int)algosCtx.size());
@@ -319,7 +319,7 @@ int main(void)
 
 			ID1 = p1context.getId();
 
-			bitset<5> b2(*(selectionVector.begin()._M_p));
+			bitset<5> b2(*(selectionVector.begin()._M_p)); //for debug only
 
 			cout << "##### Vector = " << b2 << " #####" << endl;
 			printf("Round: algosCtx.size = %d\n", (int)algosCtx.size());
