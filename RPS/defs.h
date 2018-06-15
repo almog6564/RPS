@@ -9,7 +9,7 @@
 typedef unsigned int UINT;
 
 /***** For debug printing ******/
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG == 1
 #define consume(x)						

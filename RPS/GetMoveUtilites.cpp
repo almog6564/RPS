@@ -35,7 +35,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getNextRandomMove(void)
 		}
 		if (all_of(checkList.begin(), checkList.end(), [](bool i) {return i;})) //check if all pieces were checked yet
 		{
-			cout << "Error, did not find a moving piece" << endl;
+			dprint("Did not find a legal moving piece");
 			return nullptr; //invalid Move
 		}
 	} while (true);

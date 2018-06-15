@@ -245,7 +245,7 @@ int Game::getWinner(eReason* pReason)
 	int winner = 0;
 	eReason reason = INVALID_REASON;
 
-	if (movesCounter >= 10000)
+	if (movesCounter >= 100)
 	{
 		reason = MORE_THAN_100_MOVES;
 	}
@@ -286,7 +286,7 @@ int Game::getWinner(eReason* pReason)
 		else if (player1Context->getTypeCount(FLAG) == 0 && player2Context->getTypeCount(FLAG) > 0)
 			winner = 2;
 
-		printf("BOTH player Got TIE scenario with two different reasons:\n"
+		dprint("BOTH player Got TIE scenario with two different reasons:\n"
 			"\tPlayer #1 reason: %s\n"
 			"\tPlayer #2 reason: %s\n",
 			GetReasonString(player1Context->getReason()).c_str(), GetReasonString(player2Context->getReason()).c_str());
@@ -409,6 +409,7 @@ string Game::GetReasonString(eReason reason)
 		return (string)temp;
 
 	default:
+		cout << "New Invalid eReason code" << endl;
 		return "Invalid eReason code";
 	}
 }
