@@ -99,6 +99,7 @@
     <ClCompile Include="FilePlayerAlgorithm.cpp" />
     <ClCompile Include="GetMoveUtilites.cpp" />
     <ClCompile Include="main_ex3.cpp" />
+    <ClCompile Include="main_so.cpp" />
     <ClCompile Include="MultiGameManager.cpp" />
     <ClCompile Include="myBoard.cpp" />
     <ClCompile Include="game.cpp" />

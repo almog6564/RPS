@@ -1,12 +1,10 @@
 
 #include "MultiGameManager.h"
-
+#include <typeinfo>
 
 MultiGameManager MultiGameManager::gameManager;
 
-
-void MultiGameManager::registerAlgorithm(std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod)
+void MultiGameManager::registerAlgorithm(PlayerAlgorithmFactory factoryMethod)
 {
-	//TODO: should warn if id is already registered
-	algos.push_back(move(factoryMethod));
+	MultiGameManager::getGameManager().factories.push_back(factoryMethod);
 }

@@ -27,7 +27,7 @@ Example usage: addAllToVector(R,'R') - inserts all ROCK pieces to the rpsbVector
 #define addAllToVector(c,cc)	for (UINT i = 0; i < initPieceCnt.c; i++) rpsbVector.push_back(cc);
 
 
-class RSPPlayer_2 : public PlayerAlgorithm
+class RSPPlayer_0 : public PlayerAlgorithm
 {
 private:
 
@@ -133,15 +133,15 @@ private:
 		int &pieceIndex);
 
 public:
-	RSPPlayer_2(UINT boardRows, UINT boardCols,
+	RSPPlayer_0(UINT boardRows, UINT boardCols,
 		UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID);
 
-	~RSPPlayer_2();
-
-	RSPPlayer_2() : RSPPlayer_2(BOARD_SIZE, BOARD_SIZE, R_COUNT, P_COUNT, S_COUNT, B_COUNT, J_COUNT, F_COUNT, 0)
+	RSPPlayer_0() : RSPPlayer_0(BOARD_SIZE, BOARD_SIZE, R_COUNT, P_COUNT, S_COUNT, B_COUNT, J_COUNT, F_COUNT, 0)
 	{
-		dprintreg("Created a new RSPPlayer_2\n");
+		dprintreg("Created a new RSPPlayer_0\n");
 	}
+
+	~RSPPlayer_0();
 
 	/*
 	Places all the pieces of the current player on the auto player's board - used in "playerPieces".
@@ -463,7 +463,7 @@ void positionRestOfMovingPiecesRandomly(const int piecesAlreadyPositioned, Rando
 
 
 
-int RSPPlayer_2::fillCornersWithAlreadyOccupiedCorners(vector<bool>& selectedCorners, BoardSet& boardSet)
+int RSPPlayer_0::fillCornersWithAlreadyOccupiedCorners(vector<bool>& selectedCorners, BoardSet& boardSet)
 {
 	int count = 4;
 
@@ -495,7 +495,7 @@ int RSPPlayer_2::fillCornersWithAlreadyOccupiedCorners(vector<bool>& selectedCor
 	return count;
 }
 
-void RSPPlayer_2::placeMovingPiecesOnCorners(vector<char> &movingPieceVector,
+void RSPPlayer_0::placeMovingPiecesOnCorners(vector<char> &movingPieceVector,
 	const int initialMovingCnt, RandomContext &rndCtx, PieceVector& vectorToFill, BoardSet& boardSet,
 	int &pieceIndex)
 {
@@ -529,7 +529,7 @@ void RSPPlayer_2::placeMovingPiecesOnCorners(vector<char> &movingPieceVector,
 }
 
 
-void RSPPlayer_2::chooseCorner(int select, RandomContext& rndCtx,
+void RSPPlayer_0::chooseCorner(int select, RandomContext& rndCtx,
 	int& cornerX, int& cornerY, int* bomb1X, int* bomb1Y, int* bomb2X, int* bomb2Y)
 {
 
@@ -575,7 +575,7 @@ void RSPPlayer_2::chooseCorner(int select, RandomContext& rndCtx,
 	}
 }
 
-void RSPPlayer_2::fillListWithRPSBpieces(vector<char>& rpsbVector, const int bombsUsed)
+void RSPPlayer_0::fillListWithRPSBpieces(vector<char>& rpsbVector, const int bombsUsed)
 {
 	addAllToVector(R, 'R');
 	addAllToVector(P, 'P');
@@ -585,7 +585,7 @@ void RSPPlayer_2::fillListWithRPSBpieces(vector<char>& rpsbVector, const int bom
 		rpsbVector.push_back('B');
 }
 
-int RSPPlayer_2::positionFlagsAndBombs(RandomContext& rndCtx,
+int RSPPlayer_0::positionFlagsAndBombs(RandomContext& rndCtx,
 	BoardSet& boardSet, PieceVector& vectorToFill)
 {
 	/* Other static variables */
@@ -654,7 +654,7 @@ int RSPPlayer_2::positionFlagsAndBombs(RandomContext& rndCtx,
 
 
 //assumes at least one moving piece exists
-unique_ptr<Move> RSPPlayer_2::getNextRandomMove(void)
+unique_ptr<Move> RSPPlayer_0::getNextRandomMove(void)
 {
 	random_device				seed;
 	mt19937						gen(seed());
@@ -690,7 +690,7 @@ unique_ptr<Move> RSPPlayer_2::getNextRandomMove(void)
 	} while (true);
 }
 
-unique_ptr<Move> RSPPlayer_2::checkAllAdjecentOpponents(const MyPiecePosition & piece, std::bitset<4>& boolVec, const int x, const int y)
+unique_ptr<Move> RSPPlayer_0::checkAllAdjecentOpponents(const MyPiecePosition & piece, std::bitset<4>& boolVec, const int x, const int y)
 {
 	if (checkForAdjecentOpponent(MyPiecePosition(x - 1, y)))
 	{
@@ -724,7 +724,7 @@ unique_ptr<Move> RSPPlayer_2::checkAllAdjecentOpponents(const MyPiecePosition & 
 	return nullptr;
 }
 
-char RSPPlayer_2::getNewJokerRep(const char oldJokerRep)
+char RSPPlayer_0::getNewJokerRep(const char oldJokerRep)
 {
 	char result;
 	switch (oldJokerRep)
@@ -744,7 +744,7 @@ char RSPPlayer_2::getNewJokerRep(const char oldJokerRep)
 	return result;
 }
 
-unique_ptr<JokerChange> RSPPlayer_2::checkAllAdjecentOpponents(const MyPiecePosition & joker, const int x, const int y)
+unique_ptr<JokerChange> RSPPlayer_0::checkAllAdjecentOpponents(const MyPiecePosition & joker, const int x, const int y)
 {
 	bool foundAdjecentOpponent = false;
 	do
@@ -791,14 +791,14 @@ unique_ptr<JokerChange> RSPPlayer_2::checkAllAdjecentOpponents(const MyPiecePosi
 }
 
 //pos will be received as a lvalue reference, and other as rvalue reference
-bool RSPPlayer_2::checkForAdjecentOpponent(const MyPiecePosition other)
+bool RSPPlayer_0::checkForAdjecentOpponent(const MyPiecePosition other)
 {
 	if (opponentsPieces.find(other) != opponentsPieces.end())
 		return true;
 	return false;
 }
 
-unique_ptr<Move> RSPPlayer_2::getMove()
+unique_ptr<Move> RSPPlayer_0::getMove()
 {
 	unique_ptr<Move> nextMove;
 	std::bitset<4> fleeArr(0xF); //[left, right, up, down]
@@ -851,7 +851,7 @@ unique_ptr<Move> RSPPlayer_2::getMove()
 }
 
 
-char RSPPlayer_2::getRandomJokerChahge(int rand, char jokerRep)
+char RSPPlayer_0::getRandomJokerChahge(int rand, char jokerRep)
 {
 	switch (jokerRep)
 	{
@@ -908,7 +908,7 @@ char RSPPlayer_2::getRandomJokerChahge(int rand, char jokerRep)
 	}
 }
 
-unique_ptr<MyMove> RSPPlayer_2::getLegalMove(const MyPoint& point)
+unique_ptr<MyMove> RSPPlayer_0::getLegalMove(const MyPoint& point)
 {
 	std::bitset<4> legalDirections(0xF);
 
@@ -916,12 +916,12 @@ unique_ptr<MyMove> RSPPlayer_2::getLegalMove(const MyPoint& point)
 
 }
 
-bool RSPPlayer_2::existsOnBoardSet(const MyPoint& point)
+bool RSPPlayer_0::existsOnBoardSet(const MyPoint& point)
 {
 	return playerPieces.count(MyPiecePosition(point.getX(), point.getY())) > 0;
 }
 
-void RSPPlayer_2::removeOutOfBoundsDirections(const MyPoint& point, std::bitset<4>& legalFleeDirections)
+void RSPPlayer_0::removeOutOfBoundsDirections(const MyPoint& point, std::bitset<4>& legalFleeDirections)
 {
 	//[left, right, up, down]
 	if (point.getX() == 1)
@@ -961,7 +961,7 @@ const MyPoint getPointByDirection(const MyPoint& point, int direction)
 	return point;
 }
 
-unique_ptr<MyMove> RSPPlayer_2::getLegalMove(const MyPoint& point, bitset<4>& legalFleeDirections)
+unique_ptr<MyMove> RSPPlayer_0::getLegalMove(const MyPoint& point, bitset<4>& legalFleeDirections)
 {
 	vector<int> possibleMoves(0);
 	int chosenDirection = 0;
@@ -1001,7 +1001,7 @@ unique_ptr<MyMove> RSPPlayer_2::getLegalMove(const MyPoint& point, bitset<4>& le
 
 
 
-RSPPlayer_2::RSPPlayer_2(UINT rows, UINT cols, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID) : ID(ID)
+RSPPlayer_0::RSPPlayer_0(UINT rows, UINT cols, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID) : ID(ID)
 {
 	random_device				seed;			//Will be used to obtain a seed for the random number engine
 	mt19937						gen(seed());	//Standard mersenne_twister_engine seeded with seed()
@@ -1021,12 +1021,12 @@ RSPPlayer_2::RSPPlayer_2(UINT rows, UINT cols, UINT R, UINT P, UINT S, UINT B, U
 }
 
 
-RSPPlayer_2::~RSPPlayer_2()
+RSPPlayer_0::~RSPPlayer_0()
 {
 	delete scenario;
 }
 
-void RSPPlayer_2::getInitialPositions(int player, PieceVector& vectorToFill)
+void RSPPlayer_0::getInitialPositions(int player, PieceVector& vectorToFill)
 {
 	//update player's ID
 	ID = player;
@@ -1083,7 +1083,7 @@ void RSPPlayer_2::getInitialPositions(int player, PieceVector& vectorToFill)
 
 }
 
-void RSPPlayer_2::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<FightInfo>>& fights)
+void RSPPlayer_0::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<FightInfo>>& fights)
 {
 	int owner;
 	for (UINT i = 1; i <= boardRows; i++)
@@ -1146,7 +1146,7 @@ void RSPPlayer_2::notifyOnInitialBoard(const Board & b, const vector<unique_ptr<
 }
 
 
-void RSPPlayer_2::notifyOnOpponentMove(const Move & move)
+void RSPPlayer_0::notifyOnOpponentMove(const Move & move)
 {
 	auto& pieceToMove = *opponentsPieces.find(MyPiecePosition(move.getFrom().getX(), move.getFrom().getY()));
 	char type = pieceToMove.getPiece();
@@ -1156,7 +1156,7 @@ void RSPPlayer_2::notifyOnOpponentMove(const Move & move)
 	opponentsPieces.insert(MyPiecePosition(getTo.getX(), getTo.getY(), type, jokerRep));
 }
 
-void RSPPlayer_2::notifyFightResult(const FightInfo & fightInfo)
+void RSPPlayer_0::notifyFightResult(const FightInfo & fightInfo)
 {
 	const MyPoint fightPoint = fightInfo.getPosition();
 	const MyPiecePosition fightPos(fightPoint.getX(), fightPoint.getY());
@@ -1202,7 +1202,7 @@ void RSPPlayer_2::notifyFightResult(const FightInfo & fightInfo)
 	}
 }
 
-unique_ptr<JokerChange> RSPPlayer_2::getJokerChange()
+unique_ptr<JokerChange> RSPPlayer_0::getJokerChange()
 {
 	unique_ptr<JokerChange> nextJokerChange;
 
@@ -1227,4 +1227,4 @@ unique_ptr<JokerChange> RSPPlayer_2::getJokerChange()
 	return nullptr;
 }
 
-REGISTER_ALGORITHM(2)
+REGISTER_ALGORITHM(0)

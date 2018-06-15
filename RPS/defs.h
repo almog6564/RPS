@@ -11,7 +11,7 @@ typedef unsigned int UINT;
 /***** For debug printing ******/
 #define DEBUG 0
 
-#if DEBUG == 1
+#if DEBUG == 0
 #define consume(x)						
 #define dprint(...) printf(__VA_ARGS__)
 #else
@@ -25,7 +25,7 @@ typedef unsigned int UINT;
 /***** For debug printing ******/
 #define NEW_DEBUG 1
 
-#if NEW_DEBUG == 1					
+#if NEW_DEBUG == 1	
 #define dprintreg(...) printf(__VA_ARGS__)
 #else
 #define dprintreg(...)

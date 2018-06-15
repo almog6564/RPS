@@ -6,13 +6,12 @@
 
 AlgorithmRegistration::AlgorithmRegistration(std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod) 
 {
-	//std::cout << "Creating AlgorithmRegistration in ctor from MACRO" << std::endl;
+	//printf("Creating AlgorithmRegistration\n");
 	MultiGameManager::getGameManager().registerAlgorithm(factoryMethod);
 }
 
 AlgorithmRegistration::~AlgorithmRegistration()
 {
-	//std::cout << "DELETING AlgorithmRegistration" << std::endl;
 }
 
 
