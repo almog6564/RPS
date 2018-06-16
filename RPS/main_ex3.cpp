@@ -363,6 +363,7 @@ int main(int argc, char* argv[])
 
 			//printf("Created p1\n");
 
+			ID1 = p1context.getId();
 
 			if (p1context.getGamesPlayCount() == rounds)
 			{
@@ -375,7 +376,7 @@ int main(int argc, char* argv[])
 
 			}
 
-			ID1 = p1context.getId();
+			
 			
 			//printf("\n##### Vector = ");
 			//for (bool b : selectionVector) printf("%d", b);
