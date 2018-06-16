@@ -13,26 +13,10 @@
 #include <cstring>
 #include <algorithm>
 #include <list>
-
-
-#ifndef _WIN64
 #include <dirent.h>
 #include <dlfcn.h>
-#else
-#define RTLD_LAZY 0
-void* dlopen(const char* a, int b) { (void*)a; (void)b; return (void*)a; }
-void dlclose(void* a) { (void*)a; }
-std::string dlerror() { return ""; }
-typedef void DIR;
-void* opendir(const char* a) { return (void*)a; }
-struct dirent
-{
-	const char* d_name;
-};
-struct dirent * readdir(DIR* a) { return (void*)a; }
-void closedir(void* a) { (void*)a; }
+#include <sstream>
 
-#endif
 
 
 using namespace std;
@@ -53,8 +37,9 @@ int getdir(string dir, vector<string>& soFileNames)
 {
 	DIR *dp;
 	struct dirent *dirp;
-	if ((dp = opendir(dir.c_str())) == NULL) {
-		cout << "Error(" << strerror(errno) << ") opening " << dir << endl;
+	if ((dp = opendir(dir.c_str())) == NULL) 
+	{
+		cout << "Error while opening the directory [" << dir << "]: " << strerror(errno) << endl;
 		return -1;
 	}
 
@@ -171,18 +156,95 @@ public:
 	int getGamesPlayCount()								{ return gamesPlayedCount; }
 };
 
-int main(void)
+bool parseCmdLineArgs(int argc, char* argv[], int& threads_count, string& path)
 {
-	int threads_count = 1;
+	string threadsStr = "-threads";
+	string pathStr = "-path";
+	bool ret = false;
+	int temp = -1;
+
+	switch (argc)
+	{
+	case 1:
+		ret = true;
+		break;
+
+	case 3:
+		if (threadsStr == argv[1])
+		{
+			istringstream chk(argv[2]);
+			chk >> temp;
+			if (!chk.fail())
+			{
+				threads_count = temp;
+				ret = true;
+			}
+		}
+		else if (pathStr == argv[1])
+		{
+			path = argv[2];
+			ret = true;
+		}
+		break;
+
+	case 5:
+		if (threadsStr == argv[1])
+		{
+			istringstream chk(argv[2]);
+			chk >> temp;
+			if (!chk.fail())
+			{
+				threads_count = temp;
+
+				if (pathStr == argv[3])
+				{
+					path = argv[4];
+					ret = true;
+				}
+			}
+		}
+		else if (pathStr == argv[1])
+		{
+			path = argv[2];
+			
+			if (threadsStr == argv[3])
+			{
+				istringstream chk(argv[4]);
+				chk >> temp;
+				if (!chk.fail())
+				{
+					threads_count = temp;
+					ret = true;
+				}
+			}
+		}
+
+		break;
+	}
+
+	return ret;
+}
+
+int main(int argc, char* argv[])
+{
+	string path = ".";
+	int threads_count = 4;
 	int rounds = 30;
 	done = false;
 	singleThread = threads_count == 1 ? true : false;
+
+	if (!parseCmdLineArgs(argc, argv, threads_count, path))
+	{
+		cout << "\nUsage: ex3 [-thread_couns <num_threads>] [-path <location_of_algorithms>]\n" << endl;
+		return 1;
+	}
+	
+	cout << "args: threads " << threads_count << " path [" << path << "]" << endl;
 
 	/************************************************************************/
 	/* Get SO Handles														*/
 	/************************************************************************/
 
-	string path = ".";
 
 	vector< pair<string, void*> > soHandles;
 	vector<string> soFileNames;
