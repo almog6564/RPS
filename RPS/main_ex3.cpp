@@ -38,6 +38,7 @@ void closedir(void* a) { (void*)a; }
 using namespace std;
 
 volatile bool done;
+bool singleThread;
 mutex mx;
 condition_variable tasksAvailable, tasksCompleted;
 
@@ -89,7 +90,7 @@ public:
 		unique_lock<mutex> lock(mx);
 
 		//critical section
-		while (taskQueue.empty() && !done)
+		while (taskQueue.empty() && !done && !singleThread)
 		{
 			tasksAvailable.wait(lock);
 		}
@@ -99,8 +100,12 @@ public:
 		taskQueue.pop_front();
 
 		if (taskQueue.empty())
-			tasksCompleted.notify_one();
-
+		{
+			if (singleThread)
+				done = 1;
+			else
+				tasksCompleted.notify_one();
+		}
 		//cout << this_thread::get_id() << endl;  //debug
 		//cout << ret->getGameID() << endl;		//debug
 		return ret;
@@ -115,12 +120,6 @@ public:
 	{
 		return (int)taskQueue.size();
 	}
-
-	deque<unique_ptr<Game>>& getQueue()
-	{
-		return taskQueue;
-	}
-
 };
 
 void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
@@ -172,9 +171,10 @@ public:
 
 int main(void)
 {
-	int threads_count = 10;
+	int threads_count = 1;
 	int rounds = 30;
 	done = false;
+	singleThread = threads_count == 1 ? true : false;
 
 	/************************************************************************/
 	/* Get SO Handles														*/
@@ -389,46 +389,9 @@ int main(void)
 	}
 	printf("Produced all games\n");
 
+	if (singleThread) //single main thread execution
+		run_thread(&taskPool, &scoreBoard);
 
-#if 0
-	for (int j = 0; j < rounds; j++)
-	{
-		for (int i = 0; i < players_count; i += 2)
-		{
-			unique_ptr<PlayerAlgorithm> p1 = move(gameManager.factories[i]());
-			unique_ptr<PlayerAlgorithm> p2 = move(gameManager.factories[i + 1]());
-			unique_ptr<Game> game = make_unique<Game>(p1, p2, i, i + 1, (i / 2) + (players_count / 2)*j);
-			taskPool.producer(game);
-			tasksAvailable.notify_one();
-		}
-	}
-#endif
-
-#define addToScore(pid,score)	if(pid>=0) scoreBoard[pid]+=score;
-
-	if (threads_count == 1) //single main thread execution
-	{
-		for (auto& task : taskPool.getQueue())
-		{
-			int winner;
-			task->run(&winner);
-			pair<int, int> playersGlobalIDs = task->getPlayersGlobalIDs();
-
-			if (winner == 0) //Tie
-			{
-				addToScore(playersGlobalIDs.first, 1);
-				addToScore(playersGlobalIDs.second, 1);
-			}
-			else if (winner == 1)
-			{
-				addToScore(playersGlobalIDs.first, 3);
-			}
-			else
-			{
-				addToScore(playersGlobalIDs.second, 3);
-			}
-		}
-	}
 	else //threads_count > 1
 	{
 		{
