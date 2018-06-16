@@ -221,7 +221,7 @@ int main(void)
 	int randPlayer1, randPlayer2;
 	int ID1, ID2, gameId = 0;
 	vector<thread> threadsPool;
-	vector<atomic<int>> scoreBoard(players_count);
+	vector<atomic<int>> scoreBoard(players_count + 1); //+1 is to collect "garbage" scores of player who already had 30 games
 	TaskPool taskPool;
 	random_device				seed;			//Will be used to obtain a seed for the random number engine
 	mt19937						gen(seed());	//Standard mersenne_twister_engine seeded with seed()
@@ -267,40 +267,31 @@ int main(void)
 		while (count(selectionVector.cbegin(), selectionVector.cend(), false) > 0 && algosCtx.size() > 0)	// iterate while not all games were played
 		{
 			//create a game and put in produce in each while iteration
-			bitset<5> b(*(selectionVector.begin()._M_p)); //for debug only
-
-			cout << "\n##### Vector = " << b << " #####" << endl;
+			printf("\n##### Vector = ");
+			for (bool b : selectionVector) printf("%d", b);
+			printf(" #####\n" );
 			printf("Round: algosCtx.size = %d\n", (int)algosCtx.size());
 
-			if (algosCtx.size() == 1)
-			{
-				randPlayer1 = 0;
-			}
-			else
-			{
-				//randomize first player
+			bool lastPlayerInCurrRound = count(selectionVector.cbegin(), selectionVector.cend(), false) == 1 ? 1 : 0;
+			bool lastRemainingPlayer = algosCtx.size() == 1 ? 1 : 0;
 
-				uniform_int_distribution<>	getRandomAlgo(0, algosCtx.size() - 1);		//Distributed random
-				printf("Randomizing p1...\n");
+			//randomize first player
+			uniform_int_distribution<>	getRandomAlgo(0, algosCtx.size() - 1);		//Distributed random
+			printf("Randomizing p1...\n");
 
-				do
-				{
-					randPlayer1 = getRandomAlgo(gen);
-					printf("%d, ", randPlayer1);
-				} while (selectionVector[randPlayer1]); //while this player already played this round
-			}
+			do
+			{
+				randPlayer1 = getRandomAlgo(gen);
+				printf("%d, ", randPlayer1);
+			} while (selectionVector[randPlayer1]); //while this player already played this round
 
 			printf("\nrandPlayer1 = %d\n", randPlayer1);
 
 			selectionVector[randPlayer1] = true;
-
 			auto it = algosCtx.begin();
 			advance(it, randPlayer1);
-
 			auto& p1context = *it;
-
 			p1context.incrementCounter();
-
 			unique_ptr<PlayerAlgorithm> p1 = move(p1context.createAlgorithm()); //create player1
 
 			printf("Created p1\n");
@@ -318,35 +309,42 @@ int main(void)
 			}
 
 			ID1 = p1context.getId();
-
-			bitset<5> b2(*(selectionVector.begin()._M_p)); //for debug only
-
-			cout << "##### Vector = " << b2 << " #####" << endl;
+			
+			printf("\n##### Vector = ");
+			for (bool b : selectionVector) printf("%d", b);
+			printf(" #####\n");
 			printf("Round: algosCtx.size = %d\n", (int)algosCtx.size());
 
 			unique_ptr<PlayerAlgorithm> p2;
 
-			if (count(selectionVector.cbegin(), selectionVector.cend(), false) == 0) //only one player remaining - odd number of players
+			if (lastRemainingPlayer) //only one player remaining with less than 30 games played
 			{
-				printf("*** ODD NUMBER ***\n");
+				printf("*** lastRemainingPlayer ***\n");
 
 				//in this case, get a random algorithm from donePlaying vector
-				//make sure not to count their result - can be done using
-				uniform_int_distribution<>	getRandomDonePlayingAlgo(0, donePlaying.size() - 1);		//Distributed random
-
+				uniform_int_distribution<>	getRandomDonePlayingAlgo(0, donePlaying.size() - 1);	//Distributed random
 				randPlayer2 = getRandomDonePlayingAlgo(gen);
-
-
 				p2 = move(donePlaying[randPlayer2].createAlgorithm()); //create player2
-
-				ID2 = -1; //some constant that is defined as: "DO NOT COUNT THIS PLAYERS RESULT IN SCOREBOARD"
+				ID2 = players_count; //this will not be counted
 			}
-
 			else
 			{
-				if (algosCtx.size() == 1)
+				if (lastPlayerInCurrRound)
 				{
-					randPlayer2 = 0;
+					//in this case randomize another player from all remaining algorithms
+					uniform_int_distribution<>	getRandomAlgo(0, algosCtx.size() - 1);		//Distributed random
+					printf("*** lastPlayerInCurrRound ***\n");
+
+					do
+					{
+						randPlayer2 = getRandomAlgo(gen);
+						printf("%d, ", randPlayer2);
+
+						auto it = algosCtx.begin();
+						advance(it, randPlayer2);
+						auto& p2context = *it;
+						ID2 = p2context.getId();
+					} while (ID1 == ID2); //loop while this player already played this round
 				}
 				else
 				{
@@ -359,30 +357,29 @@ int main(void)
 						randPlayer2 = getRandomAlgo(gen);
 						printf("%d, ", randPlayer2);
 					} while (selectionVector[randPlayer2]); //verify that it is not the same player
+															//}
+				}
+				printf("randPlayer2 = %d\n", randPlayer2);
+
+				selectionVector[randPlayer2] = true;
+				auto it2 = algosCtx.begin();
+				advance(it2, randPlayer2);
+				auto& p2context = *it2;
+				p2context.incrementCounter();
+				p2 = move(p2context.createAlgorithm()); //create player2
+				ID2 = p2context.getId();
+				printf("Created p2\n");
+
+				if (p2context.getGamesPlayCount() == rounds)
+				{
+					//in this case, remove the algorithm from algorithms, and transfer it to donePlaying vector
+					printf("Removing %d from algosCtx, adding to donePlaying\n", it2->getId());
+					selectionVector.erase(selectionVector.begin() + randPlayer2);
+					donePlaying.push_back(*it2);
+					algosCtx.erase(it2);
 				}
 			}
-			printf("randPlayer2 = %d\n", randPlayer2);
-
-			selectionVector[randPlayer2] = true;
-
-			auto it2 = algosCtx.begin();
-			advance(it2, randPlayer2);
-
-			auto& p2context = *it2;
-
-			p2context.incrementCounter();
-
-			p2 = move(p2context.createAlgorithm()); //create player2
-			ID2 = p2context.getId();
-			printf("Created p2\n");
-
-			if (p2context.getGamesPlayCount() == rounds)
-			{
-				//in this case, remove the algorithm from algorithms, and transfer it to donePlaying vector
-				donePlaying.push_back(*it2);
-				algosCtx.erase(it2);
-			}
-
+			
 			//create game
 			unique_ptr<Game> game = make_unique<Game>(p1, p2, ID1, ID2, gameId++);
 			printf("Game (%d) created: %d - %d\n\n", gameId - 1, ID1, ID2);
@@ -390,6 +387,8 @@ int main(void)
 			tasksAvailable.notify_one();
 		}
 	}
+	printf("Produced all games\n");
+
 
 #if 0
 	for (int j = 0; j < rounds; j++)
@@ -447,9 +446,8 @@ int main(void)
 	for (auto& th : threadsPool)
 		th.join();
 
-	for (int score : scoreBoard)
-		cout << score << endl;
-
+	for (unsigned int i = 0; i < scoreBoard.size() - 1; i++)
+		cout << scoreBoard[i] << endl;
 
 	MultiGameManager::clearFactories();
 

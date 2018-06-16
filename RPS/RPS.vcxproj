@@ -116,7 +116,6 @@
     <ClCompile Include="RSPPlayer_032700767.cpp" />
     <ClCompile Include="RSPPlayer_1.cpp" />
     <ClCompile Include="RSPPlayer_2.cpp" />
-    <ClCompile Include="RSPPlayer_204312763.cpp" />
     <ClCompile Include="RSPPlayer_3.cpp" />
     <ClCompile Include="RSPPlayer_4.cpp" />
   </ItemGroup>
