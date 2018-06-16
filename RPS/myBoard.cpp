@@ -156,17 +156,8 @@ int MyBoard::positionPiece(BoardPiece* newPiece, UINT toX, UINT toY, unique_ptr<
 
 		if (type == BOMB || existingPieceType == BOMB)
 		{
-			if (type != existingPieceType)
-			{
-				fight.reset(new MyFightInfo(toX, toY, p1Piece, p2Piece, type == BOMB ? newPieceOwner->getPlayerId() + 1 : existingPieceOwner->getPlayerId() + 1));
-
-				dprint("Player #%d WINS!\n", type == BOMB ? newPieceOwner->getPlayerId()+1 : existingPieceOwner->getPlayerId()+1);
-			}
-			else
-			{
-				fight.reset(new MyFightInfo(toX, toY, p1Piece, p2Piece, 0));
-				dprint("It's a TIE!\n");
-			}
+			fight.reset(new MyFightInfo(toX, toY, p1Piece, p2Piece, 0));
+			dprint("It's a TIE!\n");
 
 			removePiece(toX, toY);
 			if (moved)

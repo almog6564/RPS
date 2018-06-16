@@ -34,6 +34,9 @@ private:
 		UINT R, P, S, B, J, F;
 	} initPieceCnt;
 
+	random_device	seed;			//Will be used to obtain a seed for the random number engine
+	mt19937			gen;			//Standard mersenne_twister_engine seeded with seed()
+
 
 	PositioningScenario* scenario;		//This member holds the positioning scenario, as described in the class itself
 	UINT boardRows, boardCols;			//Size of board

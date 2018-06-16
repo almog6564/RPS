@@ -7,8 +7,6 @@
 //assumes at least one moving piece exists
 unique_ptr<Move> AutoPlayerAlgorithm::getNextRandomMove(void)
 {
-	random_device				seed;
-	mt19937						gen(seed());
 	uniform_int_distribution<>	rand_gen(0, (int)playerPieces.size() - 1);
 	int rand;
 	vector<bool> checkList(playerPieces.size(), false);
@@ -339,8 +337,6 @@ unique_ptr<MyMove> AutoPlayerAlgorithm::getLegalMove(const MyPoint& point, bitse
 
 	if (possibleMoves.size() > 1)
 	{
-		random_device	seed;
-		mt19937			gen(seed());
 		uniform_int_distribution<> genDirection(0, (int)possibleMoves.size() - 1);
 		chosenDirection = genDirection(gen);
 	}

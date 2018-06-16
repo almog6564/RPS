@@ -7,10 +7,9 @@
 using namespace std;
 
 
-AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID): ID(ID)
+AutoPlayerAlgorithm::AutoPlayerAlgorithm(UINT rows, UINT cols, UINT R, UINT P, UINT S, UINT B, UINT J, UINT F, int ID): 
+	ID(ID), gen(seed())
 {
-	random_device				seed;			//Will be used to obtain a seed for the random number engine
-	mt19937						gen(seed());	//Standard mersenne_twister_engine seeded with seed()
 	uniform_int_distribution<>	dis(0,1);		//Distributed random
 	
 	scenario = new PositioningScenario(dis(gen), dis(gen));
@@ -45,8 +44,6 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, PieceVector& vectorToF
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/* Random Generators Context */
-	random_device				seed;
-	mt19937						gen(seed());
 	uniform_int_distribution<>	binaryGen(0, 1), cornerGen(0, 3),
 		rowNumGen(1, boardRows), colNumGen(1, boardCols);
 	RandomContext rndCtx(gen, colNumGen, rowNumGen, cornerGen, binaryGen);
