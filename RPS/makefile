@@ -96,33 +96,13 @@ clean:
 #-fPIC -rdynamic  -ldl
 SO_COMP_FLAG = -std=c++14 -shared -g 
 EX3_OBJS = $(OBJS) main_ex3.o MultiGameManager.o AlgorithmRegistration.o  
-SP_FILE = RSPPlayer_0.so
+SP_FILE = RSPPlayer_032700767.so
 
 main_ex3.o: main_ex3.cpp MultiGameManager.h defs.h PlayerAlgorithm.h \
  Point.h PiecePosition.h Board.h FightInfo.h Move.h JokerChange.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
-RSPPlayer_0.o: RSPPlayer_0.cpp AlgorithmRegistration.h PlayerAlgorithm.h \
- Point.h PiecePosition.h Board.h FightInfo.h Move.h JokerChange.h \
- MyJokerChange.h defs.h MyPoint.h MyPiecePosition.h MyMove.h parser.h
-	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
-
-RSPPlayer_1.o: RSPPlayer_1.cpp AlgorithmRegistration.h PlayerAlgorithm.h \
- Point.h PiecePosition.h Board.h FightInfo.h Move.h JokerChange.h \
- MyJokerChange.h defs.h MyPoint.h MyPiecePosition.h MyMove.h parser.h
-	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
-
-RSPPlayer_2.o: RSPPlayer_2.cpp AlgorithmRegistration.h PlayerAlgorithm.h \
- Point.h PiecePosition.h Board.h FightInfo.h Move.h JokerChange.h \
- MyJokerChange.h defs.h MyPoint.h MyPiecePosition.h MyMove.h parser.h
-	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
-
-RSPPlayer_3.o: RSPPlayer_3.cpp AlgorithmRegistration.h PlayerAlgorithm.h \
- Point.h PiecePosition.h Board.h FightInfo.h Move.h JokerChange.h \
- MyJokerChange.h defs.h MyPoint.h MyPiecePosition.h MyMove.h parser.h
-	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
-
-RSPPlayer_4.o: RSPPlayer_4.cpp AlgorithmRegistration.h PlayerAlgorithm.h \
+RSPPlayer_032700767.o: RSPPlayer_032700767.cpp AlgorithmRegistration.h PlayerAlgorithm.h \
  Point.h PiecePosition.h Board.h FightInfo.h Move.h JokerChange.h \
  MyJokerChange.h defs.h MyPoint.h MyPiecePosition.h MyMove.h parser.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
@@ -140,26 +120,12 @@ AlgorithmRegistration.o: AlgorithmRegistration.cpp \
 rps_tournament: $(EX3_OBJS) 
 	$(COMP) -rdynamic -pthread -lpthread -o ex3 $(EX3_OBJS) -ldl
 
-LIB_OBJS = RSPPlayer_0.o RSPPlayer_1.o RSPPlayer_2.o RSPPlayer_3.o RSPPlayer_4.o \
- parser.o MyPoint.o MyJokerChange.o MyMove.o \
+LIB_OBJS = RSPPlayer_032700767.o parser.o MyPoint.o MyJokerChange.o MyMove.o \
  MyFightInfo.o MyPiecePosition.o BoardPiece.o myBoard.o PlayerContext.o MultiGameManager.o
 
 
-RSPPlayer_0.so: $(LIB_OBJS)
-	$(COMP) $(SO_COMP_FLAG) -Wl,-soname,lib$@ -o  $@ RSPPlayer_0.o
+RSPPlayer_032700767.so: $(LIB_OBJS)
+	$(COMP) $(SO_COMP_FLAG) -Wl,-soname,lib$@ -o  $@ RSPPlayer_032700767.o
 
-RSPPlayer_1.so: $(LIB_OBJS)
-	$(COMP) $(SO_COMP_FLAG) -Wl,-soname,lib$@ -o  $@ RSPPlayer_1.o
-
-RSPPlayer_2.so: $(LIB_OBJS)
-	$(COMP) $(SO_COMP_FLAG) -Wl,-soname,lib$@ -o  $@ RSPPlayer_2.o
-
-RSPPlayer_3.so: $(LIB_OBJS)
-	$(COMP) $(SO_COMP_FLAG) -Wl,-soname,lib$@ -o  $@ RSPPlayer_3.o
-
-RSPPlayer_4.so: $(LIB_OBJS)
-	$(COMP) $(SO_COMP_FLAG) -Wl,-soname,lib$@ -o  $@ RSPPlayer_4.o
-
-rps_lib: $(LIB_OBJS) RSPPlayer_0.so RSPPlayer_1.so RSPPlayer_2.so RSPPlayer_3.so RSPPlayer_4.so
-
+rps_lib: $(LIB_OBJS) RSPPlayer_032700767.so
 all: rps_tournament rps_lib

@@ -2,7 +2,7 @@
 #include "MultiGameManager.h"
 #include "game.h"
 #include <iostream>
-#include <deque>
+#include <queue>
 #include <mutex>
 #include <condition_variable>	
 #include <thread>
@@ -21,8 +21,9 @@
 
 using namespace std;
 
-volatile bool done;
-bool singleThread;
+/*Global Variables*/
+volatile bool done; // Indicating that all tasks are complete
+bool singleThread; // Indicating that this program runs with a single thread
 mutex mx;
 condition_variable tasksAvailable, tasksCompleted;
 
@@ -50,7 +51,7 @@ int getdir(string dir, vector<string>& soFileNames)
 		if (ends_with(fname, ".so"))
 		{
 			soFileNames.push_back(fname);
-			printf("Found: %s\n", fname.c_str());
+			//printf("Found: %s\n", fname.c_str());
 		}
 	}
 	closedir(dp);
@@ -58,18 +59,24 @@ int getdir(string dir, vector<string>& soFileNames)
 }
 
 
-
+/*
+	The Following class is built in the Consumer-Producer Design Pattern as learned.
+	The main thread is the producer in this case, creating all games (=tasks) to play, and all other threads are the consumers
+	All tasks are gathered in a "Pool", available for all threads to try and take tasks using locks
+*/
 class TaskPool
 {
-	deque<unique_ptr<Game>> taskQueue;
+	queue<unique_ptr<Game>> taskQueue; 
 
 public:
+	/*The producer simply pushes a task into the taskQueue*/
 	void producer(unique_ptr<Game>& task)
 	{
 		lock_guard<mutex> lock(mx);
-		taskQueue.push_back(move(task));
+		taskQueue.push(move(task));
 	}
 
+	/*Consumer will try to get a task from the queue. If the queue seems empty, it will sleep until awaken by producer*/
 	unique_ptr<Game> consumer()
 	{
 		unique_lock<mutex> lock(mx);
@@ -77,22 +84,20 @@ public:
 		//critical section
 		while (taskQueue.empty() && !done && !singleThread)
 		{
-			tasksAvailable.wait(lock);
+			tasksAvailable.wait(lock); //wait until awaken by producer in case of a new task or all tasks are completed
 		}
 		if (done)
 			return nullptr;
 		unique_ptr<Game> ret = move(taskQueue.front()); //take ownership
-		taskQueue.pop_front();
+		taskQueue.pop();
 
 		if (taskQueue.empty())
 		{
 			if (singleThread)
 				done = 1;
 			else
-				tasksCompleted.notify_one();
+				tasksCompleted.notify_one(); //notify the main thread that there are no more tasks availble
 		}
-		//cout << this_thread::get_id() << endl;  //debug
-		//cout << ret->getGameID() << endl;		//debug
 		return ret;
 	}
 
@@ -106,7 +111,15 @@ public:
 		return (int)taskQueue.size();
 	}
 };
+/* END OF TASKPOOL CLASS*/
 
+
+/*
+	The run method of threads. 
+	The threads run "forever", until the done signal is on, signaling that all tasks are completed.
+	In each iteration, get one task to do, and if succeded, release the lock, and execute the game. 
+	At the end of each game, write scores to scoreboard (implemented with atomic integers)
+*/
 void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 {
 	while (!done)
@@ -133,8 +146,6 @@ void run_thread(TaskPool *taskPool, vector<atomic<int>> *scoreBoard)
 			cout << "error: wrong winner value" << endl;
 			return;
 		}
-		//printf("Score id <%d> = <%d>\nScore id <%d> = <%d>\n\n",
-		//	playersGlobalIDs.first, (*scoreBoard)[playersGlobalIDs.first].load(), playersGlobalIDs.second, (*scoreBoard)[playersGlobalIDs.second].load());
 	}
 }
 
@@ -228,16 +239,18 @@ bool parseCmdLineArgs(int argc, char* argv[], int& threads_count, string& path)
 int main(int argc, char* argv[])
 {
 	string path = ".";
-	int threads_count = 4;
-	int rounds = 30;
+	int threads_count = 4; //default
+	int rounds = 30; //maximum games for each player
 	done = false;
-	singleThread = threads_count == 1 ? true : false;
 
 	if (!parseCmdLineArgs(argc, argv, threads_count, path))
 	{
 		cout << "\nUsage: ex3 [-thread_couns <num_threads>] [-path <location_of_algorithms>]\n" << endl;
 		return 1;
 	}
+
+	singleThread = threads_count == 1 ? true : false;
+
 	
 	cout << "args: threads " << threads_count << " path [" << path << "]" << endl;
 
@@ -261,6 +274,13 @@ int main(int argc, char* argv[])
 	if (soCnt == 0)
 	{
 		cout << "Found 0 shared libraries in the path provided, exiting" << endl;
+		return 1;
+	}
+
+	else if (soCnt == 1)
+	{
+		cout << "Found only one shared libraries in the path provided, can't create a tournament, exiting" << endl;
+		return 1;
 	}
 
 	for (auto& soFname : soFileNames)
@@ -272,7 +292,7 @@ int main(int argc, char* argv[])
 			return 0;
 		}
 
-		printf("Adding [%s] handle 0x%p to soHandles\n", soFname.c_str(), handle);
+		//printf("Adding [%s] handle 0x%p to soHandles\n", soFname.c_str(), handle);
 
 		int pos = soFname.find('_');
 
@@ -292,9 +312,6 @@ int main(int argc, char* argv[])
 	TaskPool taskPool;
 	random_device				seed;			//Will be used to obtain a seed for the random number engine
 	mt19937						gen(seed());	//Standard mersenne_twister_engine seeded with seed()
-
-	printf("Got %d factories\n", players_count);
-
 
 	//run threads
 	for (int i = 0; i < threads_count - 1; i++)
@@ -316,17 +333,8 @@ int main(int argc, char* argv[])
 	vector<AlgorithmFactoryContext> donePlaying(0); //This vector will hold algorithms that reached 30 games to use them for extra needed games
 	donePlaying.reserve(players_count);
 
-	//printf("Created algosCtx, donePlaying\n");
-
 	while (!algosCtx.empty()) //loop until no remaining algorithms with less than 30 games played
 	{
-		//printf("\n\n\n------------------------------------------\nRound: counters (");
-		//for (auto& algo : algosCtx)
-		//{
-		//	printf("%d,", algo.getGamesPlayCount());
-		//}
-		//printf(")\n");
-
 		//each iteration is kind of Round
 
 		vector<bool> selectionVector(algosCtx.size(), false); //in this round who played
@@ -334,25 +342,15 @@ int main(int argc, char* argv[])
 		while (count(selectionVector.cbegin(), selectionVector.cend(), false) > 0 && algosCtx.size() > 0)	// iterate while not all games were played
 		{
 			//create a game and put in produce in each while iteration
-			//printf("\n##### Vector = ");
-			//for (bool b : selectionVector) printf("%d", b);
-			//printf(" #####\n" );
-			//printf("Round: algosCtx.size = %d\n", (int)algosCtx.size());
-
 			bool lastPlayerInCurrRound = count(selectionVector.cbegin(), selectionVector.cend(), false) == 1 ? 1 : 0;
 			bool lastRemainingPlayer = algosCtx.size() == 1 ? 1 : 0;
 
 			//randomize first player
 			uniform_int_distribution<>	getRandomAlgo(0, algosCtx.size() - 1);		//Distributed random
-			//printf("Randomizing p1...\n");
-
 			do
 			{
 				randPlayer1 = getRandomAlgo(gen);
-				//printf("%d, ", randPlayer1);
 			} while (selectionVector[randPlayer1]); //while this player already played this round
-
-			//printf("\nrandPlayer1 = %d\n", randPlayer1);
 
 			selectionVector[randPlayer1] = true;
 			auto it = algosCtx.begin();
@@ -361,34 +359,20 @@ int main(int argc, char* argv[])
 			p1context.incrementCounter();
 			unique_ptr<PlayerAlgorithm> p1 = move(p1context.createAlgorithm()); //create player1
 
-			//printf("Created p1\n");
-
 			ID1 = p1context.getId();
 
 			if (p1context.getGamesPlayCount() == rounds)
 			{
 				//in this case, remove the algorithm from algorithms, and transfer it to donePlaying vector
-				//printf("Removing %d from algosCtx, adding to donePlaying\n", it->getId());
-
 				selectionVector.erase(selectionVector.begin() + randPlayer1);
 				donePlaying.push_back(*it);
 				algosCtx.erase(it);
-
 			}
-
-			
-			
-			//printf("\n##### Vector = ");
-			//for (bool b : selectionVector) printf("%d", b);
-			//printf(" #####\n");
-			//printf("Round: algosCtx.size = %d\n", (int)algosCtx.size());
 
 			unique_ptr<PlayerAlgorithm> p2;
 
 			if (lastRemainingPlayer) //only one player remaining with less than 30 games played
 			{
-				//printf("*** lastRemainingPlayer ***\n");
-
 				//in this case, get a random algorithm from donePlaying vector
 				uniform_int_distribution<>	getRandomDonePlayingAlgo(0, donePlaying.size() - 1);	//Distributed random
 				randPlayer2 = getRandomDonePlayingAlgo(gen);
@@ -401,13 +385,9 @@ int main(int argc, char* argv[])
 				{
 					//in this case randomize another player from all remaining algorithms
 					uniform_int_distribution<>	getRandomAlgo(0, algosCtx.size() - 1);		//Distributed random
-					//printf("*** lastPlayerInCurrRound ***\n");
-
 					do
 					{
 						randPlayer2 = getRandomAlgo(gen);
-						//printf("%d, ", randPlayer2);
-
 						auto it = algosCtx.begin();
 						advance(it, randPlayer2);
 						auto& p2context = *it;
@@ -418,17 +398,12 @@ int main(int argc, char* argv[])
 				{
 					//randomize second player
 					uniform_int_distribution<>	getRandomAlgo(0, algosCtx.size() - 1);		//Distributed random
-					//printf("Randomizing p2...\n");
-
 					do
 					{
 						randPlayer2 = getRandomAlgo(gen);
-						//printf("%d, ", randPlayer2);
 					} while (selectionVector[randPlayer2]); //verify that it is not the same player
 															//}
 				}
-				//printf("randPlayer2 = %d\n", randPlayer2);
-
 				selectionVector[randPlayer2] = true;
 				auto it2 = algosCtx.begin();
 				advance(it2, randPlayer2);
@@ -436,12 +411,10 @@ int main(int argc, char* argv[])
 				p2context.incrementCounter();
 				p2 = move(p2context.createAlgorithm()); //create player2
 				ID2 = p2context.getId();
-				//printf("Created p2\n");
 
 				if (p2context.getGamesPlayCount() == rounds)
 				{
 					//in this case, remove the algorithm from algorithms, and transfer it to donePlaying vector
-					//printf("Removing %d from algosCtx, adding to donePlaying\n", it2->getId());
 					selectionVector.erase(selectionVector.begin() + randPlayer2);
 					donePlaying.push_back(*it2);
 					algosCtx.erase(it2);
@@ -450,12 +423,11 @@ int main(int argc, char* argv[])
 			
 			//create game
 			unique_ptr<Game> game = make_unique<Game>(p1, p2, ID1, ID2, gameId++);
-			//printf("Game (%d) created: %d - %d\n\n", gameId - 1, ID1, ID2);
 			taskPool.producer(game);
-			tasksAvailable.notify_one();
+			tasksAvailable.notify_one(); //notify just a single waiting thread, because only one task is added
 		}
 	}
-	printf("Produced all games\n");
+	//printf("Produced all games\n");
 
 	if (singleThread) //single main thread execution
 		run_thread(&taskPool, &scoreBoard);
@@ -470,7 +442,7 @@ int main(int argc, char* argv[])
 			}
 		}
 		done = true;
-		tasksAvailable.notify_all();
+		tasksAvailable.notify_all(); //wake up all sleeping threads to finish their run
 	}
 
 	//join threads
